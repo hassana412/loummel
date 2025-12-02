@@ -13,31 +13,31 @@ const services = [
     icon: Globe,
     title: "Référencement SEO",
     description: "Optimisez la visibilité de votre boutique sur les moteurs de recherche",
-    price: "15 000 FCFA/an",
+    price: "+3 000 FCFA/an",
   },
   {
     icon: Megaphone,
     title: "Publicité Page d'Accueil",
-    description: "Mettez votre boutique en avant sur la page principale de SahelMarket",
-    price: "25 000 FCFA/mois",
+    description: "Mettez votre boutique en avant sur la page principale de Loummel",
+    price: "+2 000 FCFA/mois",
   },
   {
     icon: MessageCircle,
     title: "WhatsApp Business",
     description: "Intégration directe avec WhatsApp pour vos clients",
-    price: "10 000 FCFA/an",
+    price: "+2 000 FCFA/an",
   },
   {
     icon: TrendingUp,
     title: "Pub Réseaux Sociaux",
     description: "Promotion sur TikTok, Facebook et Instagram",
-    price: "À partir de 20 000 FCFA",
+    price: "+3 000 FCFA/an",
   },
   {
     icon: Headphones,
     title: "Accompagnement VIP",
     description: "Support personnalisé et conseils pour développer vos ventes",
-    price: "50 000 FCFA/an",
+    price: "+5 000 FCFA/an",
   },
 ];
 
@@ -83,12 +83,47 @@ const ServicesSection = () => {
             </div>
           ))}
 
-          {/* Subscription CTA */}
-          <div className="bg-gradient-to-br from-accent to-sahel-ochre rounded-xl p-6 flex flex-col justify-center animate-fade-up"
+          {/* Basic Subscription */}
+          <div className="bg-card rounded-xl p-6 border border-border flex flex-col justify-center animate-fade-up"
             style={{ animationDelay: "0.5s" }}
           >
+            <h3 className="font-display font-bold text-foreground text-xl mb-4">
+              Abonnement Base
+            </h3>
+            <ul className="space-y-2 mb-6">
+              <li className="flex items-center gap-2 text-muted-foreground text-sm">
+                <CheckCircle2 className="w-4 h-4 text-primary" />
+                Boutique 3 pages complète
+              </li>
+              <li className="flex items-center gap-2 text-muted-foreground text-sm">
+                <CheckCircle2 className="w-4 h-4 text-primary" />
+                12 produits + 5 services
+              </li>
+              <li className="flex items-center gap-2 text-muted-foreground text-sm">
+                <CheckCircle2 className="w-4 h-4 text-primary" />
+                Page contact personnalisée
+              </li>
+              <li className="flex items-center gap-2 text-muted-foreground text-sm">
+                <CheckCircle2 className="w-4 h-4 text-primary" />
+                Support technique inclus
+              </li>
+            </ul>
+            <div className="mb-4">
+              <span className="text-3xl font-bold text-foreground">5 000</span>
+              <span className="text-muted-foreground"> FCFA/an</span>
+            </div>
+            <Button variant="outline" className="w-full">
+              Commencer
+            </Button>
+          </div>
+
+          {/* VIP Pack */}
+          <div className="bg-gradient-to-br from-accent to-sahel-ochre rounded-xl p-6 flex flex-col justify-center animate-fade-up"
+            style={{ animationDelay: "0.6s" }}
+          >
+            <span className="text-xs font-bold uppercase tracking-wider text-accent-foreground/80 mb-2">Pack Complet</span>
             <h3 className="font-display font-bold text-accent-foreground text-xl mb-4">
-              Abonnement Annuel
+              Pack VIP
             </h3>
             <ul className="space-y-2 mb-6">
               <li className="flex items-center gap-2 text-accent-foreground/90 text-sm">
@@ -97,23 +132,23 @@ const ServicesSection = () => {
               </li>
               <li className="flex items-center gap-2 text-accent-foreground/90 text-sm">
                 <CheckCircle2 className="w-4 h-4" />
-                12 produits + 5 services
+                Référencement SEO inclus
               </li>
               <li className="flex items-center gap-2 text-accent-foreground/90 text-sm">
                 <CheckCircle2 className="w-4 h-4" />
-                Page contact personnalisée
+                Pub Réseaux Sociaux inclus
               </li>
               <li className="flex items-center gap-2 text-accent-foreground/90 text-sm">
                 <CheckCircle2 className="w-4 h-4" />
-                Support technique inclus
+                Accompagnement personnalisé
               </li>
             </ul>
             <div className="mb-4">
-              <span className="text-3xl font-bold text-accent-foreground">35 000</span>
+              <span className="text-3xl font-bold text-accent-foreground">15 000</span>
               <span className="text-accent-foreground/80"> FCFA/an</span>
             </div>
             <Button variant="sahel" className="w-full">
-              Souscrire maintenant
+              Souscrire VIP
             </Button>
           </div>
         </div>

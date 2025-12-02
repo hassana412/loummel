@@ -69,6 +69,7 @@ export default {
           earth: "hsl(var(--sahel-earth))",
           oasis: "hsl(var(--sahel-oasis))",
           sunset: "hsl(var(--sahel-sunset))",
+          sky: "hsl(var(--sahel-sky))",
         },
       },
       borderRadius: {

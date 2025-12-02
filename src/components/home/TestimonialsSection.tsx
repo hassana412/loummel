@@ -6,7 +6,7 @@ const testimonials = [
     name: "Amadou Bouba",
     role: "Artisan Potier",
     location: "Rhumsiki",
-    content: "Grâce à SahelMarket, j'ai pu vendre mes poteries traditionnelles au-delà des frontières du Cameroun. Une vraie révolution pour mon commerce !",
+    content: "Grâce à Loummel, j'ai pu vendre mes poteries traditionnelles au-delà des frontières du Cameroun. Une vraie révolution pour mon commerce !",
     rating: 5,
   },
   {
