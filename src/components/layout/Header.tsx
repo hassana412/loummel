@@ -24,11 +24,11 @@ const Header = () => {
       <div className="bg-sahel-earth text-primary-foreground py-2">
         <div className="container flex items-center justify-between text-sm">
           <span className="hidden md:block">
-            Bienvenue sur SahelMarket - Le marché digital du Nord Cameroun
+            Bienvenue sur Loummel - Le marché digital du Nord Cameroun
           </span>
           <div className="flex items-center gap-4">
             <Link to="/inscription-vendeur" className="hover:text-accent transition-colors">
-              Vendre sur SahelMarket
+              Vendre sur Loummel
             </Link>
             <Link to="/aide" className="hover:text-accent transition-colors">
               Aide
@@ -47,7 +47,7 @@ const Header = () => {
                 <Store className="w-5 h-5 text-primary-foreground" />
               </div>
               <span className="font-display text-xl font-bold text-foreground hidden sm:block">
-                Sahel<span className="text-primary">Market</span>
+                Loum<span className="text-primary">mel</span>
               </span>
             </Link>
 
@@ -112,7 +112,7 @@ const Header = () => {
         </div>
 
         {/* Categories Nav */}
-        <nav className="bg-secondary/50 border-t border-border hidden lg:block">
+        <nav className="bg-sahel-sky border-t border-sahel-sky/60 hidden lg:block">
           <div className="container">
             <ul className="flex items-center gap-1 py-2 overflow-x-auto">
               <li>

@@ -40,7 +40,7 @@ const Footer = () => {
                 <Store className="w-5 h-5 text-primary-foreground" />
               </div>
               <span className="font-display text-xl font-bold">
-                SahelMarket
+                Loummel
               </span>
             </Link>
             <p className="text-primary-foreground/80 text-sm mb-4">
@@ -95,7 +95,7 @@ const Footer = () => {
               </li>
               <li className="flex items-center gap-2">
                 <Mail className="w-4 h-4 shrink-0" />
-                <span>contact@sahelmarket.cm</span>
+                <span>contact@loummel.cm</span>
               </li>
             </ul>
           </div>
@@ -106,7 +106,7 @@ const Footer = () => {
       <div className="border-t border-primary-foreground/20">
         <div className="container py-4">
           <div className="flex flex-col md:flex-row items-center justify-between gap-4 text-sm text-primary-foreground/70">
-            <p>© 2024 SahelMarket. Tous droits réservés.</p>
+            <p>© 2024 Loummel. Tous droits réservés.</p>
             <div className="flex gap-4">
               <Link to="/cgu" className="hover:text-accent transition-colors">CGU</Link>
               <Link to="/rgpd" className="hover:text-accent transition-colors">RGPD</Link>
