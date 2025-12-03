@@ -41,15 +41,19 @@
 
     --radius: 0.75rem;
 
-    /* Sahel Custom Colors */
-    --sahel-terracotta: 20 70% 45%;
-    --sahel-ochre: 35 75% 50%;
-    --sahel-gold: 42 80% 55%;
-    --sahel-sand: 35 35% 88%;
-    --sahel-earth: 25 40% 25%;
-    --sahel-oasis: 160 40% 35%;
-    --sahel-sunset: 15 85% 55%;
-    --sahel-sky: 200 70% 75%;
+    /* Sahel Custom Colors - Softer palette */
+    --sahel-terracotta: 20 55% 58%;
+    --sahel-ochre: 35 60% 62%;
+    --sahel-gold: 42 70% 60%;
+    --sahel-sand: 35 40% 92%;
+    --sahel-earth: 25 30% 35%;
+    --sahel-oasis: 160 35% 45%;
+    --sahel-sunset: 15 70% 65%;
+    --sahel-sky: 200 60% 88%;
+    
+    /* VIP Colors */
+    --vip-gold: 45 90% 55%;
+    --vip-gold-light: 45 85% 75%;
 
     /* Gradients */
     --gradient-hero: linear-gradient(135deg, hsl(20 70% 45% / 0.9), hsl(35 75% 50% / 0.8));
