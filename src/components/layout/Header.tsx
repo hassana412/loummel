@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { Link } from "react-router-dom";
-import { Search, ShoppingCart, Menu, X, User, Store } from "lucide-react";
+import { Search, ShoppingCart, Menu, X, User, Store, Handshake } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 
@@ -73,20 +73,24 @@ const Header = () => {
               <Button variant="ghost" size="icon" className="hidden lg:flex">
                 <User className="w-5 h-5" />
               </Button>
+              <Link to="/devenir-partenaire" className="hidden lg:block">
+                <Button variant="outline" size="sm">
+                  <Handshake className="w-4 h-4 mr-1" />
+                  Devenir Partenaire
+                </Button>
+              </Link>
               <Button variant="ghost" size="icon" className="relative">
                 <ShoppingCart className="w-5 h-5" />
                 <span className="absolute -top-1 -right-1 w-5 h-5 bg-primary text-primary-foreground text-xs rounded-full flex items-center justify-center">
                   0
                 </span>
               </Button>
-              <Button
-                variant="hero"
-                size="sm"
-                className="hidden lg:flex"
-              >
-                <Store className="w-4 h-4 mr-1" />
-                Créer ma Boutique
-              </Button>
+              <Link to="/inscription-vendeur" className="hidden lg:block">
+                <Button variant="hero" size="sm">
+                  <Store className="w-4 h-4 mr-1" />
+                  Créer ma Boutique
+                </Button>
+              </Link>
               <Button
                 variant="ghost"
                 size="icon"
