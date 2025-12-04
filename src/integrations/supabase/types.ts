@@ -14,16 +14,340 @@ export type Database = {
   }
   public: {
     Tables: {
-      [_ in never]: never
+      partners: {
+        Row: {
+          arrondissements: string[] | null
+          base_commission_rate: number | null
+          created_at: string | null
+          current_commission_rate: number | null
+          departments: string[] | null
+          forfait_amount: number | null
+          forfait_end_date: string | null
+          forfait_notes: string | null
+          forfait_start_date: string | null
+          id: string
+          intercommunautaire: boolean | null
+          partnership_type: Database["public"]["Enums"]["partnership_type"]
+          region: string | null
+          shops_recruited: number | null
+          status: Database["public"]["Enums"]["entity_status"] | null
+          total_commission_earned: number | null
+          updated_at: string | null
+          user_id: string
+        }
+        Insert: {
+          arrondissements?: string[] | null
+          base_commission_rate?: number | null
+          created_at?: string | null
+          current_commission_rate?: number | null
+          departments?: string[] | null
+          forfait_amount?: number | null
+          forfait_end_date?: string | null
+          forfait_notes?: string | null
+          forfait_start_date?: string | null
+          id?: string
+          intercommunautaire?: boolean | null
+          partnership_type: Database["public"]["Enums"]["partnership_type"]
+          region?: string | null
+          shops_recruited?: number | null
+          status?: Database["public"]["Enums"]["entity_status"] | null
+          total_commission_earned?: number | null
+          updated_at?: string | null
+          user_id: string
+        }
+        Update: {
+          arrondissements?: string[] | null
+          base_commission_rate?: number | null
+          created_at?: string | null
+          current_commission_rate?: number | null
+          departments?: string[] | null
+          forfait_amount?: number | null
+          forfait_end_date?: string | null
+          forfait_notes?: string | null
+          forfait_start_date?: string | null
+          id?: string
+          intercommunautaire?: boolean | null
+          partnership_type?: Database["public"]["Enums"]["partnership_type"]
+          region?: string | null
+          shops_recruited?: number | null
+          status?: Database["public"]["Enums"]["entity_status"] | null
+          total_commission_earned?: number | null
+          updated_at?: string | null
+          user_id?: string
+        }
+        Relationships: []
+      }
+      products: {
+        Row: {
+          category: string | null
+          created_at: string | null
+          description: string | null
+          id: string
+          image_url: string | null
+          is_promo: boolean | null
+          name: string
+          price: number
+          promo_price: number | null
+          shop_id: string
+          sort_order: number | null
+          updated_at: string | null
+        }
+        Insert: {
+          category?: string | null
+          created_at?: string | null
+          description?: string | null
+          id?: string
+          image_url?: string | null
+          is_promo?: boolean | null
+          name: string
+          price: number
+          promo_price?: number | null
+          shop_id: string
+          sort_order?: number | null
+          updated_at?: string | null
+        }
+        Update: {
+          category?: string | null
+          created_at?: string | null
+          description?: string | null
+          id?: string
+          image_url?: string | null
+          is_promo?: boolean | null
+          name?: string
+          price?: number
+          promo_price?: number | null
+          shop_id?: string
+          sort_order?: number | null
+          updated_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "products_shop_id_fkey"
+            columns: ["shop_id"]
+            isOneToOne: false
+            referencedRelation: "shops"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      profiles: {
+        Row: {
+          avatar_url: string | null
+          created_at: string | null
+          email: string | null
+          full_name: string | null
+          id: string
+          phone: string | null
+          updated_at: string | null
+        }
+        Insert: {
+          avatar_url?: string | null
+          created_at?: string | null
+          email?: string | null
+          full_name?: string | null
+          id: string
+          phone?: string | null
+          updated_at?: string | null
+        }
+        Update: {
+          avatar_url?: string | null
+          created_at?: string | null
+          email?: string | null
+          full_name?: string | null
+          id?: string
+          phone?: string | null
+          updated_at?: string | null
+        }
+        Relationships: []
+      }
+      services: {
+        Row: {
+          created_at: string | null
+          description: string | null
+          duration: string | null
+          id: string
+          name: string
+          price: number
+          shop_id: string
+          sort_order: number | null
+          updated_at: string | null
+        }
+        Insert: {
+          created_at?: string | null
+          description?: string | null
+          duration?: string | null
+          id?: string
+          name: string
+          price: number
+          shop_id: string
+          sort_order?: number | null
+          updated_at?: string | null
+        }
+        Update: {
+          created_at?: string | null
+          description?: string | null
+          duration?: string | null
+          id?: string
+          name?: string
+          price?: number
+          shop_id?: string
+          sort_order?: number | null
+          updated_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "services_shop_id_fkey"
+            columns: ["shop_id"]
+            isOneToOne: false
+            referencedRelation: "shops"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      shops: {
+        Row: {
+          category: string | null
+          city: string | null
+          contact_address: string | null
+          contact_email: string | null
+          contact_phone: string | null
+          contact_whatsapp: string | null
+          created_at: string | null
+          description: string | null
+          has_seo: boolean | null
+          has_social: boolean | null
+          has_whatsapp: boolean | null
+          id: string
+          is_vip: boolean | null
+          logo_url: string | null
+          name: string
+          partner_id: string | null
+          region: string | null
+          slug: string
+          social_facebook: string | null
+          social_instagram: string | null
+          social_tiktok: string | null
+          social_youtube: string | null
+          status: Database["public"]["Enums"]["entity_status"] | null
+          subscription_amount: number | null
+          subscription_expires_at: string | null
+          subscription_type: string | null
+          updated_at: string | null
+          user_id: string
+        }
+        Insert: {
+          category?: string | null
+          city?: string | null
+          contact_address?: string | null
+          contact_email?: string | null
+          contact_phone?: string | null
+          contact_whatsapp?: string | null
+          created_at?: string | null
+          description?: string | null
+          has_seo?: boolean | null
+          has_social?: boolean | null
+          has_whatsapp?: boolean | null
+          id?: string
+          is_vip?: boolean | null
+          logo_url?: string | null
+          name: string
+          partner_id?: string | null
+          region?: string | null
+          slug: string
+          social_facebook?: string | null
+          social_instagram?: string | null
+          social_tiktok?: string | null
+          social_youtube?: string | null
+          status?: Database["public"]["Enums"]["entity_status"] | null
+          subscription_amount?: number | null
+          subscription_expires_at?: string | null
+          subscription_type?: string | null
+          updated_at?: string | null
+          user_id: string
+        }
+        Update: {
+          category?: string | null
+          city?: string | null
+          contact_address?: string | null
+          contact_email?: string | null
+          contact_phone?: string | null
+          contact_whatsapp?: string | null
+          created_at?: string | null
+          description?: string | null
+          has_seo?: boolean | null
+          has_social?: boolean | null
+          has_whatsapp?: boolean | null
+          id?: string
+          is_vip?: boolean | null
+          logo_url?: string | null
+          name?: string
+          partner_id?: string | null
+          region?: string | null
+          slug?: string
+          social_facebook?: string | null
+          social_instagram?: string | null
+          social_tiktok?: string | null
+          social_youtube?: string | null
+          status?: Database["public"]["Enums"]["entity_status"] | null
+          subscription_amount?: number | null
+          subscription_expires_at?: string | null
+          subscription_type?: string | null
+          updated_at?: string | null
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "shops_partner_id_fkey"
+            columns: ["partner_id"]
+            isOneToOne: false
+            referencedRelation: "partners"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      user_roles: {
+        Row: {
+          created_at: string | null
+          id: string
+          role: Database["public"]["Enums"]["app_role"]
+          user_id: string
+        }
+        Insert: {
+          created_at?: string | null
+          id?: string
+          role: Database["public"]["Enums"]["app_role"]
+          user_id: string
+        }
+        Update: {
+          created_at?: string | null
+          id?: string
+          role?: Database["public"]["Enums"]["app_role"]
+          user_id?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
     }
     Functions: {
-      [_ in never]: never
+      has_role: {
+        Args: {
+          _role: Database["public"]["Enums"]["app_role"]
+          _user_id: string
+        }
+        Returns: boolean
+      }
     }
     Enums: {
-      [_ in never]: never
+      app_role: "super_admin" | "partner" | "shop_owner"
+      entity_status:
+        | "pending"
+        | "approved"
+        | "active"
+        | "suspended"
+        | "rejected"
+      partnership_type: "commission" | "forfait"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -150,6 +474,10 @@ export type CompositeTypes<
 
 export const Constants = {
   public: {
-    Enums: {},
+    Enums: {
+      app_role: ["super_admin", "partner", "shop_owner"],
+      entity_status: ["pending", "approved", "active", "suspended", "rejected"],
+      partnership_type: ["commission", "forfait"],
+    },
   },
 } as const
