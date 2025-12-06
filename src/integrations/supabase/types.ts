@@ -14,6 +14,39 @@ export type Database = {
   }
   public: {
     Tables: {
+      notifications: {
+        Row: {
+          created_at: string | null
+          id: string
+          is_read: boolean | null
+          message: string | null
+          related_id: string | null
+          title: string
+          type: string | null
+          user_id: string
+        }
+        Insert: {
+          created_at?: string | null
+          id?: string
+          is_read?: boolean | null
+          message?: string | null
+          related_id?: string | null
+          title: string
+          type?: string | null
+          user_id: string
+        }
+        Update: {
+          created_at?: string | null
+          id?: string
+          is_read?: boolean | null
+          message?: string | null
+          related_id?: string | null
+          title?: string
+          type?: string | null
+          user_id?: string
+        }
+        Relationships: []
+      }
       partners: {
         Row: {
           arrondissements: string[] | null
@@ -206,6 +239,7 @@ export type Database = {
       }
       shops: {
         Row: {
+          affiliate_code: string | null
           category: string | null
           city: string | null
           contact_address: string | null
@@ -236,6 +270,7 @@ export type Database = {
           user_id: string
         }
         Insert: {
+          affiliate_code?: string | null
           category?: string | null
           city?: string | null
           contact_address?: string | null
@@ -266,6 +301,7 @@ export type Database = {
           user_id: string
         }
         Update: {
+          affiliate_code?: string | null
           category?: string | null
           city?: string | null
           contact_address?: string | null

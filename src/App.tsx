@@ -10,6 +10,8 @@ import ProtectedRoute from "@/components/ProtectedRoute";
 import Index from "./pages/Index";
 import NotFound from "./pages/NotFound";
 import Auth from "./pages/Auth";
+import Backoffice from "./pages/Backoffice";
+import Recherche from "./pages/Recherche";
 import InscriptionVendeur from "./pages/InscriptionVendeur";
 import DevenirPartenaire from "./pages/DevenirPartenaire";
 
@@ -37,6 +39,8 @@ const App = () => (
             {/* Public routes */}
             <Route path="/" element={<Index />} />
             <Route path="/auth" element={<Auth />} />
+            <Route path="/backoffice" element={<Backoffice />} />
+            <Route path="/recherche" element={<Recherche />} />
             <Route path="/inscription-vendeur" element={<InscriptionVendeur />} />
             <Route path="/devenir-partenaire" element={<DevenirPartenaire />} />
             
