@@ -9,7 +9,7 @@ import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { toast } from "@/hooks/use-toast";
-import { Loader2, LogIn, UserPlus, Eye, EyeOff } from "lucide-react";
+import { Loader2, LogIn, UserPlus, Eye, EyeOff, ShoppingBag } from "lucide-react";
 import { z } from "zod";
 
 const emailSchema = z.string().email("Email invalide");
@@ -32,6 +32,11 @@ const Auth = () => {
   const [signupEmail, setSignupEmail] = useState("");
   const [signupPassword, setSignupPassword] = useState("");
   const [signupConfirmPassword, setSignupConfirmPassword] = useState("");
+
+  // Quick client signup
+  const [clientName, setClientName] = useState("");
+  const [clientEmail, setClientEmail] = useState("");
+  const [clientPassword, setClientPassword] = useState("");
 
   // Redirect if already logged in
   useEffect(() => {
@@ -148,6 +153,55 @@ const Auth = () => {
     setIsLoading(false);
   };
 
+  const handleQuickClientSignup = async (e: React.FormEvent) => {
+    e.preventDefault();
+    
+    if (!clientName.trim()) {
+      toast({
+        title: "Erreur",
+        description: "Veuillez entrer votre nom",
+        variant: "destructive",
+      });
+      return;
+    }
+    
+    try {
+      emailSchema.parse(clientEmail);
+      passwordSchema.parse(clientPassword);
+    } catch (err) {
+      if (err instanceof z.ZodError) {
+        toast({
+          title: "Erreur de validation",
+          description: err.errors[0].message,
+          variant: "destructive",
+        });
+        return;
+      }
+    }
+    
+    setIsLoading(true);
+    
+    const { error } = await signUp(clientEmail, clientPassword, clientName);
+    
+    if (error) {
+      toast({
+        title: "Erreur d'inscription",
+        description: error.message === "User already registered"
+          ? "Un compte existe déjà avec cet email"
+          : error.message,
+        variant: "destructive",
+      });
+    } else {
+      toast({
+        title: "Compte créé !",
+        description: "Vous pouvez maintenant effectuer vos achats.",
+      });
+      navigate("/");
+    }
+    
+    setIsLoading(false);
+  };
+
   if (loading) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-background">
@@ -170,9 +224,10 @@ const Auth = () => {
           </CardHeader>
           <CardContent>
             <Tabs defaultValue="login" className="w-full">
-              <TabsList className="grid w-full grid-cols-2">
+              <TabsList className="grid w-full grid-cols-3">
                 <TabsTrigger value="login">Connexion</TabsTrigger>
                 <TabsTrigger value="signup">Inscription</TabsTrigger>
+                <TabsTrigger value="client">Client</TabsTrigger>
               </TabsList>
               
               {/* Login Tab */}
@@ -283,6 +338,63 @@ const Auth = () => {
                     Créer mon compte
                   </Button>
                 </form>
+              </TabsContent>
+
+              {/* Quick Client Signup Tab */}
+              <TabsContent value="client">
+                <div className="mt-4">
+                  <div className="text-center mb-4 p-3 bg-primary/5 rounded-lg">
+                    <ShoppingBag className="w-8 h-8 mx-auto text-primary mb-2" />
+                    <p className="text-sm text-muted-foreground">
+                      Créez un compte rapidement pour acheter sur Loummel
+                    </p>
+                  </div>
+                  <form onSubmit={handleQuickClientSignup} className="space-y-4">
+                    <div className="space-y-2">
+                      <Label htmlFor="client-name">Votre nom</Label>
+                      <Input
+                        id="client-name"
+                        value={clientName}
+                        onChange={(e) => setClientName(e.target.value)}
+                        placeholder="Nom complet"
+                        required
+                      />
+                    </div>
+                    
+                    <div className="space-y-2">
+                      <Label htmlFor="client-email">Email</Label>
+                      <Input
+                        id="client-email"
+                        type="email"
+                        value={clientEmail}
+                        onChange={(e) => setClientEmail(e.target.value)}
+                        placeholder="votre@email.com"
+                        required
+                      />
+                    </div>
+                    
+                    <div className="space-y-2">
+                      <Label htmlFor="client-password">Mot de passe</Label>
+                      <Input
+                        id="client-password"
+                        type="password"
+                        value={clientPassword}
+                        onChange={(e) => setClientPassword(e.target.value)}
+                        placeholder="••••••••"
+                        required
+                      />
+                    </div>
+                    
+                    <Button type="submit" variant="hero" className="w-full" disabled={isLoading}>
+                      {isLoading ? (
+                        <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                      ) : (
+                        <ShoppingBag className="w-4 h-4 mr-2" />
+                      )}
+                      Créer mon compte client
+                    </Button>
+                  </form>
+                </div>
               </TabsContent>
             </Tabs>
           </CardContent>

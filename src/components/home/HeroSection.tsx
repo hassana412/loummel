@@ -1,8 +1,23 @@
-import { ArrowRight, Store, Users, ShoppingBag } from "lucide-react";
+import { useState } from "react";
+import { useNavigate, Link } from "react-router-dom";
+import { ArrowRight, Store, Users, ShoppingBag, Search } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
 import heroImage from "@/assets/hero-rhumsiki.jpg";
 
 const HeroSection = () => {
+  const navigate = useNavigate();
+  const [searchQuery, setSearchQuery] = useState("");
+
+  const handleSearch = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (searchQuery.trim()) {
+      navigate(`/recherche?q=${encodeURIComponent(searchQuery.trim())}`);
+    } else {
+      navigate("/recherche");
+    }
+  };
+
   return (
     <section className="relative overflow-hidden">
       {/* Background Image */}
@@ -34,19 +49,43 @@ const HeroSection = () => {
               Rejoignez la communauté de commerçants et artisans du Nord Cameroun.
             </p>
 
+            {/* Search Bar */}
+            <form onSubmit={handleSearch} className="mb-8">
+              <div className="relative max-w-xl">
+                <Input
+                  type="search"
+                  placeholder="Rechercher une boutique, un produit, un service..."
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
+                  className="h-14 pl-5 pr-14 rounded-full border-2 border-primary-foreground/30 bg-primary-foreground/10 backdrop-blur-sm text-primary-foreground placeholder:text-primary-foreground/60 focus:border-accent focus:bg-primary-foreground/20"
+                />
+                <Button
+                  type="submit"
+                  size="icon"
+                  className="absolute right-2 top-1/2 -translate-y-1/2 rounded-full h-10 w-10 bg-accent hover:bg-accent/90"
+                >
+                  <Search className="w-5 h-5" />
+                </Button>
+              </div>
+            </form>
+
             <div className="flex flex-col sm:flex-row gap-4 mb-12">
-              <Button variant="hero" size="xl">
-                <Store className="w-5 h-5 mr-2" />
-                Créer ma Boutique
-                <ArrowRight className="w-5 h-5 ml-2" />
-              </Button>
-              <Button 
-                variant="outline" 
-                size="xl"
-                className="border-primary-foreground/30 text-primary-foreground hover:bg-primary-foreground/10 hover:text-primary-foreground"
-              >
-                Explorer les Boutiques
-              </Button>
+              <Link to="/inscription-vendeur">
+                <Button variant="hero" size="xl">
+                  <Store className="w-5 h-5 mr-2" />
+                  Créer ma Boutique
+                  <ArrowRight className="w-5 h-5 ml-2" />
+                </Button>
+              </Link>
+              <Link to="/recherche">
+                <Button 
+                  variant="outline" 
+                  size="xl"
+                  className="border-primary-foreground/30 text-primary-foreground hover:bg-primary-foreground/10 hover:text-primary-foreground"
+                >
+                  Explorer les Boutiques
+                </Button>
+              </Link>
             </div>
           </div>
 
