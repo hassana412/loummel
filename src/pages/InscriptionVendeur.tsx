@@ -14,9 +14,12 @@ import { toast } from "@/hooks/use-toast";
 import { 
   User, Store, Package, Briefcase, Phone, CreditCard, 
   ArrowRight, ArrowLeft, Check, Plus, Trash2, Crown,
-  Facebook, Instagram, Youtube
+  Facebook, Instagram, Youtube, Copy
 } from "lucide-react";
 import { getAllRegionNames } from "@/data/cameroon-regions";
+import { supabase } from "@/integrations/supabase/client";
+import { useAuth } from "@/contexts/AuthContext";
+import { generateAffiliateCode } from "@/lib/generateAffiliateCode";
 
 const steps = [
   { id: 1, title: "Informations", icon: User },
@@ -34,7 +37,10 @@ const categories = [
 
 const InscriptionVendeur = () => {
   const navigate = useNavigate();
+  const { user } = useAuth();
   const [currentStep, setCurrentStep] = useState(1);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [createdShopCode, setCreatedShopCode] = useState<string | null>(null);
   const regions = getAllRegionNames();
 
   // Form state
@@ -122,12 +128,165 @@ const InscriptionVendeur = () => {
     return total;
   };
 
-  const handleSubmit = () => {
-    toast({
-      title: "Inscription réussie !",
-      description: "Votre boutique sera créée après validation du paiement.",
-    });
-    navigate("/");
+  const generateSlug = (name: string) => {
+    return name
+      .toLowerCase()
+      .normalize("NFD")
+      .replace(/[\u0300-\u036f]/g, "")
+      .replace(/[^a-z0-9]+/g, "-")
+      .replace(/^-+|-+$/g, "");
+  };
+
+  const handleSubmit = async () => {
+    if (!user) {
+      toast({
+        title: "Connexion requise",
+        description: "Veuillez vous connecter pour créer une boutique.",
+        variant: "destructive",
+      });
+      navigate("/auth");
+      return;
+    }
+
+    if (!formData.shopName || !formData.shopCategory || !formData.contactPhone) {
+      toast({
+        title: "Champs requis",
+        description: "Veuillez remplir tous les champs obligatoires.",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    setIsSubmitting(true);
+
+    try {
+      // Generate unique affiliate code
+      const affiliateCode = generateAffiliateCode();
+      const slug = generateSlug(formData.shopName);
+      const isVip = formData.subscriptionType === 'vip';
+
+      // Create shop in database
+      const { data: shopData, error: shopError } = await supabase
+        .from("shops")
+        .insert({
+          user_id: user.id,
+          name: formData.shopName,
+          slug: slug,
+          description: formData.shopDescription,
+          category: formData.shopCategory,
+          region: formData.region,
+          city: formData.city,
+          contact_phone: formData.contactPhone,
+          contact_whatsapp: formData.contactWhatsapp,
+          contact_email: formData.contactEmail || formData.email,
+          contact_address: formData.contactAddress,
+          social_facebook: formData.facebook,
+          social_instagram: formData.instagram,
+          social_tiktok: formData.tiktok,
+          social_youtube: formData.youtube,
+          subscription_type: formData.subscriptionType,
+          subscription_amount: calculateTotal(),
+          subscription_expires_at: new Date(Date.now() + 365 * 24 * 60 * 60 * 1000).toISOString(),
+          is_vip: isVip,
+          has_seo: formData.addSEO || isVip,
+          has_whatsapp: formData.addWhatsapp || isVip,
+          has_social: formData.addSocial || isVip,
+          affiliate_code: affiliateCode,
+          status: "pending",
+        })
+        .select()
+        .single();
+
+      if (shopError) throw shopError;
+
+      // Create products
+      const validProducts = formData.products.filter(p => p.name && p.price);
+      if (validProducts.length > 0) {
+        const { error: productsError } = await supabase
+          .from("products")
+          .insert(
+            validProducts.map((p, index) => ({
+              shop_id: shopData.id,
+              name: p.name,
+              description: p.description,
+              price: parseFloat(p.price),
+              category: p.category || formData.shopCategory,
+              sort_order: index,
+            }))
+          );
+        if (productsError) console.error("Products error:", productsError);
+      }
+
+      // Create services
+      const validServices = formData.services.filter(s => s.name && s.price);
+      if (validServices.length > 0) {
+        const { error: servicesError } = await supabase
+          .from("services")
+          .insert(
+            validServices.map((s, index) => ({
+              shop_id: shopData.id,
+              name: s.name,
+              description: s.description,
+              price: parseFloat(s.price),
+              duration: s.duration,
+              sort_order: index,
+            }))
+          );
+        if (servicesError) console.error("Services error:", servicesError);
+      }
+
+      // Assign shop_owner role if not already assigned
+      const { error: roleError } = await supabase
+        .from("user_roles")
+        .upsert({
+          user_id: user.id,
+          role: "shop_owner",
+        }, { onConflict: "user_id,role" });
+
+      if (roleError) console.error("Role error:", roleError);
+
+      // Create notification for admins
+      const { data: admins } = await supabase
+        .from("user_roles")
+        .select("user_id")
+        .eq("role", "super_admin");
+
+      if (admins && admins.length > 0) {
+        await supabase.from("notifications").insert(
+          admins.map(admin => ({
+            user_id: admin.user_id,
+            title: "Nouvelle boutique créée",
+            message: `La boutique "${formData.shopName}" a été créée et attend validation.`,
+            type: "new_shop",
+            related_id: shopData.id,
+          }))
+        );
+      }
+
+      setCreatedShopCode(affiliateCode);
+      
+      toast({
+        title: "Boutique créée avec succès !",
+        description: `Votre code partenaire : ${affiliateCode}`,
+      });
+
+    } catch (error: any) {
+      console.error("Error creating shop:", error);
+      toast({
+        title: "Erreur",
+        description: error.message || "Une erreur est survenue lors de la création de la boutique.",
+        variant: "destructive",
+      });
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+
+  const copyAffiliateCode = () => {
+    if (createdShopCode) {
+      navigator.clipboard.writeText(createdShopCode);
+      toast({ title: "Code copié !" });
+    }
   };
 
   const nextStep = () => {
@@ -137,6 +296,57 @@ const InscriptionVendeur = () => {
   const prevStep = () => {
     if (currentStep > 1) setCurrentStep(prev => prev - 1);
   };
+
+  // Success screen after creation
+  if (createdShopCode) {
+    return (
+      <div className="min-h-screen flex flex-col bg-background">
+        <Header />
+        <main className="flex-1 py-16">
+          <div className="container max-w-lg text-center">
+            <div className="w-20 h-20 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-6">
+              <Check className="w-10 h-10 text-green-600" />
+            </div>
+            <h1 className="font-display text-3xl font-bold text-foreground mb-4">
+              Boutique créée avec succès !
+            </h1>
+            <p className="text-muted-foreground mb-8">
+              Votre boutique est en cours de validation. Vous recevrez une notification une fois qu'elle sera active.
+            </p>
+            
+            <Card className="mb-8">
+              <CardHeader>
+                <CardTitle className="text-lg">Votre code partenaire</CardTitle>
+                <CardDescription>
+                  Partagez ce code avec un partenaire Loummel pour bénéficier d'un accompagnement
+                </CardDescription>
+              </CardHeader>
+              <CardContent>
+                <div className="flex items-center justify-center gap-3">
+                  <code className="text-3xl font-bold text-primary bg-primary/10 px-6 py-3 rounded-lg">
+                    {createdShopCode}
+                  </code>
+                  <Button variant="outline" size="icon" onClick={copyAffiliateCode}>
+                    <Copy className="w-5 h-5" />
+                  </Button>
+                </div>
+              </CardContent>
+            </Card>
+
+            <div className="flex gap-4 justify-center">
+              <Button variant="outline" onClick={() => navigate("/")}>
+                Retour à l'accueil
+              </Button>
+              <Button onClick={() => navigate("/dashboard/boutique")}>
+                Accéder à mon tableau de bord
+              </Button>
+            </div>
+          </div>
+        </main>
+        <Footer />
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen flex flex-col bg-background">
@@ -152,6 +362,11 @@ const InscriptionVendeur = () => {
             <p className="text-muted-foreground">
               Rejoignez Loummel et vendez vos produits en ligne
             </p>
+            {!user && (
+              <p className="text-destructive text-sm mt-2">
+                ⚠️ Vous devez être connecté pour créer une boutique
+              </p>
+            )}
           </div>
 
           {/* Progress Steps */}
@@ -621,9 +836,19 @@ const InscriptionVendeur = () => {
                     <ArrowRight className="w-4 h-4 ml-2" />
                   </Button>
                 ) : (
-                  <Button variant="hero" onClick={handleSubmit}>
-                    <Check className="w-4 h-4 mr-2" />
-                    Créer ma boutique
+                  <Button 
+                    variant="hero" 
+                    onClick={handleSubmit}
+                    disabled={isSubmitting || !user}
+                  >
+                    {isSubmitting ? (
+                      "Création en cours..."
+                    ) : (
+                      <>
+                        <Check className="w-4 h-4 mr-2" />
+                        Créer ma boutique
+                      </>
+                    )}
                   </Button>
                 )}
               </div>
