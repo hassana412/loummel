@@ -5,13 +5,14 @@ import { supabase } from "@/integrations/supabase/client";
 import Header from "@/components/layout/Header";
 import Footer from "@/components/layout/Footer";
 import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Progress } from "@/components/ui/progress";
 import { toast } from "@/hooks/use-toast";
 import {
   Handshake, Store, TrendingUp, Plus, LogOut,
-  Calendar, DollarSign, Target, Award, Clock
+  Calendar, DollarSign, Target, Award, Clock, Search
 } from "lucide-react";
 
 interface PartnerData {
@@ -43,6 +44,8 @@ const PartenaireDashboard = () => {
   const [partner, setPartner] = useState<PartnerData | null>(null);
   const [shops, setShops] = useState<Shop[]>([]);
   const [loading, setLoading] = useState(true);
+  const [affiliateCode, setAffiliateCode] = useState("");
+  const [isAddingShop, setIsAddingShop] = useState(false);
 
   useEffect(() => {
     if (user) {
@@ -62,7 +65,6 @@ const PartenaireDashboard = () => {
 
     if (partnerError) {
       if (partnerError.code === "PGRST116") {
-        // No partner profile found - redirect to registration
         toast({
           title: "Profil non trouvé",
           description: "Vous devez d'abord vous inscrire comme partenaire.",
@@ -87,6 +89,72 @@ const PartenaireDashboard = () => {
     }
 
     setLoading(false);
+  };
+
+  const handleAddShopByCode = async () => {
+    if (!partner || !affiliateCode.trim()) {
+      toast({ title: "Erreur", description: "Veuillez entrer un code valide", variant: "destructive" });
+      return;
+    }
+
+    if (partner.status !== "approved") {
+      toast({ title: "Non autorisé", description: "Votre compte doit être approuvé", variant: "destructive" });
+      return;
+    }
+
+    setIsAddingShop(true);
+
+    try {
+      // Find shop by affiliate code
+      const { data: shopData, error: shopError } = await supabase
+        .from("shops")
+        .select("*")
+        .eq("affiliate_code", affiliateCode.trim().toUpperCase())
+        .single();
+
+      if (shopError || !shopData) {
+        toast({ title: "Code invalide", description: "Aucune boutique trouvée avec ce code", variant: "destructive" });
+        return;
+      }
+
+      if (shopData.partner_id) {
+        toast({ title: "Déjà affiliée", description: "Cette boutique est déjà affiliée à un partenaire", variant: "destructive" });
+        return;
+      }
+
+      // Update shop with partner_id
+      const { error: updateError } = await supabase
+        .from("shops")
+        .update({ partner_id: partner.id })
+        .eq("id", shopData.id);
+
+      if (updateError) throw updateError;
+
+      // Update partner's shops_recruited count
+      await supabase
+        .from("partners")
+        .update({ shops_recruited: (partner.shops_recruited || 0) + 1 })
+        .eq("id", partner.id);
+
+      // Send notification to shop owner
+      await supabase.from("notifications").insert({
+        user_id: shopData.user_id,
+        title: "Partenaire affilié",
+        message: `Votre boutique "${shopData.name}" a été affiliée à un partenaire Loummel.`,
+        type: "shop_affiliated",
+        related_id: partner.id,
+      });
+
+      toast({ title: "Succès", description: `Boutique "${shopData.name}" ajoutée à votre réseau` });
+      setAffiliateCode("");
+      fetchPartnerData();
+
+    } catch (error: any) {
+      console.error("Error adding shop:", error);
+      toast({ title: "Erreur", description: error.message, variant: "destructive" });
+    } finally {
+      setIsAddingShop(false);
+    }
   };
 
   const handleSignOut = async () => {
@@ -305,31 +373,71 @@ const PartenaireDashboard = () => {
           {/* Actions & Shops List */}
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
             {/* Quick Actions */}
-            <Card>
-              <CardHeader>
-                <CardTitle>Actions Rapides</CardTitle>
-              </CardHeader>
-              <CardContent className="space-y-3">
-                <Link to="/inscription-vendeur" className="block">
-                  <Button className="w-full" variant="hero" disabled={partner.status !== "approved"}>
-                    <Plus className="w-4 h-4 mr-2" />
-                    Créer une boutique client
+            <div className="space-y-6">
+              {/* Add Shop by Code */}
+              <Card className="border-primary/20">
+                <CardHeader>
+                  <CardTitle className="flex items-center gap-2">
+                    <Search className="w-5 h-5 text-primary" />
+                    Ajouter une boutique
+                  </CardTitle>
+                  <CardDescription>
+                    Entrez le code partenaire fourni par le propriétaire
+                  </CardDescription>
+                </CardHeader>
+                <CardContent className="space-y-3">
+                  <Input
+                    placeholder="Ex: LM-A3K9X2"
+                    value={affiliateCode}
+                    onChange={(e) => setAffiliateCode(e.target.value.toUpperCase())}
+                    className="text-center font-mono text-lg"
+                    disabled={partner.status !== "approved"}
+                  />
+                  <Button 
+                    onClick={handleAddShopByCode}
+                    className="w-full"
+                    disabled={partner.status !== "approved" || isAddingShop || !affiliateCode.trim()}
+                  >
+                    {isAddingShop ? "Ajout en cours..." : (
+                      <>
+                        <Plus className="w-4 h-4 mr-2" />
+                        Ajouter à mon réseau
+                      </>
+                    )}
                   </Button>
-                </Link>
-                <p className="text-xs text-muted-foreground text-center">
-                  {partner.status !== "approved" 
-                    ? "Disponible après approbation"
-                    : "Créez une boutique pour un nouveau client"}
-                </p>
-              </CardContent>
-            </Card>
+                  {partner.status !== "approved" && (
+                    <p className="text-xs text-muted-foreground text-center">
+                      Disponible après approbation
+                    </p>
+                  )}
+                </CardContent>
+              </Card>
+
+              {/* Create Shop for Client */}
+              <Card>
+                <CardHeader>
+                  <CardTitle>Créer pour un client</CardTitle>
+                </CardHeader>
+                <CardContent className="space-y-3">
+                  <Link to="/inscription-vendeur" className="block">
+                    <Button className="w-full" variant="outline" disabled={partner.status !== "approved"}>
+                      <Store className="w-4 h-4 mr-2" />
+                      Créer une boutique client
+                    </Button>
+                  </Link>
+                  <p className="text-xs text-muted-foreground text-center">
+                    Créez une boutique au nom d'un client
+                  </p>
+                </CardContent>
+              </Card>
+            </div>
 
             {/* Shops List */}
             <Card className="lg:col-span-2">
               <CardHeader>
                 <CardTitle>Mes Boutiques Recrutées</CardTitle>
                 <CardDescription>
-                  {shops.length} boutique{shops.length > 1 ? "s" : ""} créée{shops.length > 1 ? "s" : ""}
+                  {shops.length} boutique{shops.length > 1 ? "s" : ""} dans votre réseau
                 </CardDescription>
               </CardHeader>
               <CardContent>

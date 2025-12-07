@@ -14,7 +14,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { toast } from "@/hooks/use-toast";
 import {
   Store, Package, Briefcase, Settings, LogOut, Plus,
-  Trash2, Eye, Crown, Clock, Edit
+  Trash2, Eye, Crown, Clock, Copy, Handshake, Phone, Mail, Shield
 } from "lucide-react";
 
 interface ShopData {
@@ -31,6 +31,19 @@ interface ShopData {
   contact_whatsapp: string;
   contact_email: string;
   contact_address: string;
+  affiliate_code: string | null;
+  partner_id: string | null;
+}
+
+interface PartnerInfo {
+  id: string;
+  region: string;
+  user_id: string;
+  profile?: {
+    full_name: string;
+    email: string;
+    phone: string;
+  };
 }
 
 interface Product {
@@ -55,6 +68,7 @@ const BoutiqueDashboard = () => {
   const navigate = useNavigate();
   const { user, signOut } = useAuth();
   const [shop, setShop] = useState<ShopData | null>(null);
+  const [partner, setPartner] = useState<PartnerInfo | null>(null);
   const [products, setProducts] = useState<Product[]>([]);
   const [services, setServices] = useState<Service[]>([]);
   const [loading, setLoading] = useState(true);
@@ -68,6 +82,13 @@ const BoutiqueDashboard = () => {
   const [newService, setNewService] = useState({
     name: "", description: "", price: "", duration: ""
   });
+
+  // Support contact
+  const supportContact = {
+    email: "support@loummel.com",
+    phone: "+237 6XX XXX XXX",
+    whatsapp: "+237 6XX XXX XXX"
+  };
 
   useEffect(() => {
     if (user) {
@@ -98,6 +119,29 @@ const BoutiqueDashboard = () => {
     }
 
     setShop(shopData);
+
+    // Fetch partner info if shop has a partner
+    if (shopData.partner_id) {
+      const { data: partnerData } = await supabase
+        .from("partners")
+        .select("id, region, user_id")
+        .eq("id", shopData.partner_id)
+        .single();
+
+      if (partnerData) {
+        // Fetch partner's profile
+        const { data: profileData } = await supabase
+          .from("profiles")
+          .select("full_name, email, phone")
+          .eq("id", partnerData.user_id)
+          .single();
+
+        setPartner({
+          ...partnerData,
+          profile: profileData || undefined
+        });
+      }
+    }
 
     // Fetch products
     const { data: productsData } = await supabase
@@ -131,6 +175,13 @@ const BoutiqueDashboard = () => {
 
   const formatCurrency = (amount: number) => {
     return new Intl.NumberFormat("fr-FR").format(amount) + " FCFA";
+  };
+
+  const copyAffiliateCode = () => {
+    if (shop?.affiliate_code) {
+      navigator.clipboard.writeText(shop.affiliate_code);
+      toast({ title: "Code copié !" });
+    }
   };
 
   const addProduct = async () => {
@@ -286,6 +337,97 @@ const BoutiqueDashboard = () => {
               </CardContent>
             </Card>
           )}
+
+          {/* Affiliate Code Card */}
+          <Card className="mb-8 border-primary/20 bg-primary/5">
+            <CardContent className="pt-6">
+              <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
+                <div>
+                  <p className="text-sm font-medium text-muted-foreground mb-1">Votre code partenaire</p>
+                  <div className="flex items-center gap-3">
+                    <code className="text-2xl font-bold text-primary bg-background px-4 py-2 rounded-lg">
+                      {shop.affiliate_code || "Non généré"}
+                    </code>
+                    {shop.affiliate_code && (
+                      <Button variant="outline" size="icon" onClick={copyAffiliateCode}>
+                        <Copy className="w-4 h-4" />
+                      </Button>
+                    )}
+                  </div>
+                  <p className="text-xs text-muted-foreground mt-2">
+                    Partagez ce code avec un partenaire pour être affilié
+                  </p>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+
+          {/* Partner & Support Cards */}
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-8">
+            {/* Partner Info */}
+            <Card className={partner ? "border-blue-200 bg-blue-50" : "border-dashed"}>
+              <CardHeader className="pb-3">
+                <CardTitle className="text-lg flex items-center gap-2">
+                  <Handshake className="w-5 h-5 text-blue-600" />
+                  Mon Partenaire
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                {partner ? (
+                  <div className="space-y-2">
+                    <p className="font-semibold">{partner.profile?.full_name || "Partenaire"}</p>
+                    <p className="text-sm text-muted-foreground">Région: {partner.region}</p>
+                    {partner.profile?.email && (
+                      <p className="text-sm flex items-center gap-2">
+                        <Mail className="w-4 h-4" />
+                        {partner.profile.email}
+                      </p>
+                    )}
+                    {partner.profile?.phone && (
+                      <p className="text-sm flex items-center gap-2">
+                        <Phone className="w-4 h-4" />
+                        {partner.profile.phone}
+                      </p>
+                    )}
+                  </div>
+                ) : (
+                  <p className="text-sm text-muted-foreground">
+                    Aucun partenaire affilié. Partagez votre code pour être accompagné.
+                  </p>
+                )}
+              </CardContent>
+            </Card>
+
+            {/* Support Contact */}
+            <Card className="border-green-200 bg-green-50">
+              <CardHeader className="pb-3">
+                <CardTitle className="text-lg flex items-center gap-2">
+                  <Shield className="w-5 h-5 text-green-600" />
+                  Support Technique
+                </CardTitle>
+              </CardHeader>
+              <CardContent className="space-y-2">
+                <p className="text-sm flex items-center gap-2">
+                  <Mail className="w-4 h-4" />
+                  {supportContact.email}
+                </p>
+                <p className="text-sm flex items-center gap-2">
+                  <Phone className="w-4 h-4" />
+                  {supportContact.phone}
+                </p>
+                <a 
+                  href={`https://wa.me/${supportContact.whatsapp.replace(/\s/g, "").replace("+", "")}`}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="inline-block mt-2"
+                >
+                  <Button size="sm" variant="outline" className="text-green-600 border-green-600">
+                    Contacter via WhatsApp
+                  </Button>
+                </a>
+              </CardContent>
+            </Card>
+          </div>
 
           {/* Stats */}
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
@@ -494,29 +636,32 @@ const BoutiqueDashboard = () => {
               <Card>
                 <CardHeader>
                   <CardTitle>Informations de la boutique</CardTitle>
+                  <CardDescription>
+                    Vos coordonnées de contact
+                  </CardDescription>
                 </CardHeader>
                 <CardContent className="space-y-4">
                   <div className="grid gap-4 md:grid-cols-2">
                     <div>
-                      <Label>Téléphone</Label>
-                      <p className="text-muted-foreground">{shop.contact_phone || "Non renseigné"}</p>
+                      <Label className="text-muted-foreground">Téléphone</Label>
+                      <p className="font-medium">{shop.contact_phone || "-"}</p>
                     </div>
                     <div>
-                      <Label>WhatsApp</Label>
-                      <p className="text-muted-foreground">{shop.contact_whatsapp || "Non renseigné"}</p>
+                      <Label className="text-muted-foreground">WhatsApp</Label>
+                      <p className="font-medium">{shop.contact_whatsapp || "-"}</p>
                     </div>
                     <div>
-                      <Label>Email</Label>
-                      <p className="text-muted-foreground">{shop.contact_email || "Non renseigné"}</p>
+                      <Label className="text-muted-foreground">Email</Label>
+                      <p className="font-medium">{shop.contact_email || "-"}</p>
                     </div>
                     <div>
-                      <Label>Adresse</Label>
-                      <p className="text-muted-foreground">{shop.contact_address || "Non renseigné"}</p>
+                      <Label className="text-muted-foreground">Adresse</Label>
+                      <p className="font-medium">{shop.contact_address || "-"}</p>
                     </div>
                   </div>
-                  <div>
-                    <Label>Description</Label>
-                    <p className="text-muted-foreground">{shop.description || "Non renseigné"}</p>
+                  <div className="pt-4 border-t">
+                    <Label className="text-muted-foreground">Description</Label>
+                    <p className="mt-1">{shop.description || "-"}</p>
                   </div>
                 </CardContent>
               </Card>
