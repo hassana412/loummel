@@ -111,6 +111,7 @@ const Footer = () => {
               <Link to="/cgu" className="hover:text-accent transition-colors">CGU</Link>
               <Link to="/rgpd" className="hover:text-accent transition-colors">RGPD</Link>
               <Link to="/mentions-legales" className="hover:text-accent transition-colors">Mentions légales</Link>
+              <Link to="/backoffice" className="hover:text-accent transition-colors">Panel</Link>
             </div>
           </div>
         </div>

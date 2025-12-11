@@ -7,14 +7,14 @@ import Footer from "@/components/layout/Footer";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
-import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { toast } from "@/hooks/use-toast";
 import {
   Store, Package, Briefcase, Settings, LogOut, Plus,
-  Trash2, Eye, Crown, Clock, Copy, Handshake, Phone, Mail, Shield
+  Trash2, Eye, Crown, Clock, Copy, Handshake, Phone, Mail, Shield,
+  TrendingUp, AlertTriangle, Users, FileText, BarChart3, ShoppingCart
 } from "lucide-react";
 
 interface ShopData {
@@ -64,6 +64,46 @@ interface Service {
   duration: string;
 }
 
+// Demo data for stats, clients, invoices
+const demoStats = {
+  totalSold: 47,
+  inStock: 7,
+  outOfStock: 0,
+  totalVisits: 1234,
+  monthlyRevenue: 856000,
+};
+
+const demoClients = [
+  { id: "1", name: "Amadou Bello", email: "amadou@gmail.com", phone: "+237 677 111 222", orders: 5, totalSpent: 125000 },
+  { id: "2", name: "Fatima Yaya", email: "fatima@gmail.com", phone: "+237 699 333 444", orders: 3, totalSpent: 85000 },
+  { id: "3", name: "Ibrahim Moussa", email: "ibrahim@gmail.com", phone: "+237 655 555 666", orders: 8, totalSpent: 245000 },
+  { id: "4", name: "Aissatou Diallo", email: "aissatou@gmail.com", phone: "+237 677 777 888", orders: 2, totalSpent: 55000 },
+  { id: "5", name: "Oumarou Saidou", email: "oumarou@gmail.com", phone: "+237 699 999 000", orders: 4, totalSpent: 156000 },
+];
+
+const demoInvoices = [
+  { id: "INV-001", client: "Amadou Bello", date: "2024-12-10", amount: 35000, status: "paid" },
+  { id: "INV-002", client: "Fatima Yaya", date: "2024-12-09", amount: 28000, status: "paid" },
+  { id: "INV-003", client: "Ibrahim Moussa", date: "2024-12-08", amount: 75000, status: "pending" },
+  { id: "INV-004", client: "Aissatou Diallo", date: "2024-12-07", amount: 18000, status: "paid" },
+  { id: "INV-005", client: "Oumarou Saidou", date: "2024-12-05", amount: 45000, status: "paid" },
+];
+
+const demoTopProducts = [
+  { name: "Collier Fulani traditionnel", views: 456, sold: 12 },
+  { name: "Bracelet en cuivre gravé", views: 389, sold: 15 },
+  { name: "Boubou brodé premium", views: 312, sold: 8 },
+  { name: "Poterie Rhumsiki", views: 278, sold: 6 },
+  { name: "Sac en cuir tressé", views: 234, sold: 6 },
+];
+
+// Support contact
+const supportContact = {
+  email: "support@loummel.com",
+  phone: "+237 6XX XXX XXX",
+  whatsapp: "2376XXXXXXXX"
+};
+
 const BoutiqueDashboard = () => {
   const navigate = useNavigate();
   const { user, signOut } = useAuth();
@@ -83,13 +123,6 @@ const BoutiqueDashboard = () => {
     name: "", description: "", price: "", duration: ""
   });
 
-  // Support contact
-  const supportContact = {
-    email: "support@loummel.com",
-    phone: "+237 6XX XXX XXX",
-    whatsapp: "+237 6XX XXX XXX"
-  };
-
   useEffect(() => {
     if (user) {
       fetchShopData();
@@ -99,21 +132,18 @@ const BoutiqueDashboard = () => {
   const fetchShopData = async () => {
     if (!user) return;
 
-    // Fetch shop info
     const { data: shopData, error: shopError } = await supabase
       .from("shops")
       .select("*")
       .eq("user_id", user.id)
-      .single();
+      .maybeSingle();
 
-    if (shopError) {
-      if (shopError.code === "PGRST116") {
-        toast({
-          title: "Boutique non trouvée",
-          description: "Vous devez d'abord créer une boutique.",
-        });
-        navigate("/inscription-vendeur");
-      }
+    if (shopError || !shopData) {
+      toast({
+        title: "Boutique non trouvée",
+        description: "Vous devez d'abord créer une boutique.",
+      });
+      navigate("/inscription-vendeur");
       setLoading(false);
       return;
     }
@@ -126,15 +156,14 @@ const BoutiqueDashboard = () => {
         .from("partners")
         .select("id, region, user_id")
         .eq("id", shopData.partner_id)
-        .single();
+        .maybeSingle();
 
       if (partnerData) {
-        // Fetch partner's profile
         const { data: profileData } = await supabase
           .from("profiles")
           .select("full_name, email, phone")
           .eq("id", partnerData.user_id)
-          .single();
+          .maybeSingle();
 
         setPartner({
           ...partnerData,
@@ -416,7 +445,7 @@ const BoutiqueDashboard = () => {
                   {supportContact.phone}
                 </p>
                 <a 
-                  href={`https://wa.me/${supportContact.whatsapp.replace(/\s/g, "").replace("+", "")}`}
+                  href={`https://wa.me/${supportContact.whatsapp}`}
                   target="_blank"
                   rel="noopener noreferrer"
                   className="inline-block mt-2"
@@ -429,47 +458,127 @@ const BoutiqueDashboard = () => {
             </Card>
           </div>
 
-          {/* Stats */}
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
+          {/* Stats Overview */}
+          <div className="grid grid-cols-2 md:grid-cols-5 gap-4 mb-8">
             <Card>
               <CardContent className="pt-6 text-center">
-                <Package className="w-8 h-8 text-primary mx-auto mb-2" />
-                <p className="text-2xl font-bold">{products.length}/12</p>
-                <p className="text-xs text-muted-foreground">Produits</p>
+                <ShoppingCart className="w-8 h-8 text-green-500 mx-auto mb-2" />
+                <p className="text-2xl font-bold">{demoStats.totalSold}</p>
+                <p className="text-xs text-muted-foreground">Vendus</p>
               </CardContent>
             </Card>
             <Card>
               <CardContent className="pt-6 text-center">
-                <Briefcase className="w-8 h-8 text-blue-500 mx-auto mb-2" />
-                <p className="text-2xl font-bold">{services.length}/5</p>
-                <p className="text-xs text-muted-foreground">Services</p>
+                <Package className="w-8 h-8 text-blue-500 mx-auto mb-2" />
+                <p className="text-2xl font-bold">{products.length || demoStats.inStock}</p>
+                <p className="text-xs text-muted-foreground">En stock</p>
               </CardContent>
             </Card>
             <Card>
               <CardContent className="pt-6 text-center">
-                <Badge className="mx-auto mb-2">{shop.subscription_type.toUpperCase()}</Badge>
-                <p className="text-xs text-muted-foreground mt-2">Abonnement</p>
+                <AlertTriangle className="w-8 h-8 text-red-500 mx-auto mb-2" />
+                <p className="text-2xl font-bold">{demoStats.outOfStock}</p>
+                <p className="text-xs text-muted-foreground">Rupture</p>
               </CardContent>
             </Card>
             <Card>
               <CardContent className="pt-6 text-center">
-                <p className="text-sm font-semibold">
-                  {shop.subscription_expires_at 
-                    ? new Date(shop.subscription_expires_at).toLocaleDateString("fr-FR")
-                    : "Non défini"}
-                </p>
-                <p className="text-xs text-muted-foreground">Expiration</p>
+                <BarChart3 className="w-8 h-8 text-purple-500 mx-auto mb-2" />
+                <p className="text-2xl font-bold">{demoStats.totalVisits}</p>
+                <p className="text-xs text-muted-foreground">Visites</p>
+              </CardContent>
+            </Card>
+            <Card>
+              <CardContent className="pt-6 text-center">
+                <TrendingUp className="w-8 h-8 text-amber-500 mx-auto mb-2" />
+                <p className="text-lg font-bold">{formatCurrency(demoStats.monthlyRevenue)}</p>
+                <p className="text-xs text-muted-foreground">Ce mois</p>
               </CardContent>
             </Card>
           </div>
 
           {/* Tabs */}
-          <Tabs defaultValue="products">
-            <TabsList>
-              <TabsTrigger value="products">Produits ({products.length}/12)</TabsTrigger>
-              <TabsTrigger value="services">Services ({services.length}/5)</TabsTrigger>
-              <TabsTrigger value="settings">Paramètres</TabsTrigger>
+          <Tabs defaultValue="overview">
+            <TabsList className="grid grid-cols-5 w-full max-w-2xl">
+              <TabsTrigger value="overview">Aperçu</TabsTrigger>
+              <TabsTrigger value="products">Produits</TabsTrigger>
+              <TabsTrigger value="services">Services</TabsTrigger>
+              <TabsTrigger value="clients">Clients</TabsTrigger>
+              <TabsTrigger value="invoices">Factures</TabsTrigger>
             </TabsList>
+
+            {/* Overview Tab */}
+            <TabsContent value="overview" className="mt-6">
+              <div className="grid gap-6 lg:grid-cols-2">
+                {/* Top Products */}
+                <Card>
+                  <CardHeader>
+                    <CardTitle className="text-lg flex items-center gap-2">
+                      <TrendingUp className="w-5 h-5 text-primary" />
+                      Produits les plus visités
+                    </CardTitle>
+                  </CardHeader>
+                  <CardContent>
+                    <div className="space-y-3">
+                      {demoTopProducts.map((product, index) => (
+                        <div key={index} className="flex items-center justify-between p-3 bg-muted/50 rounded-lg">
+                          <div className="flex items-center gap-3">
+                            <span className="w-6 h-6 bg-primary text-primary-foreground rounded-full flex items-center justify-center text-xs font-bold">
+                              {index + 1}
+                            </span>
+                            <span className="font-medium text-sm">{product.name}</span>
+                          </div>
+                          <div className="text-right text-sm">
+                            <p className="font-semibold">{product.views} vues</p>
+                            <p className="text-muted-foreground">{product.sold} vendus</p>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  </CardContent>
+                </Card>
+
+                {/* Quick Stats */}
+                <Card>
+                  <CardHeader>
+                    <CardTitle className="text-lg flex items-center gap-2">
+                      <Settings className="w-5 h-5 text-primary" />
+                      Informations boutique
+                    </CardTitle>
+                  </CardHeader>
+                  <CardContent className="space-y-4">
+                    <div className="grid grid-cols-2 gap-4">
+                      <div>
+                        <p className="text-sm text-muted-foreground">Abonnement</p>
+                        <Badge>{shop.subscription_type?.toUpperCase() || "BASE"}</Badge>
+                      </div>
+                      <div>
+                        <p className="text-sm text-muted-foreground">Expiration</p>
+                        <p className="font-semibold text-sm">
+                          {shop.subscription_expires_at 
+                            ? new Date(shop.subscription_expires_at).toLocaleDateString("fr-FR")
+                            : "Non défini"}
+                        </p>
+                      </div>
+                      <div>
+                        <p className="text-sm text-muted-foreground">Produits</p>
+                        <p className="font-semibold">{products.length}/12</p>
+                      </div>
+                      <div>
+                        <p className="text-sm text-muted-foreground">Services</p>
+                        <p className="font-semibold">{services.length}/5</p>
+                      </div>
+                    </div>
+                    <div className="pt-4 border-t">
+                      <p className="text-sm text-muted-foreground mb-2">Contact</p>
+                      <p className="text-sm">{shop.contact_phone}</p>
+                      <p className="text-sm">{shop.contact_email}</p>
+                      <p className="text-sm text-muted-foreground">{shop.contact_address}</p>
+                    </div>
+                  </CardContent>
+                </Card>
+              </div>
+            </TabsContent>
 
             {/* Products Tab */}
             <TabsContent value="products" className="mt-6">
@@ -478,6 +587,7 @@ const BoutiqueDashboard = () => {
                 <Card>
                   <CardHeader>
                     <CardTitle className="text-lg">Ajouter un produit</CardTitle>
+                    <CardDescription>{products.length}/12 produits</CardDescription>
                   </CardHeader>
                   <CardContent className="space-y-3">
                     <Input
@@ -501,11 +611,7 @@ const BoutiqueDashboard = () => {
                       value={newProduct.description}
                       onChange={(e) => setNewProduct(p => ({ ...p, description: e.target.value }))}
                     />
-                    <Button 
-                      onClick={addProduct} 
-                      className="w-full"
-                      disabled={products.length >= 12}
-                    >
+                    <Button onClick={addProduct} className="w-full" disabled={products.length >= 12}>
                       <Plus className="w-4 h-4 mr-2" />
                       Ajouter
                     </Button>
@@ -514,38 +620,32 @@ const BoutiqueDashboard = () => {
 
                 {/* Products List */}
                 <div className="lg:col-span-2 space-y-3">
-                  {products.length === 0 ? (
-                    <Card>
-                      <CardContent className="py-8 text-center text-muted-foreground">
-                        Aucun produit ajouté
+                  {products.map((product) => (
+                    <Card key={product.id}>
+                      <CardContent className="pt-4">
+                        <div className="flex items-center justify-between">
+                          <div>
+                            <h4 className="font-semibold">{product.name}</h4>
+                            <p className="text-sm text-muted-foreground">{product.category}</p>
+                            <p className="text-primary font-bold">{formatCurrency(product.price)}</p>
+                          </div>
+                          <Button
+                            variant="destructive"
+                            size="icon"
+                            onClick={() => deleteProduct(product.id)}
+                          >
+                            <Trash2 className="w-4 h-4" />
+                          </Button>
+                        </div>
                       </CardContent>
                     </Card>
-                  ) : (
-                    products.map((product) => (
-                      <Card key={product.id}>
-                        <CardContent className="py-4">
-                          <div className="flex items-center justify-between">
-                            <div>
-                              <p className="font-semibold">{product.name}</p>
-                              <p className="text-sm text-muted-foreground">{product.category}</p>
-                            </div>
-                            <div className="flex items-center gap-3">
-                              <p className="font-bold text-primary">
-                                {formatCurrency(product.price)}
-                              </p>
-                              <Button
-                                variant="ghost"
-                                size="icon"
-                                className="text-destructive"
-                                onClick={() => deleteProduct(product.id)}
-                              >
-                                <Trash2 className="w-4 h-4" />
-                              </Button>
-                            </div>
-                          </div>
-                        </CardContent>
-                      </Card>
-                    ))
+                  ))}
+                  {products.length === 0 && (
+                    <Card>
+                      <CardContent className="pt-6 text-center text-muted-foreground">
+                        Aucun produit. Ajoutez votre premier produit !
+                      </CardContent>
+                    </Card>
                   )}
                 </div>
               </div>
@@ -558,6 +658,7 @@ const BoutiqueDashboard = () => {
                 <Card>
                   <CardHeader>
                     <CardTitle className="text-lg">Ajouter un service</CardTitle>
+                    <CardDescription>{services.length}/5 services</CardDescription>
                   </CardHeader>
                   <CardContent className="space-y-3">
                     <Input
@@ -581,11 +682,7 @@ const BoutiqueDashboard = () => {
                       value={newService.description}
                       onChange={(e) => setNewService(s => ({ ...s, description: e.target.value }))}
                     />
-                    <Button 
-                      onClick={addService} 
-                      className="w-full"
-                      disabled={services.length >= 5}
-                    >
+                    <Button onClick={addService} className="w-full" disabled={services.length >= 5}>
                       <Plus className="w-4 h-4 mr-2" />
                       Ajouter
                     </Button>
@@ -594,74 +691,119 @@ const BoutiqueDashboard = () => {
 
                 {/* Services List */}
                 <div className="lg:col-span-2 space-y-3">
-                  {services.length === 0 ? (
-                    <Card>
-                      <CardContent className="py-8 text-center text-muted-foreground">
-                        Aucun service ajouté
+                  {services.map((service) => (
+                    <Card key={service.id}>
+                      <CardContent className="pt-4">
+                        <div className="flex items-center justify-between">
+                          <div>
+                            <h4 className="font-semibold">{service.name}</h4>
+                            <p className="text-sm text-muted-foreground">{service.duration}</p>
+                            <p className="text-primary font-bold">{formatCurrency(service.price)}</p>
+                          </div>
+                          <Button
+                            variant="destructive"
+                            size="icon"
+                            onClick={() => deleteService(service.id)}
+                          >
+                            <Trash2 className="w-4 h-4" />
+                          </Button>
+                        </div>
                       </CardContent>
                     </Card>
-                  ) : (
-                    services.map((service) => (
-                      <Card key={service.id}>
-                        <CardContent className="py-4">
-                          <div className="flex items-center justify-between">
-                            <div>
-                              <p className="font-semibold">{service.name}</p>
-                              <p className="text-sm text-muted-foreground">{service.duration}</p>
-                            </div>
-                            <div className="flex items-center gap-3">
-                              <p className="font-bold text-primary">
-                                {formatCurrency(service.price)}
-                              </p>
-                              <Button
-                                variant="ghost"
-                                size="icon"
-                                className="text-destructive"
-                                onClick={() => deleteService(service.id)}
-                              >
-                                <Trash2 className="w-4 h-4" />
-                              </Button>
-                            </div>
-                          </div>
-                        </CardContent>
-                      </Card>
-                    ))
+                  ))}
+                  {services.length === 0 && (
+                    <Card>
+                      <CardContent className="pt-6 text-center text-muted-foreground">
+                        Aucun service. Ajoutez votre premier service !
+                      </CardContent>
+                    </Card>
                   )}
                 </div>
               </div>
             </TabsContent>
 
-            {/* Settings Tab */}
-            <TabsContent value="settings" className="mt-6">
+            {/* Clients Tab */}
+            <TabsContent value="clients" className="mt-6">
               <Card>
                 <CardHeader>
-                  <CardTitle>Informations de la boutique</CardTitle>
-                  <CardDescription>
-                    Vos coordonnées de contact
-                  </CardDescription>
+                  <CardTitle className="flex items-center gap-2">
+                    <Users className="w-5 h-5 text-primary" />
+                    Liste des clients ({demoClients.length})
+                  </CardTitle>
                 </CardHeader>
-                <CardContent className="space-y-4">
-                  <div className="grid gap-4 md:grid-cols-2">
-                    <div>
-                      <Label className="text-muted-foreground">Téléphone</Label>
-                      <p className="font-medium">{shop.contact_phone || "-"}</p>
-                    </div>
-                    <div>
-                      <Label className="text-muted-foreground">WhatsApp</Label>
-                      <p className="font-medium">{shop.contact_whatsapp || "-"}</p>
-                    </div>
-                    <div>
-                      <Label className="text-muted-foreground">Email</Label>
-                      <p className="font-medium">{shop.contact_email || "-"}</p>
-                    </div>
-                    <div>
-                      <Label className="text-muted-foreground">Adresse</Label>
-                      <p className="font-medium">{shop.contact_address || "-"}</p>
-                    </div>
+                <CardContent>
+                  <div className="overflow-x-auto">
+                    <table className="w-full">
+                      <thead>
+                        <tr className="border-b">
+                          <th className="text-left py-3 px-4 font-medium">Client</th>
+                          <th className="text-left py-3 px-4 font-medium">Contact</th>
+                          <th className="text-center py-3 px-4 font-medium">Commandes</th>
+                          <th className="text-right py-3 px-4 font-medium">Total dépensé</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        {demoClients.map((client) => (
+                          <tr key={client.id} className="border-b hover:bg-muted/50">
+                            <td className="py-3 px-4">
+                              <p className="font-medium">{client.name}</p>
+                              <p className="text-sm text-muted-foreground">{client.email}</p>
+                            </td>
+                            <td className="py-3 px-4 text-sm">{client.phone}</td>
+                            <td className="py-3 px-4 text-center">{client.orders}</td>
+                            <td className="py-3 px-4 text-right font-semibold text-primary">
+                              {formatCurrency(client.totalSpent)}
+                            </td>
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
                   </div>
-                  <div className="pt-4 border-t">
-                    <Label className="text-muted-foreground">Description</Label>
-                    <p className="mt-1">{shop.description || "-"}</p>
+                </CardContent>
+              </Card>
+            </TabsContent>
+
+            {/* Invoices Tab */}
+            <TabsContent value="invoices" className="mt-6">
+              <Card>
+                <CardHeader>
+                  <CardTitle className="flex items-center gap-2">
+                    <FileText className="w-5 h-5 text-primary" />
+                    Historique des factures
+                  </CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <div className="overflow-x-auto">
+                    <table className="w-full">
+                      <thead>
+                        <tr className="border-b">
+                          <th className="text-left py-3 px-4 font-medium">N° Facture</th>
+                          <th className="text-left py-3 px-4 font-medium">Client</th>
+                          <th className="text-left py-3 px-4 font-medium">Date</th>
+                          <th className="text-right py-3 px-4 font-medium">Montant</th>
+                          <th className="text-center py-3 px-4 font-medium">Statut</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        {demoInvoices.map((invoice) => (
+                          <tr key={invoice.id} className="border-b hover:bg-muted/50">
+                            <td className="py-3 px-4 font-mono text-sm">{invoice.id}</td>
+                            <td className="py-3 px-4">{invoice.client}</td>
+                            <td className="py-3 px-4 text-sm text-muted-foreground">
+                              {new Date(invoice.date).toLocaleDateString("fr-FR")}
+                            </td>
+                            <td className="py-3 px-4 text-right font-semibold">
+                              {formatCurrency(invoice.amount)}
+                            </td>
+                            <td className="py-3 px-4 text-center">
+                              <Badge variant={invoice.status === "paid" ? "default" : "secondary"}>
+                                {invoice.status === "paid" ? "Payé" : "En attente"}
+                              </Badge>
+                            </td>
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
                   </div>
                 </CardContent>
               </Card>

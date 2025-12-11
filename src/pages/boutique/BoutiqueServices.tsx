@@ -1,68 +1,116 @@
+import { useState, useEffect } from "react";
 import { useParams } from "react-router-dom";
-import { Briefcase, Clock, Phone } from "lucide-react";
+import { supabase } from "@/integrations/supabase/client";
+import { Briefcase, Clock, Phone, Loader2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent } from "@/components/ui/card";
+import { useShop } from "./BoutiqueLayout";
 
-// Demo services data
+// Demo services for "artisanat-rhumsiki"
 const demoServices = [
   { 
     id: "1", 
-    name: "Création de bijoux personnalisés", 
-    description: "Conception et réalisation de bijoux uniques sur mesure selon vos envies. Choix des matériaux, design personnalisé et finitions de qualité.",
-    price: 30000, 
+    name: "Création bijoux sur mesure", 
+    description: "Conception et réalisation de bijoux personnalisés selon vos envies. Choix des matériaux (perles, cuivre, argent), design unique et finitions de qualité artisanale. Consultation préalable incluse.",
+    price: 50000, 
     duration: "2-3 semaines",
-    image: "/placeholder.svg" 
   },
   { 
     id: "2", 
-    name: "Réparation de poterie", 
-    description: "Restauration professionnelle de vos pièces en céramique et poterie. Réparation des fissures, recollage et finition.",
+    name: "Visite atelier artisanal", 
+    description: "Découverte immersive de notre atelier au cœur de Rhumsiki. Rencontrez nos artisans, observez les techniques traditionnelles de fabrication et admirez les montagnes. Thé traditionnel offert.",
     price: 15000, 
-    duration: "3-5 jours",
-    image: "/placeholder.svg" 
+    duration: "2 heures",
   },
   { 
     id: "3", 
-    name: "Formation en artisanat", 
-    description: "Apprenez les techniques traditionnelles de l'artisanat du Nord Cameroun. Cours individuels ou en groupe.",
-    price: 25000, 
+    name: "Formation tissage traditionnel", 
+    description: "Apprenez les bases du tissage Fulani avec un maître tisserand. Initiation complète aux techniques, aux motifs traditionnels et à la teinture naturelle. Certificat de participation remis.",
+    price: 35000, 
     duration: "1 journée",
-    image: "/placeholder.svg" 
   },
   { 
     id: "4", 
-    name: "Gravure sur cuir", 
-    description: "Personnalisation de vos articles en cuir avec gravure de motifs, initiales ou dessins sur mesure.",
-    price: 10000, 
+    name: "Gravure personnalisée", 
+    description: "Service de gravure sur cuir, métal ou bois. Initiales, motifs traditionnels ou dessins personnalisés sur vos articles achetés ou apportés. Travail artisanal minutieux.",
+    price: 12000, 
     duration: "24-48h",
-    image: "/placeholder.svg" 
-  },
-  { 
-    id: "5", 
-    name: "Conseil en décoration", 
-    description: "Consultation pour intégrer des pièces artisanales dans votre intérieur. Recommandations personnalisées.",
-    price: 20000, 
-    duration: "2 heures",
-    image: "/placeholder.svg" 
   },
 ];
 
+interface Service {
+  id: string;
+  name: string;
+  description: string | null;
+  price: number;
+  duration: string | null;
+}
+
 const BoutiqueServices = () => {
   const { slug } = useParams();
-  const shopWhatsapp = "237600000000"; // Demo
-  const shopName = "Artisanat du Sahel"; // Demo
+  const { shop } = useShop();
+  const [services, setServices] = useState<Service[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const fetchServices = async () => {
+      if (!shop) return;
+
+      // Demo shop fallback
+      if (shop.id === "demo-artisanat-rhumsiki" || slug === "artisanat-rhumsiki") {
+        // Try DB first
+        const { data } = await supabase
+          .from("services")
+          .select("*")
+          .eq("shop_id", shop.id)
+          .order("sort_order");
+
+        if (data && data.length > 0) {
+          setServices(data);
+        } else {
+          setServices(demoServices);
+        }
+        setLoading(false);
+        return;
+      }
+
+      // Load from Supabase
+      const { data } = await supabase
+        .from("services")
+        .select("*")
+        .eq("shop_id", shop.id)
+        .order("sort_order");
+
+      if (data) {
+        setServices(data);
+      }
+      setLoading(false);
+    };
+
+    fetchServices();
+  }, [shop, slug]);
 
   const formatPrice = (price: number) => {
     return new Intl.NumberFormat('fr-FR').format(price) + ' FCFA';
   };
 
   const handleWhatsAppBooking = (serviceName: string) => {
+    const whatsapp = shop?.contact_whatsapp || "237677888999";
+    const shopName = shop?.name || "la boutique";
     const message = encodeURIComponent(
       `Bonjour ${shopName}! Je souhaite réserver le service "${serviceName}" vu sur Loummel. Pouvez-vous me donner plus d'informations sur la disponibilité?`
     );
-    window.open(`https://wa.me/${shopWhatsapp}?text=${message}`, '_blank');
+    window.open(`https://wa.me/${whatsapp}?text=${message}`, '_blank');
   };
+
+  if (loading) {
+    return (
+      <div className="flex items-center justify-center py-12">
+        <Loader2 className="w-8 h-8 animate-spin text-primary" />
+      </div>
+    );
+  }
 
   return (
     <div className="space-y-6">
@@ -72,24 +120,15 @@ const BoutiqueServices = () => {
           <Briefcase className="w-6 h-6 text-primary" />
           Nos Services
         </h2>
-        <p className="text-muted-foreground">{demoServices.length} services proposés</p>
+        <p className="text-muted-foreground">{services.length} services proposés</p>
       </div>
 
       {/* Services List */}
       <div className="space-y-4">
-        {demoServices.map((service) => (
+        {services.map((service) => (
           <Card key={service.id} className="overflow-hidden hover:shadow-sahel-card transition-all">
             <CardContent className="p-0">
               <div className="flex flex-col md:flex-row">
-                {/* Image */}
-                <div className="md:w-48 h-48 md:h-auto shrink-0">
-                  <img
-                    src={service.image}
-                    alt={service.name}
-                    className="w-full h-full object-cover"
-                  />
-                </div>
-
                 {/* Content */}
                 <div className="flex-1 p-6">
                   <div className="flex flex-col h-full">
@@ -98,10 +137,12 @@ const BoutiqueServices = () => {
                         <h3 className="font-display font-semibold text-lg text-foreground">
                           {service.name}
                         </h3>
-                        <Badge variant="outline" className="shrink-0">
-                          <Clock className="w-3 h-3 mr-1" />
-                          {service.duration}
-                        </Badge>
+                        {service.duration && (
+                          <Badge variant="outline" className="shrink-0">
+                            <Clock className="w-3 h-3 mr-1" />
+                            {service.duration}
+                          </Badge>
+                        )}
                       </div>
                       <p className="text-muted-foreground mb-4">
                         {service.description}
@@ -131,7 +172,7 @@ const BoutiqueServices = () => {
         ))}
       </div>
 
-      {demoServices.length === 0 && (
+      {services.length === 0 && (
         <div className="text-center py-12">
           <Briefcase className="w-12 h-12 text-muted-foreground mx-auto mb-4" />
           <p className="text-muted-foreground">Aucun service disponible pour le moment</p>

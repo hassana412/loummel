@@ -1,41 +1,89 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useParams } from "react-router-dom";
-import { ShoppingBag, Filter, Phone } from "lucide-react";
+import { supabase } from "@/integrations/supabase/client";
+import { ShoppingBag, Filter, Phone, Loader2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { useShop } from "./BoutiqueLayout";
 
-// Demo products data
+// Demo products for "artisanat-rhumsiki"
 const demoProducts = [
-  { id: "1", name: "Collier en perles Fulani", description: "Bijou artisanal authentique fait main", price: 25000, category: "Bijoux", image: "/placeholder.svg" },
-  { id: "2", name: "Bracelet en cuivre", description: "Bracelet traditionnel gravé", price: 15000, category: "Bijoux", image: "/placeholder.svg" },
-  { id: "3", name: "Poterie décorative", description: "Vase peint à la main", price: 18000, category: "Poterie", image: "/placeholder.svg" },
-  { id: "4", name: "Sac en cuir tressé", description: "Cuir de qualité supérieure", price: 35000, category: "Cuir", image: "/placeholder.svg" },
-  { id: "5", name: "Tapis tissé", description: "Grand tapis en laine naturelle", price: 75000, category: "Textiles", image: "/placeholder.svg" },
-  { id: "6", name: "Sculpture en bois", description: "Figurine sculptée à la main", price: 45000, category: "Artisanat", image: "/placeholder.svg" },
-  { id: "7", name: "Boucles d'oreilles", description: "Perles et métal forgé", price: 12000, category: "Bijoux", image: "/placeholder.svg" },
-  { id: "8", name: "Panier décoratif", description: "Osier tressé naturel", price: 8000, category: "Artisanat", image: "/placeholder.svg" },
-  { id: "9", name: "Ceinture en cuir", description: "Cuir tanné végétal", price: 22000, category: "Cuir", image: "/placeholder.svg" },
-  { id: "10", name: "Boubou brodé", description: "Tissu traditionnel brodé", price: 55000, category: "Textiles", image: "/placeholder.svg" },
-  { id: "11", name: "Jarre traditionnelle", description: "Terre cuite décorée", price: 28000, category: "Poterie", image: "/placeholder.svg" },
-  { id: "12", name: "Sandales artisanales", description: "Cuir et perles", price: 20000, category: "Cuir", image: "/placeholder.svg" },
+  { id: "1", name: "Collier Fulani traditionnel", description: "Magnifique collier artisanal en perles multicolores et métal forgé. Pièce unique fabriquée par les artisans Fulani.", price: 35000, category: "Bijoux", image_url: "/placeholder.svg", is_promo: true, promo_price: 28000 },
+  { id: "2", name: "Poterie Rhumsiki décorative", description: "Vase décoratif peint à la main avec des motifs traditionnels du Sahel.", price: 28000, category: "Poterie", image_url: "/placeholder.svg", is_promo: false, promo_price: null },
+  { id: "3", name: "Sac en cuir tressé artisanal", description: "Sac en cuir de chèvre tanné naturellement. Design authentique avec finitions en cuivre.", price: 45000, category: "Cuir", image_url: "/placeholder.svg", is_promo: false, promo_price: null },
+  { id: "4", name: "Bracelet en cuivre gravé", description: "Bracelet en cuivre pur avec gravures de motifs traditionnels Fulani.", price: 18000, category: "Bijoux", image_url: "/placeholder.svg", is_promo: true, promo_price: 15000 },
+  { id: "5", name: "Tapis tissé Sahel authentique", description: "Grand tapis tissé à la main en laine naturelle. Dimensions 2m x 1.5m.", price: 85000, category: "Textiles", image_url: "/placeholder.svg", is_promo: false, promo_price: null },
+  { id: "6", name: "Sculpture montagne Rhumsiki", description: "Sculpture en bois d'ébène représentant les pics montagneux de Rhumsiki.", price: 55000, category: "Artisanat", image_url: "/placeholder.svg", is_promo: false, promo_price: null },
+  { id: "7", name: "Boubou brodé premium", description: "Boubou en bazin riche avec broderies artisanales traditionnelles.", price: 75000, category: "Textiles", image_url: "/placeholder.svg", is_promo: true, promo_price: 65000 },
 ];
+
+interface Product {
+  id: string;
+  name: string;
+  description: string | null;
+  price: number;
+  category: string | null;
+  image_url: string | null;
+  is_promo: boolean | null;
+  promo_price: number | null;
+}
 
 const categories = ["Tous", "Bijoux", "Poterie", "Cuir", "Textiles", "Artisanat"];
 
 const BoutiqueProduits = () => {
   const { slug } = useParams();
+  const { shop } = useShop();
+  const [products, setProducts] = useState<Product[]>([]);
+  const [loading, setLoading] = useState(true);
   const [filter, setFilter] = useState("Tous");
   const [sortBy, setSortBy] = useState("default");
-  
-  const shopWhatsapp = "237600000000"; // Demo
-  const shopName = "Artisanat du Sahel"; // Demo
 
-  const filteredProducts = demoProducts
+  useEffect(() => {
+    const fetchProducts = async () => {
+      if (!shop) return;
+
+      // Demo shop fallback
+      if (shop.id === "demo-artisanat-rhumsiki" || slug === "artisanat-rhumsiki") {
+        // Try DB first
+        const { data } = await supabase
+          .from("products")
+          .select("*")
+          .eq("shop_id", shop.id)
+          .order("sort_order");
+
+        if (data && data.length > 0) {
+          setProducts(data);
+        } else {
+          setProducts(demoProducts);
+        }
+        setLoading(false);
+        return;
+      }
+
+      // Load from Supabase
+      const { data } = await supabase
+        .from("products")
+        .select("*")
+        .eq("shop_id", shop.id)
+        .order("sort_order");
+
+      if (data) {
+        setProducts(data);
+      }
+      setLoading(false);
+    };
+
+    fetchProducts();
+  }, [shop, slug]);
+
+  const filteredProducts = products
     .filter(p => filter === "Tous" || p.category === filter)
     .sort((a, b) => {
-      if (sortBy === "price-asc") return a.price - b.price;
-      if (sortBy === "price-desc") return b.price - a.price;
+      const priceA = a.is_promo && a.promo_price ? a.promo_price : a.price;
+      const priceB = b.is_promo && b.promo_price ? b.promo_price : b.price;
+      if (sortBy === "price-asc") return priceA - priceB;
+      if (sortBy === "price-desc") return priceB - priceA;
       return 0;
     });
 
@@ -44,11 +92,21 @@ const BoutiqueProduits = () => {
   };
 
   const handleWhatsAppOrder = (productName: string) => {
+    const whatsapp = shop?.contact_whatsapp || "237677888999";
+    const shopName = shop?.name || "la boutique";
     const message = encodeURIComponent(
       `Bonjour ${shopName}! Je suis intéressé(e) par "${productName}" vu sur Loummel. Pouvez-vous me donner plus d'informations?`
     );
-    window.open(`https://wa.me/${shopWhatsapp}?text=${message}`, '_blank');
+    window.open(`https://wa.me/${whatsapp}?text=${message}`, '_blank');
   };
+
+  if (loading) {
+    return (
+      <div className="flex items-center justify-center py-12">
+        <Loader2 className="w-8 h-8 animate-spin text-primary" />
+      </div>
+    );
+  }
 
   return (
     <div className="space-y-6">
@@ -92,48 +150,69 @@ const BoutiqueProduits = () => {
 
       {/* Products Grid */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-        {filteredProducts.map((product) => (
-          <div
-            key={product.id}
-            className="group bg-card rounded-xl overflow-hidden shadow-sahel hover:shadow-sahel-card transition-all duration-300 hover:-translate-y-1"
-          >
-            {/* Image */}
-            <div className="relative h-48 overflow-hidden">
-              <img
-                src={product.image}
-                alt={product.name}
-                className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
-              />
-              <Badge className="absolute top-3 left-3 bg-background/90">
-                {product.category}
-              </Badge>
-            </div>
+        {filteredProducts.map((product) => {
+          const hasPromo = product.is_promo && product.promo_price;
+          const displayPrice = hasPromo ? product.promo_price! : product.price;
 
-            {/* Content */}
-            <div className="p-4">
-              <h3 className="font-semibold text-foreground mb-1 line-clamp-1">
-                {product.name}
-              </h3>
-              <p className="text-sm text-muted-foreground mb-3 line-clamp-2">
-                {product.description}
-              </p>
-              
-              <div className="flex items-center justify-between">
-                <span className="text-lg font-bold text-primary">
-                  {formatPrice(product.price)}
-                </span>
-                <Button
-                  size="sm"
-                  className="bg-green-600 hover:bg-green-700"
-                  onClick={() => handleWhatsAppOrder(product.name)}
-                >
-                  <Phone className="w-4 h-4 mr-1" />
-                  Commander
-                </Button>
+          return (
+            <div
+              key={product.id}
+              className="group bg-card rounded-xl overflow-hidden shadow-sahel hover:shadow-sahel-card transition-all duration-300 hover:-translate-y-1"
+            >
+              {/* Image */}
+              <div className="relative h-48 overflow-hidden">
+                <img
+                  src={product.image_url || "/placeholder.svg"}
+                  alt={product.name}
+                  className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                />
+                <div className="absolute top-3 left-3 flex gap-2">
+                  {product.category && (
+                    <Badge className="bg-background/90">
+                      {product.category}
+                    </Badge>
+                  )}
+                  {hasPromo && (
+                    <Badge className="bg-red-500 text-white">
+                      Promo
+                    </Badge>
+                  )}
+                </div>
+              </div>
+
+              {/* Content */}
+              <div className="p-4">
+                <h3 className="font-semibold text-foreground mb-1 line-clamp-1">
+                  {product.name}
+                </h3>
+                <p className="text-sm text-muted-foreground mb-3 line-clamp-2">
+                  {product.description}
+                </p>
+                
+                <div className="flex items-center justify-between">
+                  <div>
+                    <span className="text-lg font-bold text-primary">
+                      {formatPrice(displayPrice)}
+                    </span>
+                    {hasPromo && (
+                      <span className="text-sm text-muted-foreground line-through ml-2">
+                        {formatPrice(product.price)}
+                      </span>
+                    )}
+                  </div>
+                  <Button
+                    size="sm"
+                    className="bg-green-600 hover:bg-green-700"
+                    onClick={() => handleWhatsAppOrder(product.name)}
+                  >
+                    <Phone className="w-4 h-4 mr-1" />
+                    Commander
+                  </Button>
+                </div>
               </div>
             </div>
-          </div>
-        ))}
+          );
+        })}
       </div>
 
       {filteredProducts.length === 0 && (

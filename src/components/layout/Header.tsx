@@ -49,9 +49,6 @@ const Header = () => {
             <Link to="/inscription-vendeur" className="hover:text-accent transition-colors">
               Vendre sur Loummel
             </Link>
-            <Link to="/backoffice" className="hover:text-accent transition-colors">
-              Backoffice
-            </Link>
           </div>
         </div>
       </div>
