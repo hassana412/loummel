@@ -51,16 +51,16 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
         setSession(session);
         setUser(session?.user ?? null);
         
-        // Defer role fetching with setTimeout
+        // Fetch roles BEFORE setting loading to false
         if (session?.user) {
-          setTimeout(() => {
-            fetchUserRoles(session.user.id).then(setRoles);
-          }, 0);
+          fetchUserRoles(session.user.id).then((fetchedRoles) => {
+            setRoles(fetchedRoles);
+            setLoading(false);
+          });
         } else {
           setRoles([]);
+          setLoading(false);
         }
-        
-        setLoading(false);
       }
     );
 
@@ -70,10 +70,13 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
       setUser(session?.user ?? null);
       
       if (session?.user) {
-        fetchUserRoles(session.user.id).then(setRoles);
+        fetchUserRoles(session.user.id).then((fetchedRoles) => {
+          setRoles(fetchedRoles);
+          setLoading(false);
+        });
+      } else {
+        setLoading(false);
       }
-      
-      setLoading(false);
     });
 
     return () => subscription.unsubscribe();
