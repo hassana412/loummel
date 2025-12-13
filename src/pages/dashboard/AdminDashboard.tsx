@@ -16,7 +16,7 @@ import {
   Check, X, Clock, LogOut, Shield, Eye,
   Package, Briefcase, DollarSign, Search,
   Download, ExternalLink, UserX, Mail, Phone,
-  UserPlus, Trash2, Loader2
+  UserPlus, Trash2, Loader2, ClipboardList, KeyRound
 } from "lucide-react";
 import { PasswordInput, getPasswordStrength } from "@/components/auth/AuthHelpers";
 
@@ -33,6 +33,18 @@ interface UserRole {
   role: string;
 }
 
+interface AuditLog {
+  id: string;
+  user_id: string | null;
+  action: string;
+  entity_type: string;
+  entity_id: string | null;
+  details: Record<string, any> | null;
+  created_at: string;
+}
+
+const DEFAULT_ADMIN_PASSWORD = "Loummel@2024!";
+
 const AdminDashboard = () => {
   const navigate = useNavigate();
   const { signOut, user } = useAuth();
@@ -41,6 +53,7 @@ const AdminDashboard = () => {
   const [profiles, setProfiles] = useState<Profile[]>([]);
   const [userRoles, setUserRoles] = useState<UserRole[]>([]);
   const [searchTerm, setSearchTerm] = useState("");
+  const [auditLogs, setAuditLogs] = useState<AuditLog[]>([]);
   const [stats, setStats] = useState({
     totalPartners: 0,
     pendingPartners: 0,
@@ -63,6 +76,22 @@ const AdminDashboard = () => {
   useEffect(() => {
     fetchData();
   }, []);
+
+  const logAuditAction = async (action: string, entityType: string, entityId?: string, details?: Record<string, any>) => {
+    if (!user) return;
+    
+    try {
+      await supabase.from("audit_logs").insert({
+        user_id: user.id,
+        action,
+        entity_type: entityType,
+        entity_id: entityId || null,
+        details: details || null,
+      });
+    } catch (error) {
+      console.error("Erreur log audit:", error);
+    }
+  };
 
   const fetchData = async () => {
     // Fetch partners
@@ -139,6 +168,17 @@ const AdminDashboard = () => {
       totalProducts: productsCount || 0,
       totalServices: servicesCount || 0,
     }));
+
+    // Fetch audit logs
+    const { data: logsData } = await supabase
+      .from("audit_logs")
+      .select("*")
+      .order("created_at", { ascending: false })
+      .limit(50);
+
+    if (logsData) {
+      setAuditLogs(logsData as AuditLog[]);
+    }
   };
 
   const createDelegatedAdmin = async (e: React.FormEvent) => {
@@ -183,6 +223,13 @@ const AdminDashboard = () => {
 
       if (roleError) throw roleError;
 
+      // 3. Log the action
+      await logAuditAction("admin_created", "admin", authData.user.id, { 
+        name: newAdminName, 
+        email: newAdminEmail,
+        used_default_password: newAdminPassword === DEFAULT_ADMIN_PASSWORD
+      });
+
       toast({ 
         title: "Admin délégué créé !", 
         description: `${newAdminName} peut maintenant accéder au backoffice.` 
@@ -213,6 +260,8 @@ const AdminDashboard = () => {
       return;
     }
 
+    const adminProfile = profiles.find(p => p.id === userId);
+
     const { error } = await supabase
       .from("user_roles")
       .delete()
@@ -222,12 +271,19 @@ const AdminDashboard = () => {
     if (error) {
       toast({ title: "Erreur", description: error.message, variant: "destructive" });
     } else {
+      await logAuditAction("admin_revoked", "admin", userId, { 
+        name: adminProfile?.full_name, 
+        email: adminProfile?.email 
+      });
       toast({ title: "Succès", description: "Rôle admin révoqué" });
       fetchData();
     }
   };
 
   const updatePartnerStatus = async (partnerId: string, status: "approved" | "rejected") => {
+    const partner = partners.find(p => p.id === partnerId);
+    const partnerProfile = profiles.find(p => p.id === partner?.user_id);
+
     const { error } = await supabase
       .from("partners")
       .update({ status })
@@ -236,12 +292,18 @@ const AdminDashboard = () => {
     if (error) {
       toast({ title: "Erreur", description: error.message, variant: "destructive" });
     } else {
+      await logAuditAction(status === "approved" ? "partner_approved" : "partner_rejected", "partner", partnerId, {
+        region: partner?.region,
+        name: partnerProfile?.full_name
+      });
       toast({ title: "Succès", description: `Partenaire ${status === "approved" ? "approuvé" : "rejeté"}` });
       fetchData();
     }
   };
 
   const updateShopStatus = async (shopId: string, status: "active" | "suspended") => {
+    const shop = shops.find(s => s.id === shopId);
+
     const { error } = await supabase
       .from("shops")
       .update({ status })
@@ -250,6 +312,10 @@ const AdminDashboard = () => {
     if (error) {
       toast({ title: "Erreur", description: error.message, variant: "destructive" });
     } else {
+      await logAuditAction(status === "active" ? "shop_activated" : "shop_suspended", "shop", shopId, {
+        name: shop?.name,
+        region: shop?.region
+      });
       toast({ title: "Succès", description: `Boutique ${status === "active" ? "activée" : "suspendue"}` });
       fetchData();
     }
@@ -287,6 +353,29 @@ const AdminDashboard = () => {
 
   const formatPrice = (price: number) => {
     return new Intl.NumberFormat('fr-FR').format(price) + ' FCFA';
+  };
+
+  const formatDate = (dateStr: string) => {
+    return new Date(dateStr).toLocaleString('fr-FR', {
+      day: '2-digit',
+      month: '2-digit',
+      year: 'numeric',
+      hour: '2-digit',
+      minute: '2-digit'
+    });
+  };
+
+  const getActionLabel = (action: string) => {
+    const labels: Record<string, { label: string; color: string }> = {
+      admin_created: { label: "Admin créé", color: "bg-blue-100 text-blue-800" },
+      admin_revoked: { label: "Admin révoqué", color: "bg-red-100 text-red-800" },
+      shop_activated: { label: "Boutique activée", color: "bg-green-100 text-green-800" },
+      shop_suspended: { label: "Boutique suspendue", color: "bg-orange-100 text-orange-800" },
+      partner_approved: { label: "Partenaire approuvé", color: "bg-green-100 text-green-800" },
+      partner_rejected: { label: "Partenaire rejeté", color: "bg-red-100 text-red-800" },
+    };
+    const l = labels[action] || { label: action, color: "bg-gray-100 text-gray-800" };
+    return <Badge className={l.color}>{l.label}</Badge>;
   };
 
   const exportCSV = (data: any[], filename: string) => {
@@ -375,10 +464,14 @@ const AdminDashboard = () => {
           </div>
 
           <Tabs defaultValue="users">
-            <TabsList>
+            <TabsList className="flex-wrap">
               <TabsTrigger value="users">Utilisateurs</TabsTrigger>
               <TabsTrigger value="partners">Partenaires</TabsTrigger>
               <TabsTrigger value="shops">Boutiques</TabsTrigger>
+              <TabsTrigger value="audit" className="bg-blue-50">
+                <ClipboardList className="w-4 h-4 mr-1" />
+                Journal d'audit
+              </TabsTrigger>
               <TabsTrigger value="admin" className="bg-[#FFCC00]/20">
                 <Shield className="w-4 h-4 mr-1" />
                 Administration
@@ -566,6 +659,61 @@ const AdminDashboard = () => {
               </Card>
             </TabsContent>
 
+            {/* Audit Log Tab */}
+            <TabsContent value="audit" className="mt-6">
+              <Card>
+                <CardHeader>
+                  <div className="flex items-center gap-2">
+                    <div className="p-2 bg-blue-100 rounded-lg">
+                      <ClipboardList className="w-5 h-5 text-blue-700" />
+                    </div>
+                    <div>
+                      <CardTitle className="text-lg">Journal d'audit</CardTitle>
+                      <CardDescription>Historique des 50 dernières actions administratives</CardDescription>
+                    </div>
+                  </div>
+                </CardHeader>
+                <CardContent>
+                  {auditLogs.length === 0 ? (
+                    <p className="text-center text-muted-foreground py-8">Aucune action enregistrée</p>
+                  ) : (
+                    <div className="space-y-3">
+                      {auditLogs.map((log) => {
+                        const adminProfile = profiles.find(p => p.id === log.user_id);
+                        return (
+                          <div key={log.id} className="flex items-center justify-between p-4 border rounded-lg hover:bg-muted/50 transition-colors">
+                            <div className="flex items-center gap-4">
+                              <div className="w-10 h-10 rounded-full bg-blue-100 flex items-center justify-center">
+                                <ClipboardList className="w-5 h-5 text-blue-700" />
+                              </div>
+                              <div>
+                                <div className="flex items-center gap-2 mb-1">
+                                  {getActionLabel(log.action)}
+                                  <Badge variant="outline" className="text-xs">{log.entity_type}</Badge>
+                                </div>
+                                <div className="text-sm text-muted-foreground">
+                                  <span>Par {adminProfile?.full_name || "Système"}</span>
+                                  {log.details && (
+                                    <span className="ml-2 text-xs">
+                                      {log.details.name && `• ${log.details.name}`}
+                                      {log.details.email && ` (${log.details.email})`}
+                                    </span>
+                                  )}
+                                </div>
+                              </div>
+                            </div>
+                            <div className="text-sm text-muted-foreground">
+                              {formatDate(log.created_at)}
+                            </div>
+                          </div>
+                        );
+                      })}
+                    </div>
+                  )}
+                </CardContent>
+              </Card>
+            </TabsContent>
+
             {/* Administration Tab */}
             <TabsContent value="admin" className="mt-6">
               <div className="grid md:grid-cols-2 gap-6">
@@ -607,13 +755,30 @@ const AdminDashboard = () => {
                         />
                       </div>
                       <div className="space-y-2">
-                        <Label htmlFor="admin-password">Mot de passe</Label>
+                        <div className="flex items-center justify-between">
+                          <Label htmlFor="admin-password">Mot de passe</Label>
+                          <Button 
+                            type="button" 
+                            variant="link" 
+                            size="sm"
+                            className="text-xs h-auto p-0 text-[#996600]"
+                            onClick={() => setNewAdminPassword(DEFAULT_ADMIN_PASSWORD)}
+                          >
+                            <KeyRound className="w-3 h-3 mr-1" />
+                            Utiliser le mot de passe par défaut
+                          </Button>
+                        </div>
                         <PasswordInput
                           id="admin-password"
                           value={newAdminPassword}
                           onChange={setNewAdminPassword}
                           showStrength
                         />
+                        {newAdminPassword === DEFAULT_ADMIN_PASSWORD && (
+                          <p className="text-xs text-amber-600 flex items-center gap-1">
+                            ⚠️ L'admin devra changer ce mot de passe à sa première connexion
+                          </p>
+                        )}
                       </div>
                       <Button 
                         type="submit" 

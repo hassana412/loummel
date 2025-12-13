@@ -32,7 +32,7 @@ const Footer = () => {
 
       {/* Main Footer */}
       <div className="container py-12">
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-8">
           {/* Brand */}
           <div>
             <Link to="/" className="flex items-center gap-2 mb-4">
@@ -78,6 +78,17 @@ const Footer = () => {
               <li><Link to="/boutiques" className="hover:text-accent transition-colors">Découvrir les boutiques</Link></li>
               <li><Link to="/nouveautes" className="hover:text-accent transition-colors">Nouveautés</Link></li>
               <li><Link to="/promotions" className="hover:text-accent transition-colors">Promotions</Link></li>
+            </ul>
+          </div>
+
+          {/* Espaces connexion */}
+          <div>
+            <h4 className="font-display text-lg font-semibold mb-4">Espaces connexion</h4>
+            <ul className="space-y-2 text-sm text-primary-foreground/80">
+              <li><Link to="/connexion" className="hover:text-accent transition-colors">👤 Espace Client</Link></li>
+              <li><Link to="/auth/vendeur" className="hover:text-accent transition-colors">🏪 Espace Vendeur</Link></li>
+              <li><Link to="/auth/partenaire" className="hover:text-accent transition-colors">🤝 Espace Partenaire</Link></li>
+              <li><Link to="/backoffice" className="hover:text-accent transition-colors">🛡️ Administration</Link></li>
             </ul>
           </div>
 
