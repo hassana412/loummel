@@ -5,17 +5,20 @@ import { supabase } from "@/integrations/supabase/client";
 import Header from "@/components/layout/Header";
 import Footer from "@/components/layout/Footer";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { toast } from "@/hooks/use-toast";
 import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
 import {
   Users, Store, Handshake, TrendingUp,
   Check, X, Clock, LogOut, Shield, Eye,
   Package, Briefcase, DollarSign, Search,
-  Download, ExternalLink, UserX, Mail, Phone
+  Download, ExternalLink, UserX, Mail, Phone,
+  UserPlus, Trash2, Loader2
 } from "lucide-react";
+import { PasswordInput, getPasswordStrength } from "@/components/auth/AuthHelpers";
 
 interface Profile {
   id: string;
@@ -32,7 +35,7 @@ interface UserRole {
 
 const AdminDashboard = () => {
   const navigate = useNavigate();
-  const { signOut } = useAuth();
+  const { signOut, user } = useAuth();
   const [partners, setPartners] = useState<any[]>([]);
   const [shops, setShops] = useState<any[]>([]);
   const [profiles, setProfiles] = useState<Profile[]>([]);
@@ -50,6 +53,12 @@ const AdminDashboard = () => {
     estimatedRevenue: 0,
     totalCommissions: 0,
   });
+
+  // States for delegated admin creation
+  const [newAdminEmail, setNewAdminEmail] = useState("");
+  const [newAdminPassword, setNewAdminPassword] = useState("");
+  const [newAdminName, setNewAdminName] = useState("");
+  const [isCreatingAdmin, setIsCreatingAdmin] = useState(false);
 
   useEffect(() => {
     fetchData();
@@ -132,6 +141,92 @@ const AdminDashboard = () => {
     }));
   };
 
+  const createDelegatedAdmin = async (e: React.FormEvent) => {
+    e.preventDefault();
+    
+    if (!newAdminEmail || !newAdminPassword || !newAdminName) {
+      toast({ title: "Erreur", description: "Veuillez remplir tous les champs", variant: "destructive" });
+      return;
+    }
+
+    const strength = getPasswordStrength(newAdminPassword);
+    if (strength.score < 2) {
+      toast({ 
+        title: "Mot de passe trop faible", 
+        description: "Utilisez au moins 8 caractères avec des majuscules et des chiffres.", 
+        variant: "destructive" 
+      });
+      return;
+    }
+
+    setIsCreatingAdmin(true);
+
+    try {
+      // 1. Create the user account
+      const { data: authData, error: authError } = await supabase.auth.signUp({
+        email: newAdminEmail,
+        password: newAdminPassword,
+        options: {
+          emailRedirectTo: `${window.location.origin}/backoffice`,
+          data: { full_name: newAdminName }
+        }
+      });
+
+      if (authError) throw authError;
+      if (!authData.user) throw new Error("Erreur lors de la création du compte");
+
+      // 2. Assign super_admin role
+      const { error: roleError } = await supabase.from("user_roles").insert({
+        user_id: authData.user.id,
+        role: "super_admin"
+      });
+
+      if (roleError) throw roleError;
+
+      toast({ 
+        title: "Admin délégué créé !", 
+        description: `${newAdminName} peut maintenant accéder au backoffice.` 
+      });
+      
+      // Reset form
+      setNewAdminEmail("");
+      setNewAdminPassword("");
+      setNewAdminName("");
+      
+      // Refresh data
+      fetchData();
+    } catch (error: any) {
+      toast({ 
+        title: "Erreur", 
+        description: error.message || "Impossible de créer l'admin délégué", 
+        variant: "destructive" 
+      });
+    } finally {
+      setIsCreatingAdmin(false);
+    }
+  };
+
+  const revokeAdminRole = async (userId: string) => {
+    // Prevent revoking own admin role
+    if (userId === user?.id) {
+      toast({ title: "Erreur", description: "Vous ne pouvez pas révoquer votre propre rôle", variant: "destructive" });
+      return;
+    }
+
+    const { error } = await supabase
+      .from("user_roles")
+      .delete()
+      .eq("user_id", userId)
+      .eq("role", "super_admin");
+
+    if (error) {
+      toast({ title: "Erreur", description: error.message, variant: "destructive" });
+    } else {
+      toast({ title: "Succès", description: "Rôle admin révoqué" });
+      fetchData();
+    }
+  };
+
   const updatePartnerStatus = async (partnerId: string, status: "approved" | "rejected") => {
     const { error } = await supabase
       .from("partners")
@@ -182,7 +277,7 @@ const AdminDashboard = () => {
     if (!role) return <Badge variant="outline">Client</Badge>;
     
     const roleLabels: Record<string, { label: string; className: string }> = {
-      super_admin: { label: "Super Admin", className: "bg-red-500 text-white" },
+      super_admin: { label: "Super Admin", className: "bg-[#FFCC00] text-black" },
       partner: { label: "Partenaire", className: "bg-purple-500 text-white" },
       shop_owner: { label: "Vendeur", className: "bg-blue-500 text-white" },
     };
@@ -220,6 +315,14 @@ const AdminDashboard = () => {
     (p.region?.toLowerCase() || "").includes(searchTerm.toLowerCase())
   );
 
+  // Get super admins list
+  const superAdmins = userRoles
+    .filter(r => r.role === "super_admin")
+    .map(r => {
+      const profile = profiles.find(p => p.id === r.user_id);
+      return { userId: r.user_id, ...profile };
+    });
+
   return (
     <div className="min-h-screen flex flex-col bg-background">
       <Header />
@@ -228,8 +331,8 @@ const AdminDashboard = () => {
         <div className="container">
           <div className="flex items-center justify-between mb-8">
             <div className="flex items-center gap-3">
-              <div className="p-3 bg-red-100 rounded-xl">
-                <Shield className="w-8 h-8 text-red-600" />
+              <div className="p-3 bg-[#FFCC00] rounded-xl">
+                <Shield className="w-8 h-8 text-black" />
               </div>
               <div>
                 <h1 className="font-display text-2xl font-bold">Dashboard Super Admin</h1>
@@ -276,6 +379,10 @@ const AdminDashboard = () => {
               <TabsTrigger value="users">Utilisateurs</TabsTrigger>
               <TabsTrigger value="partners">Partenaires</TabsTrigger>
               <TabsTrigger value="shops">Boutiques</TabsTrigger>
+              <TabsTrigger value="admin" className="bg-[#FFCC00]/20">
+                <Shield className="w-4 h-4 mr-1" />
+                Administration
+              </TabsTrigger>
             </TabsList>
 
             {/* Users Tab */}
@@ -457,6 +564,123 @@ const AdminDashboard = () => {
                   )}
                 </CardContent>
               </Card>
+            </TabsContent>
+
+            {/* Administration Tab */}
+            <TabsContent value="admin" className="mt-6">
+              <div className="grid md:grid-cols-2 gap-6">
+                {/* Create Delegated Admin */}
+                <Card className="border-[#FFCC00]/30">
+                  <CardHeader>
+                    <div className="flex items-center gap-2">
+                      <div className="p-2 bg-[#FFCC00] rounded-lg">
+                        <UserPlus className="w-5 h-5 text-black" />
+                      </div>
+                      <div>
+                        <CardTitle className="text-lg">Créer un Admin Délégué</CardTitle>
+                        <CardDescription>Ajouter un nouveau super administrateur</CardDescription>
+                      </div>
+                    </div>
+                  </CardHeader>
+                  <CardContent>
+                    <form onSubmit={createDelegatedAdmin} className="space-y-4">
+                      <div className="space-y-2">
+                        <Label htmlFor="admin-name">Nom complet</Label>
+                        <Input
+                          id="admin-name"
+                          type="text"
+                          value={newAdminName}
+                          onChange={(e) => setNewAdminName(e.target.value)}
+                          placeholder="Jean Dupont"
+                          required
+                        />
+                      </div>
+                      <div className="space-y-2">
+                        <Label htmlFor="admin-email">Email</Label>
+                        <Input
+                          id="admin-email"
+                          type="email"
+                          value={newAdminEmail}
+                          onChange={(e) => setNewAdminEmail(e.target.value)}
+                          placeholder="admin.delegue@loummel.com"
+                          required
+                        />
+                      </div>
+                      <div className="space-y-2">
+                        <Label htmlFor="admin-password">Mot de passe</Label>
+                        <PasswordInput
+                          id="admin-password"
+                          value={newAdminPassword}
+                          onChange={setNewAdminPassword}
+                          showStrength
+                        />
+                      </div>
+                      <Button 
+                        type="submit" 
+                        className="w-full bg-[#CC9900] hover:bg-[#B38600] text-white"
+                        disabled={isCreatingAdmin}
+                      >
+                        {isCreatingAdmin ? (
+                          <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                        ) : (
+                          <UserPlus className="w-4 h-4 mr-2" />
+                        )}
+                        Créer l'admin délégué
+                      </Button>
+                    </form>
+                  </CardContent>
+                </Card>
+
+                {/* Existing Super Admins List */}
+                <Card>
+                  <CardHeader>
+                    <div className="flex items-center gap-2">
+                      <div className="p-2 bg-[#FFCC00] rounded-lg">
+                        <Shield className="w-5 h-5 text-black" />
+                      </div>
+                      <div>
+                        <CardTitle className="text-lg">Super Administrateurs</CardTitle>
+                        <CardDescription>{superAdmins.length} admin(s) actif(s)</CardDescription>
+                      </div>
+                    </div>
+                  </CardHeader>
+                  <CardContent>
+                    {superAdmins.length === 0 ? (
+                      <p className="text-center text-muted-foreground py-4">Aucun super admin trouvé</p>
+                    ) : (
+                      <div className="space-y-3">
+                        {superAdmins.map((admin) => (
+                          <div key={admin.userId} className="flex items-center justify-between p-3 border rounded-lg bg-[#FFCC00]/5">
+                            <div className="flex items-center gap-3">
+                              <div className="w-10 h-10 rounded-full bg-[#FFCC00] flex items-center justify-center">
+                                <Shield className="w-5 h-5 text-black" />
+                              </div>
+                              <div>
+                                <p className="font-semibold">{admin.full_name || "Sans nom"}</p>
+                                <p className="text-sm text-muted-foreground">{admin.email}</p>
+                              </div>
+                            </div>
+                            {admin.userId !== user?.id && (
+                              <Button 
+                                size="sm" 
+                                variant="outline" 
+                                className="text-red-600 hover:bg-red-50"
+                                onClick={() => revokeAdminRole(admin.userId)}
+                              >
+                                <Trash2 className="w-4 h-4 mr-1" />
+                                Révoquer
+                              </Button>
+                            )}
+                            {admin.userId === user?.id && (
+                              <Badge className="bg-green-100 text-green-800">Vous</Badge>
+                            )}
+                          </div>
+                        ))}
+                      </div>
+                    )}
+                  </CardContent>
+                </Card>
+              </div>
             </TabsContent>
           </Tabs>
         </div>
