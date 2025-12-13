@@ -188,8 +188,17 @@ const Backoffice = () => {
 
   if (loading) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-[#FFCC00]">
-        <Loader2 className="w-8 h-8 animate-spin text-black" />
+      <div className="min-h-screen flex flex-col items-center justify-center bg-[#FFCC00]">
+        <div className="w-20 h-20 rounded-full bg-black/10 backdrop-blur-sm flex items-center justify-center mb-6 animate-pulse">
+          <Shield className="w-10 h-10 text-black animate-[spin_3s_linear_infinite]" />
+        </div>
+        <h2 className="font-display text-xl font-bold text-black mb-2">Loummel Backoffice</h2>
+        <p className="text-black/70 animate-pulse">Vérification des droits d'accès...</p>
+        <div className="mt-4 flex gap-1">
+          <span className="w-2 h-2 bg-black/50 rounded-full animate-bounce" style={{ animationDelay: '0ms' }}></span>
+          <span className="w-2 h-2 bg-black/50 rounded-full animate-bounce" style={{ animationDelay: '150ms' }}></span>
+          <span className="w-2 h-2 bg-black/50 rounded-full animate-bounce" style={{ animationDelay: '300ms' }}></span>
+        </div>
       </div>
     );
   }
