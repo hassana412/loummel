@@ -1,21 +1,22 @@
 import { useState, useEffect } from "react";
-import { useNavigate, useSearchParams } from "react-router-dom";
+import { useNavigate, Link, useSearchParams } from "react-router-dom";
 import { useAuth } from "@/contexts/AuthContext";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { toast } from "@/hooks/use-toast";
-import { Loader2, Lock, Shield, ArrowLeft, Mail, KeyRound } from "lucide-react";
+import { Loader2, Lock, Store, Eye, EyeOff, ArrowLeft, Mail, KeyRound } from "lucide-react";
 import { z } from "zod";
 import { PasswordInput, getErrorMessage, getPasswordStrength } from "@/components/auth/AuthHelpers";
+import GoogleAuthButton from "@/components/auth/GoogleAuthButton";
 
 const emailSchema = z.string().email("Email invalide");
 const passwordSchema = z.string().min(6, "Le mot de passe doit contenir au moins 6 caractères");
 
 type AuthMode = "main" | "forgot" | "reset";
 
-const Backoffice = () => {
+const VendeurAuth = () => {
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
   const { user, roles, signIn, resetPassword, updatePassword, loading } = useAuth();
@@ -36,19 +37,18 @@ const Backoffice = () => {
     }
   }, [searchParams]);
 
-  // Redirect if already logged in with super_admin role ONLY
+  // Redirect if already logged in with shop_owner role
   useEffect(() => {
     if (user && !loading && authMode !== "reset") {
-      if (roles.includes("super_admin")) {
-        navigate("/dashboard/admin", { replace: true });
+      if (roles.includes("shop_owner")) {
+        navigate("/dashboard/boutique", { replace: true });
       } else {
-        // Non-admin users shouldn't access backoffice
         toast({
           title: "Accès refusé",
-          description: "Cette zone est réservée aux administrateurs.",
+          description: "Vous n'avez pas de boutique. Créez-en une d'abord.",
           variant: "destructive",
         });
-        navigate("/", { replace: true });
+        navigate("/inscription-vendeur", { replace: true });
       }
     }
   }, [user, roles, loading, navigate, authMode]);
@@ -86,7 +86,7 @@ const Backoffice = () => {
     
     toast({
       title: "Connexion réussie",
-      description: "Vérification des droits d'accès...",
+      description: "Redirection vers votre tableau de bord...",
     });
     
     setIsLoading(false);
@@ -180,7 +180,7 @@ const Backoffice = () => {
         description: "Vous pouvez maintenant vous connecter.",
       });
       setAuthMode("main");
-      navigate("/backoffice", { replace: true });
+      navigate("/auth/vendeur", { replace: true });
     }
     
     setIsLoading(false);
@@ -188,7 +188,7 @@ const Backoffice = () => {
 
   if (loading) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-red-700 to-red-900">
+      <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-green-600 to-green-800">
         <Loader2 className="w-8 h-8 animate-spin text-white" />
       </div>
     );
@@ -197,23 +197,23 @@ const Backoffice = () => {
   // Forgot Password View
   if (authMode === "forgot") {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-red-700 via-red-800 to-rose-900 p-4">
+      <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-green-600 via-green-700 to-emerald-800 p-4">
         <div className="w-full max-w-md">
           <Card className="shadow-2xl border-0 bg-white/95 backdrop-blur-sm">
             <CardHeader className="text-center">
-              <div className="mx-auto w-12 h-12 rounded-full bg-red-100 flex items-center justify-center mb-4">
-                <Mail className="w-6 h-6 text-red-600" />
+              <div className="mx-auto w-12 h-12 rounded-full bg-green-100 flex items-center justify-center mb-4">
+                <Mail className="w-6 h-6 text-green-600" />
               </div>
               <CardTitle className="font-display text-xl">Mot de passe oublié</CardTitle>
               <CardDescription>
-                {emailSent ? "Email envoyé !" : "Réinitialisez votre mot de passe admin"}
+                {emailSent ? "Email envoyé !" : "Réinitialisez votre mot de passe"}
               </CardDescription>
             </CardHeader>
             <CardContent>
               {emailSent ? (
                 <div className="space-y-4">
-                  <div className="p-4 bg-red-50 rounded-lg text-center">
-                    <p className="text-sm text-red-700">
+                  <div className="p-4 bg-green-50 rounded-lg text-center">
+                    <p className="text-sm text-green-700">
                       Consultez votre boîte de réception.
                     </p>
                   </div>
@@ -225,17 +225,17 @@ const Backoffice = () => {
               ) : (
                 <form onSubmit={handleForgotPassword} className="space-y-4">
                   <div className="space-y-2">
-                    <Label htmlFor="forgot-email">Email admin</Label>
+                    <Label htmlFor="forgot-email">Email</Label>
                     <Input
                       id="forgot-email"
                       type="email"
                       value={forgotEmail}
                       onChange={(e) => setForgotEmail(e.target.value)}
-                      placeholder="admin@loummel.com"
+                      placeholder="votre@email.com"
                       required
                     />
                   </div>
-                  <Button type="submit" className="w-full bg-red-600 hover:bg-red-700" disabled={isLoading}>
+                  <Button type="submit" className="w-full bg-green-600 hover:bg-green-700" disabled={isLoading}>
                     {isLoading && <Loader2 className="w-4 h-4 mr-2 animate-spin" />}
                     Envoyer le lien
                   </Button>
@@ -255,12 +255,12 @@ const Backoffice = () => {
   // Reset Password View
   if (authMode === "reset") {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-red-700 via-red-800 to-rose-900 p-4">
+      <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-green-600 via-green-700 to-emerald-800 p-4">
         <div className="w-full max-w-md">
           <Card className="shadow-2xl border-0 bg-white/95 backdrop-blur-sm">
             <CardHeader className="text-center">
-              <div className="mx-auto w-12 h-12 rounded-full bg-red-100 flex items-center justify-center mb-4">
-                <KeyRound className="w-6 h-6 text-red-600" />
+              <div className="mx-auto w-12 h-12 rounded-full bg-green-100 flex items-center justify-center mb-4">
+                <KeyRound className="w-6 h-6 text-green-600" />
               </div>
               <CardTitle className="font-display text-xl">Nouveau mot de passe</CardTitle>
             </CardHeader>
@@ -274,7 +274,7 @@ const Backoffice = () => {
                   <Label htmlFor="confirm-password">Confirmer</Label>
                   <PasswordInput id="confirm-password" value={confirmNewPassword} onChange={setConfirmNewPassword} />
                 </div>
-                <Button type="submit" className="w-full bg-red-600 hover:bg-red-700" disabled={isLoading}>
+                <Button type="submit" className="w-full bg-green-600 hover:bg-green-700" disabled={isLoading}>
                   {isLoading && <Loader2 className="w-4 h-4 mr-2 animate-spin" />}
                   Mettre à jour
                 </Button>
@@ -287,38 +287,52 @@ const Backoffice = () => {
   }
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-red-700 via-red-800 to-rose-900 p-4">
+    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-green-600 via-green-700 to-emerald-800 p-4">
       <div className="w-full max-w-md">
         {/* Logo */}
         <div className="text-center mb-8">
           <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-white/10 backdrop-blur-sm mb-4">
-            <Shield className="w-8 h-8 text-white" />
+            <Store className="w-8 h-8 text-white" />
           </div>
           <h1 className="font-display text-3xl font-bold text-white mb-2">
-            Loummel Backoffice
+            Espace Vendeur
           </h1>
           <p className="text-white/80">
-            Zone réservée aux Super Administrateurs
+            Gérez votre boutique sur Loummel
           </p>
         </div>
 
         <Card className="shadow-2xl border-0 bg-white/95 backdrop-blur-sm">
           <CardHeader className="text-center pb-2">
-            <CardTitle className="font-display text-xl">Connexion Admin</CardTitle>
+            <CardTitle className="font-display text-xl">Connexion Vendeur</CardTitle>
             <CardDescription>
-              Accédez au panneau d'administration
+              Accédez à votre tableau de bord boutique
             </CardDescription>
           </CardHeader>
           <CardContent>
+            <GoogleAuthButton 
+              className="mb-4" 
+              redirectTo={`${window.location.origin}/dashboard/boutique`}
+            />
+            
+            <div className="relative my-4">
+              <div className="absolute inset-0 flex items-center">
+                <span className="w-full border-t" />
+              </div>
+              <div className="relative flex justify-center text-xs uppercase">
+                <span className="bg-white px-2 text-muted-foreground">Ou</span>
+              </div>
+            </div>
+
             <form onSubmit={handleLogin} className="space-y-4">
               <div className="space-y-2">
-                <Label htmlFor="email">Email administrateur</Label>
+                <Label htmlFor="email">Email</Label>
                 <Input
                   id="email"
                   type="email"
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
-                  placeholder="admin@loummel.com"
+                  placeholder="votre@email.com"
                   required
                   className="h-11"
                 />
@@ -333,7 +347,7 @@ const Backoffice = () => {
                 />
               </div>
               
-              <Button type="submit" className="w-full h-11 bg-red-600 hover:bg-red-700" disabled={isLoading}>
+              <Button type="submit" className="w-full h-11 bg-green-600 hover:bg-green-700" disabled={isLoading}>
                 {isLoading ? (
                   <Loader2 className="w-4 h-4 mr-2 animate-spin" />
                 ) : (
@@ -343,19 +357,22 @@ const Backoffice = () => {
               </Button>
 
               <div className="text-center">
-                <button type="button" onClick={() => setAuthMode("forgot")} className="text-sm text-red-600 hover:underline">
+                <button type="button" onClick={() => setAuthMode("forgot")} className="text-sm text-green-600 hover:underline">
                   Mot de passe oublié ?
                 </button>
               </div>
             </form>
 
-            {/* Warning */}
-            <div className="mt-6 p-3 bg-red-50 rounded-lg border border-red-200">
-              <p className="text-xs text-red-700 text-center">
-                <Shield className="w-4 h-4 inline mr-1" />
-                Accès strictement réservé aux administrateurs autorisés.
-                Toute tentative non autorisée sera enregistrée.
+            <div className="mt-6 pt-4 border-t text-center">
+              <p className="text-sm text-muted-foreground mb-2">
+                Pas encore de boutique ?
               </p>
+              <Link to="/inscription-vendeur">
+                <Button variant="outline" className="w-full">
+                  <Store className="w-4 h-4 mr-2" />
+                  Créer ma boutique
+                </Button>
+              </Link>
             </div>
           </CardContent>
         </Card>
@@ -368,4 +385,4 @@ const Backoffice = () => {
   );
 };
 
-export default Backoffice;
+export default VendeurAuth;

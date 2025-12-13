@@ -91,7 +91,7 @@ const Header = () => {
             <div className="flex items-center gap-2">
               {user && <NotificationBell />}
               
-              <Link to={user ? getDashboardLink() : "/auth"}>
+              <Link to={user ? getDashboardLink() : "/connexion"}>
                 <Button variant="ghost" size="icon" className="hidden lg:flex">
                   <User className="w-5 h-5" />
                 </Button>
@@ -189,7 +189,7 @@ const Header = () => {
                   Devenir Partenaire
                 </Button>
               </Link>
-              <Link to={user ? getDashboardLink() : "/auth"} onClick={() => setIsMenuOpen(false)}>
+              <Link to={user ? getDashboardLink() : "/connexion"} onClick={() => setIsMenuOpen(false)}>
                 <Button variant="outline" className="w-full">
                   <User className="w-4 h-4 mr-2" />
                   {user ? "Mon compte" : "Se connecter"}
