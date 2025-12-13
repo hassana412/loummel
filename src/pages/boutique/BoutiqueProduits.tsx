@@ -7,15 +7,36 @@ import { Badge } from "@/components/ui/badge";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { useShop } from "./BoutiqueLayout";
 
+// Import des images locales
+import artisanJewelry from "@/assets/artisan-jewelry.jpg";
+import artisanPottery from "@/assets/artisan-pottery.jpg";
+import artisanLeather from "@/assets/artisan-leather.jpg";
+import artisanTextiles from "@/assets/artisan-textiles.jpg";
+
+// Map des images locales
+const imageMap: Record<string, string> = {
+  '/src/assets/artisan-jewelry.jpg': artisanJewelry,
+  '/src/assets/artisan-pottery.jpg': artisanPottery,
+  '/src/assets/artisan-leather.jpg': artisanLeather,
+  '/src/assets/artisan-textiles.jpg': artisanTextiles,
+};
+
+// Helper pour résoudre les URLs d'images
+const resolveImageUrl = (url: string | null): string => {
+  if (!url) return "/placeholder.svg";
+  if (imageMap[url]) return imageMap[url];
+  return url;
+};
+
 // Demo products for "artisanat-rhumsiki"
 const demoProducts = [
-  { id: "1", name: "Collier Fulani traditionnel", description: "Magnifique collier artisanal en perles multicolores et métal forgé. Pièce unique fabriquée par les artisans Fulani.", price: 35000, category: "Bijoux", image_url: "/placeholder.svg", is_promo: true, promo_price: 28000 },
-  { id: "2", name: "Poterie Rhumsiki décorative", description: "Vase décoratif peint à la main avec des motifs traditionnels du Sahel.", price: 28000, category: "Poterie", image_url: "/placeholder.svg", is_promo: false, promo_price: null },
-  { id: "3", name: "Sac en cuir tressé artisanal", description: "Sac en cuir de chèvre tanné naturellement. Design authentique avec finitions en cuivre.", price: 45000, category: "Cuir", image_url: "/placeholder.svg", is_promo: false, promo_price: null },
-  { id: "4", name: "Bracelet en cuivre gravé", description: "Bracelet en cuivre pur avec gravures de motifs traditionnels Fulani.", price: 18000, category: "Bijoux", image_url: "/placeholder.svg", is_promo: true, promo_price: 15000 },
-  { id: "5", name: "Tapis tissé Sahel authentique", description: "Grand tapis tissé à la main en laine naturelle. Dimensions 2m x 1.5m.", price: 85000, category: "Textiles", image_url: "/placeholder.svg", is_promo: false, promo_price: null },
-  { id: "6", name: "Sculpture montagne Rhumsiki", description: "Sculpture en bois d'ébène représentant les pics montagneux de Rhumsiki.", price: 55000, category: "Artisanat", image_url: "/placeholder.svg", is_promo: false, promo_price: null },
-  { id: "7", name: "Boubou brodé premium", description: "Boubou en bazin riche avec broderies artisanales traditionnelles.", price: 75000, category: "Textiles", image_url: "/placeholder.svg", is_promo: true, promo_price: 65000 },
+  { id: "1", name: "Collier Fulani traditionnel", description: "Magnifique collier artisanal en perles multicolores et métal forgé. Pièce unique fabriquée par les artisans Fulani.", price: 35000, category: "Bijoux", image_url: artisanJewelry, is_promo: true, promo_price: 28000 },
+  { id: "2", name: "Poterie Rhumsiki décorative", description: "Vase décoratif peint à la main avec des motifs traditionnels du Sahel.", price: 28000, category: "Poterie", image_url: artisanPottery, is_promo: false, promo_price: null },
+  { id: "3", name: "Sac en cuir tressé artisanal", description: "Sac en cuir de chèvre tanné naturellement. Design authentique avec finitions en cuivre.", price: 45000, category: "Cuir", image_url: artisanLeather, is_promo: false, promo_price: null },
+  { id: "4", name: "Bracelet en cuivre gravé", description: "Bracelet en cuivre pur avec gravures de motifs traditionnels Fulani.", price: 18000, category: "Bijoux", image_url: artisanJewelry, is_promo: true, promo_price: 15000 },
+  { id: "5", name: "Tapis tissé Sahel authentique", description: "Grand tapis tissé à la main en laine naturelle. Dimensions 2m x 1.5m.", price: 85000, category: "Textiles", image_url: artisanTextiles, is_promo: false, promo_price: null },
+  { id: "6", name: "Sculpture montagne Rhumsiki", description: "Sculpture en bois d'ébène représentant les pics montagneux de Rhumsiki.", price: 55000, category: "Artisanat", image_url: artisanPottery, is_promo: false, promo_price: null },
+  { id: "7", name: "Boubou brodé premium", description: "Boubou en bazin riche avec broderies artisanales traditionnelles.", price: 75000, category: "Textiles", image_url: artisanTextiles, is_promo: true, promo_price: 65000 },
 ];
 
 interface Product {
@@ -162,7 +183,7 @@ const BoutiqueProduits = () => {
               {/* Image */}
               <div className="relative h-48 overflow-hidden">
                 <img
-                  src={product.image_url || "/placeholder.svg"}
+                  src={resolveImageUrl(product.image_url)}
                   alt={product.name}
                   className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
                 />
