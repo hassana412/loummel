@@ -188,8 +188,8 @@ const Backoffice = () => {
 
   if (loading) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-amber-600 to-yellow-800">
-        <Loader2 className="w-8 h-8 animate-spin text-white" />
+      <div className="min-h-screen flex items-center justify-center bg-[#FFCC00]">
+        <Loader2 className="w-8 h-8 animate-spin text-black" />
       </div>
     );
   }
@@ -197,12 +197,12 @@ const Backoffice = () => {
   // Forgot Password View
   if (authMode === "forgot") {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-amber-600 via-yellow-700 to-amber-800 p-4">
+      <div className="min-h-screen flex items-center justify-center bg-[#FFCC00] p-4">
         <div className="w-full max-w-md">
           <Card className="shadow-2xl border-0 bg-white/95 backdrop-blur-sm">
             <CardHeader className="text-center">
-              <div className="mx-auto w-12 h-12 rounded-full bg-amber-100 flex items-center justify-center mb-4">
-                <Mail className="w-6 h-6 text-amber-600" />
+              <div className="mx-auto w-12 h-12 rounded-full bg-yellow-200 flex items-center justify-center mb-4">
+                <Mail className="w-6 h-6 text-[#996600]" />
               </div>
               <CardTitle className="font-display text-xl">Mot de passe oublié</CardTitle>
               <CardDescription>
@@ -212,8 +212,8 @@ const Backoffice = () => {
             <CardContent>
               {emailSent ? (
                 <div className="space-y-4">
-                  <div className="p-4 bg-amber-50 rounded-lg text-center">
-                    <p className="text-sm text-amber-700">
+                  <div className="p-4 bg-yellow-100 rounded-lg text-center">
+                    <p className="text-sm text-[#996600]">
                       Consultez votre boîte de réception.
                     </p>
                   </div>
@@ -235,7 +235,7 @@ const Backoffice = () => {
                       required
                     />
                   </div>
-                  <Button type="submit" className="w-full bg-amber-600 hover:bg-amber-700" disabled={isLoading}>
+                  <Button type="submit" className="w-full bg-[#CC9900] hover:bg-[#B38600] text-white" disabled={isLoading}>
                     {isLoading && <Loader2 className="w-4 h-4 mr-2 animate-spin" />}
                     Envoyer le lien
                   </Button>
@@ -255,12 +255,12 @@ const Backoffice = () => {
   // Reset Password View
   if (authMode === "reset") {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-amber-600 via-yellow-700 to-amber-800 p-4">
+      <div className="min-h-screen flex items-center justify-center bg-[#FFCC00] p-4">
         <div className="w-full max-w-md">
           <Card className="shadow-2xl border-0 bg-white/95 backdrop-blur-sm">
             <CardHeader className="text-center">
-              <div className="mx-auto w-12 h-12 rounded-full bg-amber-100 flex items-center justify-center mb-4">
-                <KeyRound className="w-6 h-6 text-amber-600" />
+              <div className="mx-auto w-12 h-12 rounded-full bg-yellow-200 flex items-center justify-center mb-4">
+                <KeyRound className="w-6 h-6 text-[#996600]" />
               </div>
               <CardTitle className="font-display text-xl">Nouveau mot de passe</CardTitle>
             </CardHeader>
@@ -274,7 +274,7 @@ const Backoffice = () => {
                   <Label htmlFor="confirm-password">Confirmer</Label>
                   <PasswordInput id="confirm-password" value={confirmNewPassword} onChange={setConfirmNewPassword} />
                 </div>
-                <Button type="submit" className="w-full bg-amber-600 hover:bg-amber-700" disabled={isLoading}>
+                <Button type="submit" className="w-full bg-[#CC9900] hover:bg-[#B38600] text-white" disabled={isLoading}>
                   {isLoading && <Loader2 className="w-4 h-4 mr-2 animate-spin" />}
                   Mettre à jour
                 </Button>
@@ -287,17 +287,17 @@ const Backoffice = () => {
   }
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-amber-600 via-yellow-700 to-amber-800 p-4">
+    <div className="min-h-screen flex items-center justify-center bg-[#FFCC00] p-4">
       <div className="w-full max-w-md">
         {/* Logo */}
         <div className="text-center mb-8">
-          <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-white/10 backdrop-blur-sm mb-4">
-            <Shield className="w-8 h-8 text-white" />
+          <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-black/10 backdrop-blur-sm mb-4">
+            <Shield className="w-8 h-8 text-black" />
           </div>
-          <h1 className="font-display text-3xl font-bold text-white mb-2">
+          <h1 className="font-display text-3xl font-bold text-black mb-2">
             Loummel Backoffice
           </h1>
-          <p className="text-white/80">
+          <p className="text-black/70">
             Zone réservée aux Super Administrateurs
           </p>
         </div>
@@ -333,7 +333,7 @@ const Backoffice = () => {
                 />
               </div>
               
-              <Button type="submit" className="w-full h-11 bg-amber-600 hover:bg-amber-700" disabled={isLoading}>
+              <Button type="submit" className="w-full h-11 bg-[#CC9900] hover:bg-[#B38600] text-white" disabled={isLoading}>
                 {isLoading ? (
                   <Loader2 className="w-4 h-4 mr-2 animate-spin" />
                 ) : (
@@ -343,15 +343,15 @@ const Backoffice = () => {
               </Button>
 
               <div className="text-center">
-                <button type="button" onClick={() => setAuthMode("forgot")} className="text-sm text-amber-700 hover:underline">
+                <button type="button" onClick={() => setAuthMode("forgot")} className="text-sm text-[#996600] hover:underline">
                   Mot de passe oublié ?
                 </button>
               </div>
             </form>
 
             {/* Warning */}
-            <div className="mt-6 p-3 bg-amber-50 rounded-lg border border-amber-200">
-              <p className="text-xs text-amber-700 text-center">
+            <div className="mt-6 p-3 bg-yellow-100 rounded-lg border border-yellow-300">
+              <p className="text-xs text-[#996600] text-center">
                 <Shield className="w-4 h-4 inline mr-1" />
                 Accès strictement réservé aux administrateurs autorisés.
                 Toute tentative non autorisée sera enregistrée.
@@ -360,7 +360,7 @@ const Backoffice = () => {
           </CardContent>
         </Card>
 
-        <p className="text-center text-white/60 text-sm mt-6">
+        <p className="text-center text-black/60 text-sm mt-6">
           © 2024 Loummel. Tous droits réservés.
         </p>
       </div>
