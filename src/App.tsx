@@ -13,6 +13,7 @@ import Backoffice from "./pages/Backoffice";
 import Recherche from "./pages/Recherche";
 import InscriptionVendeur from "./pages/InscriptionVendeur";
 import DevenirPartenaire from "./pages/DevenirPartenaire";
+import CreerMaBoutique from "./pages/CreerMaBoutique";
 
 // Auth pages
 import ClientAuth from "./pages/auth/ClientAuth";
@@ -45,6 +46,7 @@ const App = () => (
             <Route path="/recherche" element={<Recherche />} />
             <Route path="/inscription-vendeur" element={<InscriptionVendeur />} />
             <Route path="/devenir-partenaire" element={<DevenirPartenaire />} />
+            <Route path="/creer-ma-boutique" element={<CreerMaBoutique />} />
             
             {/* Auth routes - 4 separate login pages */}
             <Route path="/connexion" element={<ClientAuth />} />
