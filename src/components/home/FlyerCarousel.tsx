@@ -3,35 +3,36 @@ import { ChevronLeft, ChevronRight, Flame, Sparkles, Gift, Percent, Store, Clock
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Link } from "react-router-dom";
+import { supabase } from "@/integrations/supabase/client";
 
 interface Flyer {
   id: string;
   type: 'promo' | 'new_shop' | 'deal' | 'event';
   title: string;
   subtitle: string;
-  description: string;
-  image: string;
-  ctaText: string;
-  ctaLink: string;
-  badge?: string;
-  discount?: string;
-  endDate?: string;
+  description: string | null;
+  image_url: string | null;
+  cta_text: string;
+  cta_link: string;
+  badge: string | null;
+  discount: string | null;
+  end_date: string | null;
   gradient: string;
 }
 
-const flyers: Flyer[] = [
+const defaultFlyers: Flyer[] = [
   {
     id: "1",
     type: "deal",
     title: "🔥 Ventes Flash",
     subtitle: "Jusqu'à -50% sur l'artisanat",
     description: "Profitez de réductions exceptionnelles sur nos produits artisanaux du Nord Cameroun",
-    image: "/placeholder.svg",
-    ctaText: "Voir les offres",
-    ctaLink: "/recherche?promo=true",
+    image_url: null,
+    cta_text: "Voir les offres",
+    cta_link: "/recherche?promo=true",
     badge: "FLASH DEAL",
     discount: "-50%",
-    endDate: "24h restantes",
+    end_date: null,
     gradient: "from-red-600 via-orange-500 to-yellow-500"
   },
   {
@@ -40,42 +41,37 @@ const flyers: Flyer[] = [
     title: "✨ Nouvelle Boutique",
     subtitle: "Artisanat Mandara",
     description: "Découvrez les créations uniques de notre nouvel artisan partenaire",
-    image: "/placeholder.svg",
-    ctaText: "Découvrir",
-    ctaLink: "/boutique/artisanat-mandara",
+    image_url: null,
+    cta_text: "Découvrir",
+    cta_link: "/recherche",
     badge: "NOUVEAU",
+    discount: null,
+    end_date: null,
     gradient: "from-emerald-600 via-teal-500 to-cyan-500"
-  },
-  {
-    id: "3",
-    type: "promo",
-    title: "🎁 Offre Spéciale",
-    subtitle: "Livraison gratuite",
-    description: "Livraison offerte sur toutes vos commandes à partir de 25 000 FCFA",
-    image: "/placeholder.svg",
-    ctaText: "En profiter",
-    ctaLink: "/recherche",
-    badge: "PROMO",
-    gradient: "from-violet-600 via-purple-500 to-pink-500"
-  },
-  {
-    id: "4",
-    type: "event",
-    title: "🛍️ Pack VIP",
-    subtitle: "15 000 FCFA/an",
-    description: "Boostez votre visibilité avec notre formule VIP premium",
-    image: "/placeholder.svg",
-    ctaText: "Devenir VIP",
-    ctaLink: "/inscription-vendeur",
-    badge: "VIP",
-    gradient: "from-amber-500 via-yellow-500 to-orange-400"
   }
 ];
 
 const FlyerCarousel = () => {
+  const [flyers, setFlyers] = useState<Flyer[]>(defaultFlyers);
   const [currentIndex, setCurrentIndex] = useState(0);
   const [isAutoPlaying, setIsAutoPlaying] = useState(true);
   const [isAnimating, setIsAnimating] = useState(false);
+
+  useEffect(() => {
+    const fetchFlyers = async () => {
+      const { data, error } = await supabase
+        .from('flyers')
+        .select('*')
+        .eq('is_active', true)
+        .order('sort_order', { ascending: true });
+
+      if (data && data.length > 0) {
+        setFlyers(data as Flyer[]);
+      }
+    };
+
+    fetchFlyers();
+  }, []);
 
   const goToSlide = useCallback((index: number) => {
     if (isAnimating) return;
@@ -87,18 +83,18 @@ const FlyerCarousel = () => {
   const goToPrevious = useCallback(() => {
     const newIndex = currentIndex === 0 ? flyers.length - 1 : currentIndex - 1;
     goToSlide(newIndex);
-  }, [currentIndex, goToSlide]);
+  }, [currentIndex, flyers.length, goToSlide]);
 
   const goToNext = useCallback(() => {
     const newIndex = (currentIndex + 1) % flyers.length;
     goToSlide(newIndex);
-  }, [currentIndex, goToSlide]);
+  }, [currentIndex, flyers.length, goToSlide]);
 
   useEffect(() => {
-    if (!isAutoPlaying) return;
+    if (!isAutoPlaying || flyers.length <= 1) return;
     const interval = setInterval(goToNext, 5000);
     return () => clearInterval(interval);
-  }, [isAutoPlaying, goToNext]);
+  }, [isAutoPlaying, goToNext, flyers.length]);
 
   const getTypeIcon = (type: string) => {
     switch (type) {
@@ -110,7 +106,22 @@ const FlyerCarousel = () => {
     }
   };
 
-  const currentFlyer = flyers[currentIndex];
+  const calculateTimeRemaining = (endDate: string | null) => {
+    if (!endDate) return null;
+    const end = new Date(endDate);
+    const now = new Date();
+    const diff = end.getTime() - now.getTime();
+    if (diff <= 0) return null;
+    
+    const hours = Math.floor(diff / (1000 * 60 * 60));
+    if (hours > 24) {
+      const days = Math.floor(hours / 24);
+      return `${days}j restants`;
+    }
+    return `${hours}h restantes`;
+  };
+
+  if (flyers.length === 0) return null;
 
   return (
     <section 
@@ -152,10 +163,10 @@ const FlyerCarousel = () => {
                       {getTypeIcon(flyer.type)}
                       <span className="ml-1">{flyer.badge}</span>
                     </Badge>
-                    {flyer.endDate && (
+                    {flyer.end_date && calculateTimeRemaining(flyer.end_date) && (
                       <span className="flex items-center gap-1 text-sm text-white/90">
                         <Clock className="w-4 h-4" />
-                        {flyer.endDate}
+                        {calculateTimeRemaining(flyer.end_date)}
                       </span>
                     )}
                   </div>
@@ -178,17 +189,19 @@ const FlyerCarousel = () => {
                   </div>
 
                   {/* Description */}
-                  <p className="text-base md:text-lg text-white/80 max-w-md">
-                    {flyer.description}
-                  </p>
+                  {flyer.description && (
+                    <p className="text-base md:text-lg text-white/80 max-w-md">
+                      {flyer.description}
+                    </p>
+                  )}
 
                   {/* CTA */}
-                  <Link to={flyer.ctaLink}>
+                  <Link to={flyer.cta_link}>
                     <Button 
                       size="lg" 
                       className="bg-white text-foreground hover:bg-white/90 font-bold shadow-lg hover:shadow-xl transition-all hover:scale-105 mt-2"
                     >
-                      {flyer.ctaText}
+                      {flyer.cta_text}
                       <ChevronRight className="w-5 h-5 ml-1" />
                     </Button>
                   </Link>
@@ -226,59 +239,67 @@ const FlyerCarousel = () => {
         ))}
 
         {/* Navigation Arrows */}
-        <button
-          onClick={goToPrevious}
-          className="absolute left-4 top-1/2 -translate-y-1/2 z-20 p-2 rounded-full bg-white/20 backdrop-blur-sm text-white hover:bg-white/30 transition-all hover:scale-110"
-          aria-label="Previous"
-        >
-          <ChevronLeft className="w-6 h-6" />
-        </button>
-        <button
-          onClick={goToNext}
-          className="absolute right-4 top-1/2 -translate-y-1/2 z-20 p-2 rounded-full bg-white/20 backdrop-blur-sm text-white hover:bg-white/30 transition-all hover:scale-110"
-          aria-label="Next"
-        >
-          <ChevronRight className="w-6 h-6" />
-        </button>
+        {flyers.length > 1 && (
+          <>
+            <button
+              onClick={goToPrevious}
+              className="absolute left-4 top-1/2 -translate-y-1/2 z-20 p-2 rounded-full bg-white/20 backdrop-blur-sm text-white hover:bg-white/30 transition-all hover:scale-110"
+              aria-label="Previous"
+            >
+              <ChevronLeft className="w-6 h-6" />
+            </button>
+            <button
+              onClick={goToNext}
+              className="absolute right-4 top-1/2 -translate-y-1/2 z-20 p-2 rounded-full bg-white/20 backdrop-blur-sm text-white hover:bg-white/30 transition-all hover:scale-110"
+              aria-label="Next"
+            >
+              <ChevronRight className="w-6 h-6" />
+            </button>
+          </>
+        )}
       </div>
 
       {/* Dots Indicator */}
-      <div className="absolute bottom-4 left-1/2 -translate-x-1/2 z-20 flex gap-2">
-        {flyers.map((_, index) => (
-          <button
-            key={index}
-            onClick={() => goToSlide(index)}
-            className={`h-2 rounded-full transition-all duration-300 ${
-              index === currentIndex
-                ? 'w-8 bg-white'
-                : 'w-2 bg-white/50 hover:bg-white/70'
-            }`}
-            aria-label={`Go to slide ${index + 1}`}
-          />
-        ))}
-      </div>
-
-      {/* Mini Flyer Previews - Desktop only */}
-      <div className="hidden xl:block absolute bottom-6 right-8 z-20">
-        <div className="flex gap-2">
-          {flyers.map((flyer, index) => (
+      {flyers.length > 1 && (
+        <div className="absolute bottom-4 left-1/2 -translate-x-1/2 z-20 flex gap-2">
+          {flyers.map((_, index) => (
             <button
-              key={flyer.id}
+              key={index}
               onClick={() => goToSlide(index)}
-              className={`relative w-16 h-12 rounded-lg overflow-hidden transition-all ${
+              className={`h-2 rounded-full transition-all duration-300 ${
                 index === currentIndex
-                  ? 'ring-2 ring-white scale-110'
-                  : 'opacity-70 hover:opacity-100'
+                  ? 'w-8 bg-white'
+                  : 'w-2 bg-white/50 hover:bg-white/70'
               }`}
-            >
-              <div className={`absolute inset-0 bg-gradient-to-r ${flyer.gradient}`} />
-              <div className="absolute inset-0 flex items-center justify-center text-white">
-                {getTypeIcon(flyer.type)}
-              </div>
-            </button>
+              aria-label={`Go to slide ${index + 1}`}
+            />
           ))}
         </div>
-      </div>
+      )}
+
+      {/* Mini Flyer Previews - Desktop only */}
+      {flyers.length > 1 && (
+        <div className="hidden xl:block absolute bottom-6 right-8 z-20">
+          <div className="flex gap-2">
+            {flyers.map((flyer, index) => (
+              <button
+                key={flyer.id}
+                onClick={() => goToSlide(index)}
+                className={`relative w-16 h-12 rounded-lg overflow-hidden transition-all ${
+                  index === currentIndex
+                    ? 'ring-2 ring-white scale-110'
+                    : 'opacity-70 hover:opacity-100'
+                }`}
+              >
+                <div className={`absolute inset-0 bg-gradient-to-r ${flyer.gradient}`} />
+                <div className="absolute inset-0 flex items-center justify-center text-white">
+                  {getTypeIcon(flyer.type)}
+                </div>
+              </button>
+            ))}
+          </div>
+        </div>
+      )}
     </section>
   );
 };

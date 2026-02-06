@@ -44,6 +44,66 @@ export type Database = {
         }
         Relationships: []
       }
+      flyers: {
+        Row: {
+          badge: string | null
+          created_at: string
+          created_by: string | null
+          cta_link: string
+          cta_text: string
+          description: string | null
+          discount: string | null
+          end_date: string | null
+          gradient: string
+          id: string
+          image_url: string | null
+          is_active: boolean
+          sort_order: number
+          subtitle: string
+          title: string
+          type: string
+          updated_at: string
+        }
+        Insert: {
+          badge?: string | null
+          created_at?: string
+          created_by?: string | null
+          cta_link?: string
+          cta_text?: string
+          description?: string | null
+          discount?: string | null
+          end_date?: string | null
+          gradient?: string
+          id?: string
+          image_url?: string | null
+          is_active?: boolean
+          sort_order?: number
+          subtitle: string
+          title: string
+          type: string
+          updated_at?: string
+        }
+        Update: {
+          badge?: string | null
+          created_at?: string
+          created_by?: string | null
+          cta_link?: string
+          cta_text?: string
+          description?: string | null
+          discount?: string | null
+          end_date?: string | null
+          gradient?: string
+          id?: string
+          image_url?: string | null
+          is_active?: boolean
+          sort_order?: number
+          subtitle?: string
+          title?: string
+          type?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
       notifications: {
         Row: {
           created_at: string | null
