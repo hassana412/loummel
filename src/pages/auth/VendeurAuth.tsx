@@ -13,19 +13,22 @@ import GoogleAuthButton from "@/components/auth/GoogleAuthButton";
 
 const emailSchema = z.string().email("Email invalide");
 const passwordSchema = z.string().min(6, "Le mot de passe doit contenir au moins 6 caractères");
+const nameSchema = z.string().min(2, "Le nom doit contenir au moins 2 caractères");
 
-type AuthMode = "main" | "forgot" | "reset";
+type AuthMode = "login" | "signup" | "forgot" | "reset";
 
 const VendeurAuth = () => {
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
-  const { user, roles, signIn, resetPassword, updatePassword, loading } = useAuth();
+  const { user, roles, signIn, signUp, resetPassword, updatePassword, loading } = useAuth();
   
   const [isLoading, setIsLoading] = useState(false);
-  const [authMode, setAuthMode] = useState<AuthMode>("main");
+  const [authMode, setAuthMode] = useState<AuthMode>("login");
   const [emailSent, setEmailSent] = useState(false);
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [fullName, setFullName] = useState("");
+  const [confirmPassword, setConfirmPassword] = useState("");
   const [forgotEmail, setForgotEmail] = useState("");
   const [newPassword, setNewPassword] = useState("");
   const [confirmNewPassword, setConfirmNewPassword] = useState("");
@@ -34,24 +37,82 @@ const VendeurAuth = () => {
     const mode = searchParams.get("mode");
     if (mode === "reset") {
       setAuthMode("reset");
+    } else if (mode === "signup") {
+      setAuthMode("signup");
     }
   }, [searchParams]);
 
   // Redirect if already logged in with shop_owner role
   useEffect(() => {
     if (user && !loading && authMode !== "reset") {
+      const redirectUrl = searchParams.get("redirect");
       if (roles.includes("shop_owner")) {
-        navigate("/dashboard/boutique", { replace: true });
+        navigate(redirectUrl || "/dashboard/boutique", { replace: true });
       } else {
-        toast({
-          title: "Accès refusé",
-          description: "Vous n'avez pas de boutique. Créez-en une d'abord.",
-          variant: "destructive",
-        });
-        navigate("/inscription-vendeur", { replace: true });
+        // User is logged in but has no shop - redirect to shop creation
+        navigate(redirectUrl || "/creer-ma-boutique", { replace: true });
       }
     }
-  }, [user, roles, loading, navigate, authMode]);
+  }, [user, roles, loading, navigate, authMode, searchParams]);
+
+  const handleSignup = async (e: React.FormEvent) => {
+    e.preventDefault();
+    
+    try {
+      emailSchema.parse(email);
+      passwordSchema.parse(password);
+      nameSchema.parse(fullName);
+    } catch (err) {
+      if (err instanceof z.ZodError) {
+        toast({
+          title: "Erreur de validation",
+          description: err.errors[0].message,
+          variant: "destructive",
+        });
+        return;
+      }
+    }
+
+    if (password !== confirmPassword) {
+      toast({
+        title: "Erreur",
+        description: "Les mots de passe ne correspondent pas",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    const strength = getPasswordStrength(password);
+    if (strength.score < 2) {
+      toast({
+        title: "Mot de passe trop faible",
+        description: "Utilisez au moins 8 caractères avec des majuscules et des chiffres.",
+        variant: "destructive",
+      });
+      return;
+    }
+    
+    setIsLoading(true);
+    
+    const { error } = await signUp(email, password, fullName);
+    
+    if (error) {
+      toast({
+        title: "Erreur d'inscription",
+        description: getErrorMessage(error),
+        variant: "destructive",
+      });
+      setIsLoading(false);
+      return;
+    }
+    
+    toast({
+      title: "🎉 Compte créé !",
+      description: "Vérifiez votre email pour confirmer votre inscription.",
+    });
+    
+    setIsLoading(false);
+  };
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -179,7 +240,7 @@ const VendeurAuth = () => {
         title: "Mot de passe mis à jour !",
         description: "Vous pouvez maintenant vous connecter.",
       });
-      setAuthMode("main");
+      setAuthMode("login");
       navigate("/auth/vendeur", { replace: true });
     }
     
@@ -217,7 +278,7 @@ const VendeurAuth = () => {
                       Consultez votre boîte de réception.
                     </p>
                   </div>
-                  <Button variant="outline" className="w-full" onClick={() => { setAuthMode("main"); setEmailSent(false); }}>
+                  <Button variant="outline" className="w-full" onClick={() => { setAuthMode("login"); setEmailSent(false); }}>
                     <ArrowLeft className="w-4 h-4 mr-2" />
                     Retour
                   </Button>
@@ -239,7 +300,7 @@ const VendeurAuth = () => {
                     {isLoading && <Loader2 className="w-4 h-4 mr-2 animate-spin" />}
                     Envoyer le lien
                   </Button>
-                  <Button type="button" variant="ghost" className="w-full" onClick={() => setAuthMode("main")}>
+                  <Button type="button" variant="ghost" className="w-full" onClick={() => setAuthMode("login")}>
                     <ArrowLeft className="w-4 h-4 mr-2" />
                     Retour
                   </Button>
@@ -286,6 +347,122 @@ const VendeurAuth = () => {
     );
   }
 
+  // Signup View
+  if (authMode === "signup") {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-green-600 via-green-700 to-emerald-800 p-4">
+        <div className="w-full max-w-md">
+          <div className="text-center mb-8">
+            <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-white/10 backdrop-blur-sm mb-4">
+              <Store className="w-8 h-8 text-white" />
+            </div>
+            <h1 className="font-display text-3xl font-bold text-white mb-2">
+              Créer un compte
+            </h1>
+            <p className="text-white/80">
+              Pour créer votre boutique sur Loummel
+            </p>
+          </div>
+
+          <Card className="shadow-2xl border-0 bg-white/95 backdrop-blur-sm">
+            <CardHeader className="text-center pb-2">
+              <CardTitle className="font-display text-xl">Inscription Vendeur</CardTitle>
+              <CardDescription>
+                Créez votre compte pour démarrer
+              </CardDescription>
+            </CardHeader>
+            <CardContent>
+              <GoogleAuthButton 
+                className="mb-4" 
+                redirectTo={`${window.location.origin}/creer-ma-boutique`}
+              />
+              
+              <div className="relative my-4">
+                <div className="absolute inset-0 flex items-center">
+                  <span className="w-full border-t" />
+                </div>
+                <div className="relative flex justify-center text-xs uppercase">
+                  <span className="bg-white px-2 text-muted-foreground">Ou</span>
+                </div>
+              </div>
+
+              <form onSubmit={handleSignup} className="space-y-4">
+                <div className="space-y-2">
+                  <Label htmlFor="fullName">Nom complet</Label>
+                  <Input
+                    id="fullName"
+                    type="text"
+                    value={fullName}
+                    onChange={(e) => setFullName(e.target.value)}
+                    placeholder="Votre nom complet"
+                    required
+                    className="h-11"
+                  />
+                </div>
+                
+                <div className="space-y-2">
+                  <Label htmlFor="signup-email">Email</Label>
+                  <Input
+                    id="signup-email"
+                    type="email"
+                    value={email}
+                    onChange={(e) => setEmail(e.target.value)}
+                    placeholder="votre@email.com"
+                    required
+                    className="h-11"
+                  />
+                </div>
+                
+                <div className="space-y-2">
+                  <Label htmlFor="signup-password">Mot de passe</Label>
+                  <PasswordInput
+                    id="signup-password"
+                    value={password}
+                    onChange={setPassword}
+                    showStrength
+                  />
+                </div>
+                
+                <div className="space-y-2">
+                  <Label htmlFor="confirm-signup-password">Confirmer le mot de passe</Label>
+                  <PasswordInput
+                    id="confirm-signup-password"
+                    value={confirmPassword}
+                    onChange={setConfirmPassword}
+                  />
+                </div>
+                
+                <Button type="submit" className="w-full h-11 bg-green-600 hover:bg-green-700" disabled={isLoading}>
+                  {isLoading ? (
+                    <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                  ) : (
+                    <Store className="w-4 h-4 mr-2" />
+                  )}
+                  Créer mon compte
+                </Button>
+              </form>
+
+              <div className="mt-6 pt-4 border-t text-center">
+                <p className="text-sm text-muted-foreground mb-2">
+                  Déjà un compte ?
+                </p>
+                <Button variant="outline" className="w-full" onClick={() => setAuthMode("login")}>
+                  <Lock className="w-4 h-4 mr-2" />
+                  Se connecter
+                </Button>
+              </div>
+            </CardContent>
+          </Card>
+
+          <p className="text-center text-white/60 text-sm mt-6">
+            © 2024 Loummel. Tous droits réservés.
+          </p>
+        </div>
+      </div>
+    );
+  }
+
+  // Login View (default)
   return (
     <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-green-600 via-green-700 to-emerald-800 p-4">
       <div className="w-full max-w-md">
@@ -365,14 +542,12 @@ const VendeurAuth = () => {
 
             <div className="mt-6 pt-4 border-t text-center">
               <p className="text-sm text-muted-foreground mb-2">
-                Pas encore de boutique ?
+                Pas encore de compte ?
               </p>
-              <Link to="/inscription-vendeur">
-                <Button variant="outline" className="w-full">
-                  <Store className="w-4 h-4 mr-2" />
-                  Créer ma boutique
-                </Button>
-              </Link>
+              <Button variant="outline" className="w-full" onClick={() => setAuthMode("signup")}>
+                <Store className="w-4 h-4 mr-2" />
+                Créer un compte vendeur
+              </Button>
             </div>
           </CardContent>
         </Card>
