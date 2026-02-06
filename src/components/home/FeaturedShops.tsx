@@ -1,5 +1,6 @@
 import { Star, MapPin, ExternalLink } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
 import potteryImg from "@/assets/artisan-pottery.jpg";
 import leatherImg from "@/assets/artisan-leather.jpg";
 import textilesImg from "@/assets/artisan-textiles.jpg";
@@ -50,7 +51,7 @@ const shops = [
 
 const FeaturedShops = () => {
   return (
-    <section className="py-16 bg-secondary/30">
+    <section className="py-16 bg-secondary/50">
       <div className="container">
         <div className="text-center mb-12">
           <span className="text-primary font-semibold text-sm uppercase tracking-wider">
@@ -68,7 +69,7 @@ const FeaturedShops = () => {
           {shops.map((shop, index) => (
             <div
               key={shop.id}
-              className="group bg-card rounded-xl overflow-hidden shadow-sahel hover:shadow-sahel-card transition-all duration-300 animate-fade-up"
+              className="group bg-card rounded-xl overflow-hidden shadow-ecom hover:shadow-ecom-hover transition-all duration-300 hover:-translate-y-1 animate-fade-up border border-border"
               style={{ animationDelay: `${index * 0.1}s` }}
             >
               <div className="relative h-48 overflow-hidden">
@@ -78,9 +79,9 @@ const FeaturedShops = () => {
                   className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
                 />
                 {shop.featured && (
-                  <span className="absolute top-3 left-3 px-3 py-1 bg-accent text-accent-foreground text-xs font-semibold rounded-full">
+                  <Badge className="absolute top-3 left-3 bg-accent text-accent-foreground border-0">
                     ⭐ Vedette
-                  </span>
+                  </Badge>
                 )}
               </div>
               
@@ -101,11 +102,11 @@ const FeaturedShops = () => {
 
                 <div className="flex items-center justify-between">
                   <div className="flex items-center gap-1">
-                    <Star className="w-4 h-4 text-accent fill-accent" />
+                    <Star className="w-4 h-4 text-vip-gold fill-vip-gold" />
                     <span className="font-semibold text-foreground">{shop.rating}</span>
                     <span className="text-muted-foreground text-sm">({shop.reviews})</span>
                   </div>
-                  <Button variant="ghost" size="sm" className="text-primary">
+                  <Button variant="ghost" size="sm" className="text-primary hover:text-primary hover:bg-primary/10">
                     Visiter
                     <ExternalLink className="w-3 h-3 ml-1" />
                   </Button>
