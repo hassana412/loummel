@@ -16,9 +16,11 @@ import {
   Check, X, Clock, LogOut, Shield, Eye,
   Package, Briefcase, DollarSign, Search,
   Download, ExternalLink, UserX, Mail, Phone,
-  UserPlus, Trash2, Loader2, ClipboardList, KeyRound
+  UserPlus, Trash2, Loader2, ClipboardList, KeyRound,
+  Megaphone
 } from "lucide-react";
 import { PasswordInput, getPasswordStrength } from "@/components/auth/AuthHelpers";
+import FlyerManager from "@/components/admin/FlyerManager";
 
 interface Profile {
   id: string;
@@ -468,6 +470,10 @@ const AdminDashboard = () => {
               <TabsTrigger value="users">Utilisateurs</TabsTrigger>
               <TabsTrigger value="partners">Partenaires</TabsTrigger>
               <TabsTrigger value="shops">Boutiques</TabsTrigger>
+              <TabsTrigger value="flyers" className="bg-primary/10">
+                <Megaphone className="w-4 h-4 mr-1" />
+                Publicité
+              </TabsTrigger>
               <TabsTrigger value="audit" className="bg-blue-50">
                 <ClipboardList className="w-4 h-4 mr-1" />
                 Journal d'audit
@@ -526,6 +532,11 @@ const AdminDashboard = () => {
                   )}
                 </CardContent>
               </Card>
+            </TabsContent>
+
+            {/* Flyers/Advertising Tab */}
+            <TabsContent value="flyers" className="mt-6">
+              <FlyerManager />
             </TabsContent>
 
             {/* Partners Tab */}
