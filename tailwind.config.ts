@@ -61,15 +61,26 @@ export default {
           border: "hsl(var(--sidebar-border))",
           ring: "hsl(var(--sidebar-ring))",
         },
-        sahel: {
-          terracotta: "hsl(var(--sahel-terracotta))",
-          ochre: "hsl(var(--sahel-ochre))",
-          gold: "hsl(var(--sahel-gold))",
-          sand: "hsl(var(--sahel-sand))",
-          earth: "hsl(var(--sahel-earth))",
-          oasis: "hsl(var(--sahel-oasis))",
-          sunset: "hsl(var(--sahel-sunset))",
-          sky: "hsl(var(--sahel-sky))",
+        ecom: {
+          orange: "hsl(var(--ecom-orange))",
+          "orange-dark": "hsl(var(--ecom-orange-dark))",
+          gold: "hsl(var(--ecom-gold))",
+          teal: "hsl(var(--ecom-teal))",
+          navy: "hsl(var(--ecom-navy))",
+          red: "hsl(var(--ecom-red))",
+          green: "hsl(var(--ecom-green))",
+          lightgray: "hsl(var(--ecom-lightgray))",
+        },
+        deal: {
+          red: "hsl(var(--deal-red))",
+          badge: "hsl(var(--deal-badge))",
+        },
+        promo: {
+          yellow: "hsl(var(--promo-yellow))",
+        },
+        vip: {
+          gold: "hsl(var(--vip-gold))",
+          "gold-light": "hsl(var(--vip-gold-light))",
         },
       },
       borderRadius: {

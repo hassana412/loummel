@@ -43,16 +43,16 @@ const services = [
 
 const ServicesSection = () => {
   return (
-    <section className="py-16 bg-gradient-to-br from-sahel-earth to-sahel-earth/90">
+    <section className="py-16 bg-gradient-dark">
       <div className="container">
         <div className="text-center mb-12">
           <span className="text-accent font-semibold text-sm uppercase tracking-wider">
             Services Premium
           </span>
-          <h2 className="font-display text-3xl md:text-4xl font-bold text-primary-foreground mt-2 mb-4">
+          <h2 className="font-display text-3xl md:text-4xl font-bold text-white mt-2 mb-4">
             Boostez votre Boutique
           </h2>
-          <p className="text-primary-foreground/80 max-w-2xl mx-auto">
+          <p className="text-white/80 max-w-2xl mx-auto">
             Ajoutez des services supplémentaires pour augmenter votre visibilité et vos ventes
           </p>
         </div>
@@ -61,7 +61,7 @@ const ServicesSection = () => {
           {services.map((service, index) => (
             <div
               key={service.title}
-              className="group bg-primary-foreground/10 backdrop-blur-sm rounded-xl p-6 border border-primary-foreground/20 hover:bg-primary-foreground/15 transition-all duration-300 animate-fade-up"
+              className="group bg-white/10 backdrop-blur-sm rounded-xl p-6 border border-white/20 hover:bg-white/15 transition-all duration-300 animate-fade-up"
               style={{ animationDelay: `${index * 0.1}s` }}
             >
               <div className="flex items-start gap-4">
@@ -69,10 +69,10 @@ const ServicesSection = () => {
                   <service.icon className="w-6 h-6 text-accent" />
                 </div>
                 <div className="flex-1">
-                  <h3 className="font-display font-semibold text-primary-foreground text-lg mb-2">
+                  <h3 className="font-display font-semibold text-white text-lg mb-2">
                     {service.title}
                   </h3>
-                  <p className="text-primary-foreground/70 text-sm mb-3">
+                  <p className="text-white/70 text-sm mb-3">
                     {service.description}
                   </p>
                   <p className="text-accent font-semibold text-sm">
@@ -118,36 +118,36 @@ const ServicesSection = () => {
           </div>
 
           {/* VIP Pack */}
-          <div className="bg-gradient-to-br from-accent to-sahel-ochre rounded-xl p-6 flex flex-col justify-center animate-fade-up"
+          <div className="bg-gradient-to-br from-accent to-vip-gold rounded-xl p-6 flex flex-col justify-center animate-fade-up"
             style={{ animationDelay: "0.6s" }}
           >
-            <span className="text-xs font-bold uppercase tracking-wider text-accent-foreground/80 mb-2">Pack Complet</span>
-            <h3 className="font-display font-bold text-accent-foreground text-xl mb-4">
+            <span className="text-xs font-bold uppercase tracking-wider text-white/80 mb-2">Pack Complet</span>
+            <h3 className="font-display font-bold text-white text-xl mb-4">
               Pack VIP
             </h3>
             <ul className="space-y-2 mb-6">
-              <li className="flex items-center gap-2 text-accent-foreground/90 text-sm">
+              <li className="flex items-center gap-2 text-white/90 text-sm">
                 <CheckCircle2 className="w-4 h-4" />
                 Boutique 3 pages complète
               </li>
-              <li className="flex items-center gap-2 text-accent-foreground/90 text-sm">
+              <li className="flex items-center gap-2 text-white/90 text-sm">
                 <CheckCircle2 className="w-4 h-4" />
                 Référencement SEO inclus
               </li>
-              <li className="flex items-center gap-2 text-accent-foreground/90 text-sm">
+              <li className="flex items-center gap-2 text-white/90 text-sm">
                 <CheckCircle2 className="w-4 h-4" />
                 Pub Réseaux Sociaux inclus
               </li>
-              <li className="flex items-center gap-2 text-accent-foreground/90 text-sm">
+              <li className="flex items-center gap-2 text-white/90 text-sm">
                 <CheckCircle2 className="w-4 h-4" />
                 Accompagnement personnalisé
               </li>
             </ul>
             <div className="mb-4">
-              <span className="text-3xl font-bold text-accent-foreground">15 000</span>
-              <span className="text-accent-foreground/80"> FCFA/an</span>
+              <span className="text-3xl font-bold text-white">15 000</span>
+              <span className="text-white/80"> FCFA/an</span>
             </div>
-            <Button variant="sahel" className="w-full">
+            <Button variant="vip" className="w-full bg-white text-primary hover:bg-white/90">
               Souscrire VIP
             </Button>
           </div>

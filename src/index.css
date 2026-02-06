@@ -6,112 +6,120 @@
 
 @layer base {
   :root {
-    /* Sahel Theme - Nord Cameroun Colors */
-    --background: 35 30% 97%;
-    --foreground: 25 40% 15%;
+    /* E-commerce Vibrant Theme - Inspired by Amazon/Alibaba */
+    --background: 0 0% 100%;
+    --foreground: 220 20% 10%;
 
-    --card: 35 25% 95%;
-    --card-foreground: 25 40% 15%;
+    --card: 0 0% 100%;
+    --card-foreground: 220 20% 10%;
 
-    --popover: 35 30% 97%;
-    --popover-foreground: 25 40% 15%;
+    --popover: 0 0% 100%;
+    --popover-foreground: 220 20% 10%;
 
-    /* Terracotta Orange - Primary */
-    --primary: 20 70% 45%;
-    --primary-foreground: 35 30% 97%;
+    /* Orange vif - Amazon inspired Primary */
+    --primary: 25 95% 53%;
+    --primary-foreground: 0 0% 100%;
 
-    /* Sand Beige - Secondary */
-    --secondary: 35 35% 88%;
-    --secondary-foreground: 25 40% 20%;
+    /* Gris léger - Secondary */
+    --secondary: 220 14% 96%;
+    --secondary-foreground: 220 20% 20%;
 
-    /* Warm Muted */
-    --muted: 35 20% 90%;
-    --muted-foreground: 25 20% 45%;
+    /* Muted tones */
+    --muted: 220 14% 96%;
+    --muted-foreground: 220 10% 45%;
 
-    /* Golden Accent */
-    --accent: 42 80% 55%;
-    --accent-foreground: 25 40% 15%;
+    /* Orange doré - Accent deals/promos */
+    --accent: 38 92% 50%;
+    --accent-foreground: 0 0% 100%;
 
-    --destructive: 0 72% 51%;
+    --destructive: 0 84% 60%;
     --destructive-foreground: 0 0% 100%;
 
-    --border: 30 25% 85%;
-    --input: 30 25% 85%;
-    --ring: 20 70% 45%;
+    --border: 220 13% 91%;
+    --input: 220 13% 91%;
+    --ring: 25 95% 53%;
 
-    --radius: 0.75rem;
+    --radius: 0.5rem;
 
-    /* Sahel Custom Colors - Softer palette */
-    --sahel-terracotta: 20 55% 58%;
-    --sahel-ochre: 35 60% 62%;
-    --sahel-gold: 42 70% 60%;
-    --sahel-sand: 35 40% 92%;
-    --sahel-earth: 25 30% 35%;
-    --sahel-oasis: 160 35% 45%;
-    --sahel-sunset: 15 70% 65%;
-    --sahel-sky: 200 60% 88%;
+    /* E-commerce Custom Colors */
+    --ecom-orange: 25 95% 53%;
+    --ecom-orange-dark: 20 90% 45%;
+    --ecom-gold: 45 93% 47%;
+    --ecom-teal: 174 72% 40%;
+    --ecom-navy: 220 60% 20%;
+    --ecom-red: 0 84% 60%;
+    --ecom-green: 142 71% 45%;
+    --ecom-lightgray: 220 14% 96%;
+    
+    /* Deal/Promo Colors */
+    --deal-red: 0 85% 55%;
+    --deal-badge: 0 84% 60%;
+    --promo-yellow: 45 100% 51%;
+    --new-badge: 142 71% 45%;
     
     /* VIP Colors */
-    --vip-gold: 45 90% 55%;
-    --vip-gold-light: 45 85% 75%;
+    --vip-gold: 45 93% 47%;
+    --vip-gold-light: 45 90% 65%;
 
     /* Gradients */
-    --gradient-hero: linear-gradient(135deg, hsl(20 70% 45% / 0.9), hsl(35 75% 50% / 0.8));
-    --gradient-card: linear-gradient(180deg, hsl(35 25% 95%), hsl(35 35% 88%));
-    --gradient-accent: linear-gradient(135deg, hsl(42 80% 55%), hsl(20 70% 45%));
+    --gradient-hero: linear-gradient(135deg, hsl(25 95% 53%), hsl(38 92% 50%));
+    --gradient-deal: linear-gradient(135deg, hsl(0 85% 55%), hsl(25 95% 53%));
+    --gradient-promo: linear-gradient(135deg, hsl(38 92% 50%), hsl(45 93% 47%));
+    --gradient-dark: linear-gradient(135deg, hsl(220 60% 15%), hsl(220 60% 25%));
 
     /* Shadows */
-    --shadow-soft: 0 4px 20px -4px hsl(25 40% 25% / 0.15);
-    --shadow-glow: 0 0 40px hsl(42 80% 55% / 0.3);
-    --shadow-card: 0 8px 30px -8px hsl(25 40% 25% / 0.2);
+    --shadow-soft: 0 2px 8px -2px hsl(220 20% 10% / 0.1);
+    --shadow-card: 0 4px 12px -4px hsl(220 20% 10% / 0.15);
+    --shadow-hover: 0 8px 24px -8px hsl(220 20% 10% / 0.2);
+    --shadow-glow: 0 0 20px hsl(25 95% 53% / 0.3);
 
-    --sidebar-background: 35 25% 95%;
-    --sidebar-foreground: 25 40% 20%;
-    --sidebar-primary: 20 70% 45%;
-    --sidebar-primary-foreground: 35 30% 97%;
-    --sidebar-accent: 35 35% 88%;
-    --sidebar-accent-foreground: 25 40% 20%;
-    --sidebar-border: 30 25% 85%;
-    --sidebar-ring: 20 70% 45%;
+    --sidebar-background: 220 60% 15%;
+    --sidebar-foreground: 0 0% 100%;
+    --sidebar-primary: 25 95% 53%;
+    --sidebar-primary-foreground: 0 0% 100%;
+    --sidebar-accent: 220 60% 25%;
+    --sidebar-accent-foreground: 0 0% 100%;
+    --sidebar-border: 220 50% 25%;
+    --sidebar-ring: 25 95% 53%;
   }
 
   .dark {
-    --background: 25 30% 8%;
-    --foreground: 35 30% 95%;
+    --background: 220 20% 8%;
+    --foreground: 0 0% 98%;
 
-    --card: 25 25% 12%;
-    --card-foreground: 35 30% 95%;
+    --card: 220 20% 12%;
+    --card-foreground: 0 0% 98%;
 
-    --popover: 25 25% 12%;
-    --popover-foreground: 35 30% 95%;
+    --popover: 220 20% 12%;
+    --popover-foreground: 0 0% 98%;
 
-    --primary: 20 65% 50%;
-    --primary-foreground: 25 30% 8%;
+    --primary: 25 95% 55%;
+    --primary-foreground: 0 0% 100%;
 
-    --secondary: 25 20% 18%;
-    --secondary-foreground: 35 30% 95%;
+    --secondary: 220 20% 18%;
+    --secondary-foreground: 0 0% 98%;
 
-    --muted: 25 20% 18%;
-    --muted-foreground: 35 20% 65%;
+    --muted: 220 20% 18%;
+    --muted-foreground: 220 10% 65%;
 
-    --accent: 42 75% 50%;
-    --accent-foreground: 25 30% 8%;
+    --accent: 38 92% 55%;
+    --accent-foreground: 0 0% 100%;
 
-    --destructive: 0 62% 40%;
+    --destructive: 0 72% 50%;
     --destructive-foreground: 0 0% 100%;
 
-    --border: 25 20% 20%;
-    --input: 25 20% 20%;
-    --ring: 20 65% 50%;
+    --border: 220 20% 20%;
+    --input: 220 20% 20%;
+    --ring: 25 95% 55%;
 
-    --sidebar-background: 25 25% 10%;
-    --sidebar-foreground: 35 30% 95%;
-    --sidebar-primary: 20 65% 50%;
-    --sidebar-primary-foreground: 25 30% 8%;
-    --sidebar-accent: 25 20% 18%;
-    --sidebar-accent-foreground: 35 30% 95%;
-    --sidebar-border: 25 20% 20%;
-    --sidebar-ring: 20 65% 50%;
+    --sidebar-background: 220 25% 10%;
+    --sidebar-foreground: 0 0% 98%;
+    --sidebar-primary: 25 95% 55%;
+    --sidebar-primary-foreground: 0 0% 100%;
+    --sidebar-accent: 220 20% 18%;
+    --sidebar-accent-foreground: 0 0% 98%;
+    --sidebar-border: 220 20% 20%;
+    --sidebar-ring: 25 95% 55%;
   }
 }
 
@@ -132,27 +140,39 @@
 @layer utilities {
   .text-gradient {
     @apply bg-clip-text text-transparent;
-    background-image: var(--gradient-accent);
+    background-image: var(--gradient-hero);
   }
 
   .bg-gradient-hero {
     background-image: var(--gradient-hero);
   }
 
-  .bg-gradient-card {
-    background-image: var(--gradient-card);
+  .bg-gradient-deal {
+    background-image: var(--gradient-deal);
   }
 
-  .shadow-sahel {
+  .bg-gradient-promo {
+    background-image: var(--gradient-promo);
+  }
+
+  .bg-gradient-dark {
+    background-image: var(--gradient-dark);
+  }
+
+  .shadow-ecom {
     box-shadow: var(--shadow-soft);
   }
 
-  .shadow-sahel-glow {
-    box-shadow: var(--shadow-glow);
+  .shadow-ecom-card {
+    box-shadow: var(--shadow-card);
   }
 
-  .shadow-sahel-card {
-    box-shadow: var(--shadow-card);
+  .shadow-ecom-hover {
+    box-shadow: var(--shadow-hover);
+  }
+
+  .shadow-ecom-glow {
+    box-shadow: var(--shadow-glow);
   }
 
   .animate-fade-up {
@@ -169,6 +189,18 @@
 
   .animate-slide-left {
     animation: slideLeft 0.5s ease-out forwards;
+  }
+
+  .animate-slide-right {
+    animation: slideRight 0.5s ease-out forwards;
+  }
+
+  .animate-pulse-deal {
+    animation: pulseDeal 2s ease-in-out infinite;
+  }
+
+  .animate-bounce-subtle {
+    animation: bounceSubtle 2s ease-in-out infinite;
   }
 }
 
@@ -214,9 +246,55 @@
   }
 }
 
+@keyframes slideRight {
+  from {
+    opacity: 0;
+    transform: translateX(-30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+@keyframes pulseDeal {
+  0%, 100% {
+    transform: scale(1);
+    box-shadow: 0 0 0 0 hsl(0 85% 55% / 0.4);
+  }
+  50% {
+    transform: scale(1.02);
+    box-shadow: 0 0 20px 5px hsl(0 85% 55% / 0.2);
+  }
+}
+
+@keyframes bounceSubtle {
+  0%, 100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-5px);
+  }
+}
+
+/* Flyer carousel animation */
+@keyframes flyerSlide {
+  0% {
+    transform: translateX(0);
+  }
+  100% {
+    transform: translateX(-50%);
+  }
+}
+
+.animate-flyer-slide {
+  animation: flyerSlide 30s linear infinite;
+}
+
 /* Custom scrollbar */
 ::-webkit-scrollbar {
   width: 8px;
+  height: 8px;
 }
 
 ::-webkit-scrollbar-track {
@@ -230,4 +308,39 @@
 
 ::-webkit-scrollbar-thumb:hover {
   background: hsl(var(--primary));
+}
+
+/* Deal ribbon */
+.deal-ribbon {
+  position: absolute;
+  top: 12px;
+  left: -8px;
+  background: hsl(var(--deal-red));
+  color: white;
+  padding: 4px 12px 4px 16px;
+  font-size: 12px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  box-shadow: 0 2px 4px hsl(0 0% 0% / 0.2);
+}
+
+.deal-ribbon::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  bottom: -8px;
+  border-left: 8px solid transparent;
+  border-top: 8px solid hsl(0 70% 40%);
+}
+
+.deal-ribbon::after {
+  content: '';
+  position: absolute;
+  right: -6px;
+  top: 0;
+  bottom: 0;
+  border-top: 13px solid transparent;
+  border-bottom: 13px solid transparent;
+  border-left: 6px solid hsl(var(--deal-red));
 }

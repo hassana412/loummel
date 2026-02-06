@@ -92,12 +92,12 @@ const VIPShowcase = () => {
   };
 
   return (
-    <section className="py-12 bg-gradient-to-r from-amber-50 via-yellow-50 to-amber-50 border-y border-amber-200/50">
+    <section className="py-12 bg-gradient-to-r from-vip-gold/10 via-accent/5 to-vip-gold/10 border-y border-vip-gold/20">
       <div className="container">
         {/* Header */}
         <div className="flex items-center justify-between mb-8">
           <div className="flex items-center gap-3">
-            <div className="p-2 bg-gradient-to-br from-amber-400 to-yellow-500 rounded-lg shadow-lg">
+            <div className="p-2 bg-gradient-to-br from-vip-gold to-accent rounded-lg shadow-lg">
               <Crown className="w-6 h-6 text-white" />
             </div>
             <div>
@@ -110,7 +110,7 @@ const VIPShowcase = () => {
             </div>
           </div>
           <Link to="/boutiques?filter=vip">
-            <Button variant="outline" size="sm" className="border-amber-300 hover:bg-amber-50">
+            <Button variant="outline" size="sm" className="border-vip-gold text-vip-gold hover:bg-vip-gold/10">
               Voir tout
               <ArrowRight className="w-4 h-4 ml-1" />
             </Button>
@@ -122,13 +122,13 @@ const VIPShowcase = () => {
           {vipItems.map((item, index) => (
             <div
               key={item.id}
-              className={`group relative bg-white rounded-xl overflow-hidden shadow-lg border border-amber-200/50 hover:shadow-xl transition-all duration-300 hover:-translate-y-1 ${
-                index === currentIndex ? 'ring-2 ring-amber-400' : ''
+              className={`group relative bg-card rounded-xl overflow-hidden shadow-ecom-card border border-vip-gold/20 hover:shadow-ecom-hover transition-all duration-300 hover:-translate-y-1 ${
+                index === currentIndex ? 'ring-2 ring-vip-gold' : ''
               }`}
             >
               {/* VIP Badge */}
               <div className="absolute top-3 left-3 z-10">
-                <Badge className="bg-gradient-to-r from-amber-400 to-yellow-500 text-white border-0 shadow-md">
+                <Badge className="bg-gradient-to-r from-vip-gold to-accent text-white border-0 shadow-md">
                   <Crown className="w-3 h-3 mr-1" />
                   VIP
                 </Badge>
@@ -141,19 +141,19 @@ const VIPShowcase = () => {
                   alt={item.name}
                   className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
                 />
-                <div className="absolute inset-0 bg-gradient-to-t from-black/40 to-transparent" />
+                <div className="absolute inset-0 bg-gradient-to-t from-foreground/40 to-transparent" />
               </div>
 
               {/* Content */}
               <div className="p-4">
                 <div className="flex items-center gap-2 mb-2">
-                  <span className="flex items-center gap-1 text-xs text-amber-600 font-medium">
+                  <span className="flex items-center gap-1 text-xs text-vip-gold font-medium">
                     {getTypeIcon(item.type)}
                     {getTypeLabel(item.type)}
                   </span>
                   {item.rating && (
                     <span className="flex items-center gap-1 text-xs text-muted-foreground ml-auto">
-                      <Star className="w-3 h-3 fill-amber-400 text-amber-400" />
+                      <Star className="w-3 h-3 fill-vip-gold text-vip-gold" />
                       {item.rating}
                     </span>
                   )}
@@ -179,7 +179,7 @@ const VIPShowcase = () => {
                     </span>
                   )}
                   <Link to={`/boutique/${item.shopSlug}`}>
-                    <Button size="sm" variant="hero" className="ml-auto">
+                    <Button size="sm" variant="vip" className="ml-auto">
                       {item.type === 'shop' ? 'Visiter' : 'Commander'}
                     </Button>
                   </Link>
@@ -200,8 +200,8 @@ const VIPShowcase = () => {
               onClick={() => setCurrentIndex(index)}
               className={`w-2 h-2 rounded-full transition-all ${
                 index === currentIndex
-                  ? 'w-6 bg-amber-500'
-                  : 'bg-amber-300 hover:bg-amber-400'
+                  ? 'w-6 bg-vip-gold'
+                  : 'bg-vip-gold/30 hover:bg-vip-gold/50'
               }`}
             />
           ))}
@@ -213,8 +213,8 @@ const VIPShowcase = () => {
             Vous êtes vendeur ? Passez au Pack VIP pour apparaître ici !
           </p>
           <Link to="/inscription-vendeur">
-            <Button variant="outline" className="border-amber-300 hover:bg-amber-50">
-              <Crown className="w-4 h-4 mr-2 text-amber-500" />
+            <Button variant="outline" className="border-vip-gold text-vip-gold hover:bg-vip-gold/10">
+              <Crown className="w-4 h-4 mr-2" />
               Devenir VIP - 15 000 FCFA/an
             </Button>
           </Link>
