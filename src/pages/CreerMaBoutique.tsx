@@ -74,7 +74,7 @@ const getDetailedErrorMessage = (error: any): string => {
 
 const CreerMaBoutique = () => {
   const navigate = useNavigate();
-  const { user, loading: authLoading } = useAuth();
+  const { user, loading: authLoading, refreshRoles } = useAuth();
 
   const [formData, setFormData] = useState({
     shopName: "",
@@ -225,6 +225,9 @@ const CreerMaBoutique = () => {
       } else {
         console.log("[CreerMaBoutique] Role assigned:", roleData);
       }
+
+      // Refresh roles in AuthContext before redirecting
+      await refreshRoles();
 
       // Success!
       toast({
