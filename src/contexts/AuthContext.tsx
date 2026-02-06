@@ -10,6 +10,7 @@ interface AuthContextType {
   loading: boolean;
   roles: AppRole[];
   hasRole: (role: AppRole) => boolean;
+  refreshRoles: () => Promise<void>;
   signUp: (email: string, password: string, fullName: string) => Promise<{ error: any }>;
   signIn: (email: string, password: string) => Promise<{ error: any }>;
   signOut: () => Promise<void>;
@@ -133,6 +134,13 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
 
   const hasRole = (role: AppRole) => roles.includes(role);
 
+  const refreshRoles = async () => {
+    if (user) {
+      const fetchedRoles = await fetchUserRoles(user.id);
+      setRoles(fetchedRoles);
+    }
+  };
+
   return (
     <AuthContext.Provider
       value={{
@@ -141,6 +149,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
         loading,
         roles,
         hasRole,
+        refreshRoles,
         signUp,
         signIn,
         signOut,
