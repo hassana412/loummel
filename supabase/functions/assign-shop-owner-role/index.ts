@@ -38,7 +38,7 @@ serve(async (req) => {
     // Verify user has a shop
     const { data: shop } = await supabaseAdmin
       .from('shops')
-      .select('id')
+      .select('id, name, city, category')
       .eq('user_id', user.id)
       .maybeSingle()
 
@@ -63,6 +63,33 @@ serve(async (req) => {
         JSON.stringify({ error: 'Erreur attribution rôle' }),
         { status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
       )
+    }
+
+    // Notify all super admins about new shop pending validation
+    const { data: admins } = await supabaseAdmin
+      .from('user_roles')
+      .select('user_id')
+      .eq('role', 'super_admin')
+
+    if (admins && admins.length > 0) {
+      const notifications = admins.map((admin) => ({
+        user_id: admin.user_id,
+        title: '🏪 Nouvelle boutique en attente',
+        message: `La boutique "${shop.name}" (${shop.category}) à ${shop.city} attend votre validation.`,
+        type: 'new_shop',
+        related_id: shop.id,
+      }))
+
+      const { error: notifError } = await supabaseAdmin
+        .from('notifications')
+        .insert(notifications)
+
+      if (notifError) {
+        console.error('Notification error:', notifError)
+        // Don't fail the whole operation for notification errors
+      } else {
+        console.log(`Notifications sent to ${admins.length} admin(s)`)
+      }
     }
 
     return new Response(
