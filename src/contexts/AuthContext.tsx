@@ -47,35 +47,38 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
 
   useEffect(() => {
     // Set up auth state listener FIRST
-    const { data: { subscription } } = supabase.auth.onAuthStateChange(
-      (event, session) => {
-        setSession(session);
-        setUser(session?.user ?? null);
-        
-        // Fetch roles BEFORE setting loading to false
-        if (session?.user) {
-          fetchUserRoles(session.user.id).then((fetchedRoles) => {
-            setRoles(fetchedRoles);
-            setLoading(false);
-          });
-        } else {
-          setRoles([]);
-          setLoading(false);
-        }
-      }
-    );
-
-    // THEN check for existing session
-    supabase.auth.getSession().then(({ data: { session } }) => {
+    const {
+      data: { subscription },
+    } = supabase.auth.onAuthStateChange((event, session) => {
       setSession(session);
       setUser(session?.user ?? null);
-      
+
+      // IMPORTANT: keep loading=true while roles are being fetched
       if (session?.user) {
+        setLoading(true);
         fetchUserRoles(session.user.id).then((fetchedRoles) => {
           setRoles(fetchedRoles);
           setLoading(false);
         });
       } else {
+        setRoles([]);
+        setLoading(false);
+      }
+    });
+
+    // THEN check for existing session
+    supabase.auth.getSession().then(({ data: { session } }) => {
+      setSession(session);
+      setUser(session?.user ?? null);
+
+      if (session?.user) {
+        setLoading(true);
+        fetchUserRoles(session.user.id).then((fetchedRoles) => {
+          setRoles(fetchedRoles);
+          setLoading(false);
+        });
+      } else {
+        setRoles([]);
         setLoading(false);
       }
     });
