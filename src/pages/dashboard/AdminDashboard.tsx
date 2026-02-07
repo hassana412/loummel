@@ -204,32 +204,26 @@ const AdminDashboard = () => {
     setIsCreatingAdmin(true);
 
     try {
-      // 1. Create the user account
-      const { data: authData, error: authError } = await supabase.auth.signUp({
-        email: newAdminEmail,
-        password: newAdminPassword,
-        options: {
-          emailRedirectTo: `${window.location.origin}/backoffice`,
-          data: { full_name: newAdminName }
+      // 1. Create the user account (server-side) WITHOUT switching current session
+      const { data, error: fnError } = await supabase.functions.invoke(
+        "create-delegated-admin",
+        {
+          body: {
+            email: newAdminEmail,
+            password: newAdminPassword,
+            full_name: newAdminName,
+          },
         }
-      });
+      );
 
-      if (authError) throw authError;
-      if (!authData.user) throw new Error("Erreur lors de la création du compte");
+      if (fnError) throw fnError;
+      if (!data?.user_id) throw new Error("Erreur lors de la création du compte");
 
-      // 2. Assign super_admin role
-      const { error: roleError } = await supabase.from("user_roles").insert({
-        user_id: authData.user.id,
-        role: "super_admin"
-      });
-
-      if (roleError) throw roleError;
-
-      // 3. Log the action
-      await logAuditAction("admin_created", "admin", authData.user.id, { 
-        name: newAdminName, 
+      // 2. Log the action
+      await logAuditAction("admin_created", "admin", data.user_id, {
+        name: newAdminName,
         email: newAdminEmail,
-        used_default_password: newAdminPassword === DEFAULT_ADMIN_PASSWORD
+        used_default_password: newAdminPassword === DEFAULT_ADMIN_PASSWORD,
       });
 
       toast({ 
