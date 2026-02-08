@@ -104,6 +104,42 @@ export type Database = {
         }
         Relationships: []
       }
+      mobile_wallets: {
+        Row: {
+          balance: number
+          created_at: string
+          id: string
+          last_sync_at: string | null
+          operator: string
+          pending_balance: number
+          total_received: number
+          total_withdrawn: number
+          updated_at: string
+        }
+        Insert: {
+          balance?: number
+          created_at?: string
+          id?: string
+          last_sync_at?: string | null
+          operator: string
+          pending_balance?: number
+          total_received?: number
+          total_withdrawn?: number
+          updated_at?: string
+        }
+        Update: {
+          balance?: number
+          created_at?: string
+          id?: string
+          last_sync_at?: string | null
+          operator?: string
+          pending_balance?: number
+          total_received?: number
+          total_withdrawn?: number
+          updated_at?: string
+        }
+        Relationships: []
+      }
       notifications: {
         Row: {
           created_at: string | null
@@ -327,6 +363,77 @@ export type Database = {
           },
         ]
       }
+      shipments: {
+        Row: {
+          created_at: string
+          customer_rating: number | null
+          damage_notes: string | null
+          delivered_at: string | null
+          delivery_cost: number
+          delivery_fee: number
+          destination_city: string
+          id: string
+          is_damaged: boolean
+          is_returned: boolean
+          origin_city: string
+          picked_at: string | null
+          shop_id: string | null
+          status: string
+          tracking_number: string
+          type: string
+          updated_at: string
+          weight_kg: number | null
+        }
+        Insert: {
+          created_at?: string
+          customer_rating?: number | null
+          damage_notes?: string | null
+          delivered_at?: string | null
+          delivery_cost?: number
+          delivery_fee?: number
+          destination_city: string
+          id?: string
+          is_damaged?: boolean
+          is_returned?: boolean
+          origin_city: string
+          picked_at?: string | null
+          shop_id?: string | null
+          status?: string
+          tracking_number: string
+          type?: string
+          updated_at?: string
+          weight_kg?: number | null
+        }
+        Update: {
+          created_at?: string
+          customer_rating?: number | null
+          damage_notes?: string | null
+          delivered_at?: string | null
+          delivery_cost?: number
+          delivery_fee?: number
+          destination_city?: string
+          id?: string
+          is_damaged?: boolean
+          is_returned?: boolean
+          origin_city?: string
+          picked_at?: string | null
+          shop_id?: string | null
+          status?: string
+          tracking_number?: string
+          type?: string
+          updated_at?: string
+          weight_kg?: number | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "shipments_shop_id_fkey"
+            columns: ["shop_id"]
+            isOneToOne: false
+            referencedRelation: "shops"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       shops: {
         Row: {
           affiliate_code: string | null
@@ -451,6 +558,65 @@ export type Database = {
           user_id?: string
         }
         Relationships: []
+      }
+      wallet_transactions: {
+        Row: {
+          amount: number
+          completed_at: string | null
+          created_at: string
+          description: string | null
+          fee: number
+          id: string
+          metadata: Json | null
+          phone_number: string | null
+          reference: string | null
+          related_id: string | null
+          related_type: string | null
+          status: string
+          type: string
+          wallet_id: string
+        }
+        Insert: {
+          amount: number
+          completed_at?: string | null
+          created_at?: string
+          description?: string | null
+          fee?: number
+          id?: string
+          metadata?: Json | null
+          phone_number?: string | null
+          reference?: string | null
+          related_id?: string | null
+          related_type?: string | null
+          status?: string
+          type: string
+          wallet_id: string
+        }
+        Update: {
+          amount?: number
+          completed_at?: string | null
+          created_at?: string
+          description?: string | null
+          fee?: number
+          id?: string
+          metadata?: Json | null
+          phone_number?: string | null
+          reference?: string | null
+          related_id?: string | null
+          related_type?: string | null
+          status?: string
+          type?: string
+          wallet_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "wallet_transactions_wallet_id_fkey"
+            columns: ["wallet_id"]
+            isOneToOne: false
+            referencedRelation: "mobile_wallets"
+            referencedColumns: ["id"]
+          },
+        ]
       }
     }
     Views: {
