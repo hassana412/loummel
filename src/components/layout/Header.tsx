@@ -40,7 +40,7 @@ const Header = () => {
   return (
     <header className="sticky top-0 z-50 w-full">
       {/* Top Bar */}
-      <div className="bg-sahel-earth text-primary-foreground py-2">
+      <div className="bg-primary text-primary-foreground py-2">
         <div className="container flex items-center justify-between text-sm">
           <span className="hidden md:block">
             Bienvenue sur Loummel - Le marché digital du Nord Cameroun
@@ -59,7 +59,7 @@ const Header = () => {
           <div className="flex items-center gap-4 lg:gap-8">
             {/* Logo */}
             <Link to="/" className="flex items-center gap-2 shrink-0">
-              <div className="w-10 h-10 rounded-full bg-gradient-to-br from-sahel-terracotta to-sahel-gold flex items-center justify-center">
+              <div className="w-10 h-10 rounded-full bg-gradient-to-br from-primary to-accent flex items-center justify-center">
                 <Store className="w-5 h-5 text-primary-foreground" />
               </div>
               <span className="font-display text-xl font-bold text-foreground hidden sm:block">
@@ -147,7 +147,7 @@ const Header = () => {
         </div>
 
         {/* Categories Nav */}
-        <nav className="bg-sahel-sky border-t border-sahel-sky/60 hidden lg:block">
+        <nav className="bg-primary/10 border-t border-primary/20 hidden lg:block">
           <div className="container">
             <ul className="flex items-center gap-1 py-2 overflow-x-auto">
               <li>

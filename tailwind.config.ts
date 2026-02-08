@@ -61,6 +61,12 @@ export default {
           border: "hsl(var(--sidebar-border))",
           ring: "hsl(var(--sidebar-ring))",
         },
+        loummel: {
+          DEFAULT: "hsl(var(--loummel-brown))",
+          light: "hsl(var(--loummel-brown-light))",
+          dark: "hsl(var(--loummel-brown-dark))",
+          copper: "hsl(var(--loummel-copper))",
+        },
         ecom: {
           orange: "hsl(var(--ecom-orange))",
           "orange-dark": "hsl(var(--ecom-orange-dark))",

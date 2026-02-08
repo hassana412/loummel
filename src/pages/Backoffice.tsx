@@ -188,16 +188,16 @@ const Backoffice = () => {
 
   if (loading) {
     return (
-      <div className="min-h-screen flex flex-col items-center justify-center bg-[#FFCC00]">
-        <div className="w-20 h-20 rounded-full bg-black/10 backdrop-blur-sm flex items-center justify-center mb-6 animate-pulse">
-          <Shield className="w-10 h-10 text-black animate-[spin_3s_linear_infinite]" />
+      <div className="min-h-screen flex flex-col items-center justify-center bg-primary">
+        <div className="w-20 h-20 rounded-full bg-white/10 backdrop-blur-sm flex items-center justify-center mb-6 animate-pulse">
+          <Shield className="w-10 h-10 text-white animate-[spin_3s_linear_infinite]" />
         </div>
-        <h2 className="font-display text-xl font-bold text-black mb-2">Loummel Backoffice</h2>
-        <p className="text-black/70 animate-pulse">Vérification des droits d'accès...</p>
+        <h2 className="font-display text-xl font-bold text-white mb-2">Loummel Backoffice</h2>
+        <p className="text-white/70 animate-pulse">Vérification des droits d'accès...</p>
         <div className="mt-4 flex gap-1">
-          <span className="w-2 h-2 bg-black/50 rounded-full animate-bounce" style={{ animationDelay: '0ms' }}></span>
-          <span className="w-2 h-2 bg-black/50 rounded-full animate-bounce" style={{ animationDelay: '150ms' }}></span>
-          <span className="w-2 h-2 bg-black/50 rounded-full animate-bounce" style={{ animationDelay: '300ms' }}></span>
+          <span className="w-2 h-2 bg-white/50 rounded-full animate-bounce" style={{ animationDelay: '0ms' }}></span>
+          <span className="w-2 h-2 bg-white/50 rounded-full animate-bounce" style={{ animationDelay: '150ms' }}></span>
+          <span className="w-2 h-2 bg-white/50 rounded-full animate-bounce" style={{ animationDelay: '300ms' }}></span>
         </div>
       </div>
     );
@@ -206,12 +206,12 @@ const Backoffice = () => {
   // Forgot Password View
   if (authMode === "forgot") {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-[#FFCC00] p-4">
+      <div className="min-h-screen flex items-center justify-center bg-primary p-4">
         <div className="w-full max-w-md">
           <Card className="shadow-2xl border-0 bg-white/95 backdrop-blur-sm">
             <CardHeader className="text-center">
-              <div className="mx-auto w-12 h-12 rounded-full bg-yellow-200 flex items-center justify-center mb-4">
-                <Mail className="w-6 h-6 text-[#996600]" />
+              <div className="mx-auto w-12 h-12 rounded-full bg-primary/20 flex items-center justify-center mb-4">
+                <Mail className="w-6 h-6 text-primary" />
               </div>
               <CardTitle className="font-display text-xl">Mot de passe oublié</CardTitle>
               <CardDescription>
@@ -221,8 +221,8 @@ const Backoffice = () => {
             <CardContent>
               {emailSent ? (
                 <div className="space-y-4">
-                  <div className="p-4 bg-yellow-100 rounded-lg text-center">
-                    <p className="text-sm text-[#996600]">
+                  <div className="p-4 bg-primary/10 rounded-lg text-center">
+                    <p className="text-sm text-primary">
                       Consultez votre boîte de réception.
                     </p>
                   </div>
@@ -244,7 +244,7 @@ const Backoffice = () => {
                       required
                     />
                   </div>
-                  <Button type="submit" className="w-full bg-[#CC9900] hover:bg-[#B38600] text-white" disabled={isLoading}>
+                  <Button type="submit" className="w-full bg-primary hover:bg-primary/90 text-white" disabled={isLoading}>
                     {isLoading && <Loader2 className="w-4 h-4 mr-2 animate-spin" />}
                     Envoyer le lien
                   </Button>
@@ -264,12 +264,12 @@ const Backoffice = () => {
   // Reset Password View
   if (authMode === "reset") {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-[#FFCC00] p-4">
+      <div className="min-h-screen flex items-center justify-center bg-primary p-4">
         <div className="w-full max-w-md">
           <Card className="shadow-2xl border-0 bg-white/95 backdrop-blur-sm">
             <CardHeader className="text-center">
-              <div className="mx-auto w-12 h-12 rounded-full bg-yellow-200 flex items-center justify-center mb-4">
-                <KeyRound className="w-6 h-6 text-[#996600]" />
+              <div className="mx-auto w-12 h-12 rounded-full bg-primary/20 flex items-center justify-center mb-4">
+                <KeyRound className="w-6 h-6 text-primary" />
               </div>
               <CardTitle className="font-display text-xl">Nouveau mot de passe</CardTitle>
             </CardHeader>
@@ -283,7 +283,7 @@ const Backoffice = () => {
                   <Label htmlFor="confirm-password">Confirmer</Label>
                   <PasswordInput id="confirm-password" value={confirmNewPassword} onChange={setConfirmNewPassword} />
                 </div>
-                <Button type="submit" className="w-full bg-[#CC9900] hover:bg-[#B38600] text-white" disabled={isLoading}>
+                <Button type="submit" className="w-full bg-primary hover:bg-primary/90 text-white" disabled={isLoading}>
                   {isLoading && <Loader2 className="w-4 h-4 mr-2 animate-spin" />}
                   Mettre à jour
                 </Button>
@@ -296,17 +296,17 @@ const Backoffice = () => {
   }
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-[#FFCC00] p-4">
+    <div className="min-h-screen flex items-center justify-center bg-primary p-4">
       <div className="w-full max-w-md">
         {/* Logo */}
         <div className="text-center mb-8">
-          <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-black/10 backdrop-blur-sm mb-4">
-            <Shield className="w-8 h-8 text-black" />
+          <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-white/10 backdrop-blur-sm mb-4">
+            <Shield className="w-8 h-8 text-white" />
           </div>
-          <h1 className="font-display text-3xl font-bold text-black mb-2">
+          <h1 className="font-display text-3xl font-bold text-white mb-2">
             Loummel Backoffice
           </h1>
-          <p className="text-black/70">
+          <p className="text-white/70">
             Zone réservée aux Super Administrateurs
           </p>
         </div>
@@ -342,7 +342,7 @@ const Backoffice = () => {
                 />
               </div>
               
-              <Button type="submit" className="w-full h-11 bg-[#CC9900] hover:bg-[#B38600] text-white" disabled={isLoading}>
+              <Button type="submit" className="w-full h-11 bg-primary hover:bg-primary/90 text-white" disabled={isLoading}>
                 {isLoading ? (
                   <Loader2 className="w-4 h-4 mr-2 animate-spin" />
                 ) : (
@@ -352,15 +352,15 @@ const Backoffice = () => {
               </Button>
 
               <div className="text-center">
-                <button type="button" onClick={() => setAuthMode("forgot")} className="text-sm text-[#996600] hover:underline">
+                <button type="button" onClick={() => setAuthMode("forgot")} className="text-sm text-primary hover:underline">
                   Mot de passe oublié ?
                 </button>
               </div>
             </form>
 
             {/* Warning */}
-            <div className="mt-6 p-3 bg-yellow-100 rounded-lg border border-yellow-300">
-              <p className="text-xs text-[#996600] text-center">
+            <div className="mt-6 p-3 bg-primary/10 rounded-lg border border-primary/30">
+              <p className="text-xs text-primary text-center">
                 <Shield className="w-4 h-4 inline mr-1" />
                 Accès strictement réservé aux administrateurs autorisés.
                 Toute tentative non autorisée sera enregistrée.
@@ -369,7 +369,7 @@ const Backoffice = () => {
           </CardContent>
         </Card>
 
-        <p className="text-center text-black/60 text-sm mt-6">
+        <p className="text-center text-white/60 text-sm mt-6">
           © 2024 Loummel. Tous droits réservés.
         </p>
       </div>

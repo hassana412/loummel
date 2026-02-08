@@ -35,9 +35,9 @@ export function AdminHeader({ onTabChange }: AdminHeaderProps) {
   const handleNotificationClick = async (notification: any) => {
     await markAsRead(notification.id);
     
-    // If it's a new shop notification, navigate to boutiques tab
+    // If it's a new shop notification, navigate to boutiques tab with shop highlight
     if (notification.type === "new_shop" && notification.related_id) {
-      onTabChange("boutiques");
+      navigate(`/dashboard/admin?tab=boutiques&shop=${notification.related_id}`);
     }
   };
 

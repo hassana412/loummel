@@ -30,7 +30,10 @@ const ProtectedRoute = ({
   }
 
   if (requireAuth && !user) {
-    return <Navigate to="/auth" state={{ from: location }} replace />;
+    // Redirect to appropriate auth page based on the route being accessed
+    const isAdminRoute = location.pathname.startsWith("/dashboard/admin") || location.pathname.startsWith("/admin");
+    const redirectTo = isAdminRoute ? "/backoffice" : "/connexion";
+    return <Navigate to={redirectTo} state={{ from: location }} replace />;
   }
 
   if (allowedRoles && allowedRoles.length > 0) {
