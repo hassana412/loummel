@@ -1,4 +1,4 @@
-import { Bell, Menu, ChevronDown } from "lucide-react";
+import { Bell, Menu } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import {
@@ -12,16 +12,6 @@ import { useNotifications } from "@/hooks/useNotifications";
 import { supabase } from "@/integrations/supabase/client";
 import { useNavigate } from "react-router-dom";
 
-const shopCategories = [
-  "Alimentation",
-  "Mode & Vêtements",
-  "Électronique",
-  "Artisanat",
-  "Services",
-  "Restauration",
-  "Beauté & Bien-être",
-  "Mobilier",
-];
 
 interface AdminHeaderProps {
   onTabChange: (tab: string) => void;
@@ -54,22 +44,6 @@ export function AdminHeader({ onTabChange }: AdminHeaderProps) {
             <Menu className="w-5 h-5 text-[#966442]" />
           </Button>
 
-          {/* Categories Dropdown */}
-          <DropdownMenu>
-            <DropdownMenuTrigger asChild>
-              <Button variant="outline" className="border-[#966442]/30 hover:bg-[#966442]/10">
-                Catégories de boutiques
-                <ChevronDown className="w-4 h-4 ml-2 text-[#966442]" />
-              </Button>
-            </DropdownMenuTrigger>
-            <DropdownMenuContent align="start" className="w-48">
-              {shopCategories.map((category) => (
-                <DropdownMenuItem key={category} className="cursor-pointer">
-                  {category}
-                </DropdownMenuItem>
-              ))}
-            </DropdownMenuContent>
-          </DropdownMenu>
         </div>
 
         <div className="flex items-center gap-4">

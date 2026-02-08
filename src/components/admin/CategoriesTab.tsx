@@ -77,18 +77,20 @@ export function CategoriesTab() {
 
       // Build category map
       const categoryMap = new Map<string, CategoryStats>();
-      const defaultCategories = ["Artisanat", "Électronique", "Mode & Textile", "Restauration", "Services", "Autre"];
-      
-      defaultCategories.forEach(cat => {
-        categoryMap.set(cat, {
-          category: cat,
-          totalShops: 0,
-          totalProducts: 0,
-          totalServices: 0,
-          totalShipments: 0,
-          totalComplaints: 0,
-          activeShops: 0,
-        });
+      // Build from actual shop categories only
+      shops?.forEach(shop => {
+        const cat = shop.category || "Autre";
+        if (!categoryMap.has(cat)) {
+          categoryMap.set(cat, {
+            category: cat,
+            totalShops: 0,
+            totalProducts: 0,
+            totalServices: 0,
+            totalShipments: 0,
+            totalComplaints: 0,
+            activeShops: 0,
+          });
+        }
       });
 
       // Count shops per category
