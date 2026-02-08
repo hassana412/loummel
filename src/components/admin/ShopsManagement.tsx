@@ -13,6 +13,10 @@ import {
   ExternalLink, MessageSquare
 } from "lucide-react";
 
+interface ShopsManagementProps {
+  filterCategory?: string;
+}
+
 interface Shop {
   id: string;
   user_id: string;
@@ -44,7 +48,7 @@ const formatDate = (dateStr: string) => {
   });
 };
 
-export function ShopsManagement() {
+export function ShopsManagement({ filterCategory }: ShopsManagementProps) {
   const { user } = useAuth();
   const [shops, setShops] = useState<Shop[]>([]);
   const [shopStats, setShopStats] = useState<Record<string, ShopStats>>({});
@@ -172,11 +176,13 @@ export function ShopsManagement() {
     return <Badge className={v.className}>{v.label}</Badge>;
   };
 
-  const filteredShops = shops.filter(s =>
-    s.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    (s.city?.toLowerCase() || "").includes(searchTerm.toLowerCase()) ||
-    (s.region?.toLowerCase() || "").includes(searchTerm.toLowerCase())
-  );
+  const filteredShops = shops.filter(s => {
+    const matchesSearch = s.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      (s.city?.toLowerCase() || "").includes(searchTerm.toLowerCase()) ||
+      (s.region?.toLowerCase() || "").includes(searchTerm.toLowerCase());
+    const matchesCategory = !filterCategory || s.category === filterCategory;
+    return matchesSearch && matchesCategory;
+  });
 
   return (
     <div className="space-y-6">
