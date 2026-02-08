@@ -3,7 +3,7 @@ import { Store, Facebook, Instagram, MessageCircle, Phone, Mail, MapPin } from "
 
 const Footer = () => {
   return (
-    <footer className="bg-sahel-earth text-primary-foreground">
+    <footer className="bg-primary text-primary-foreground">
       {/* Newsletter */}
       <div className="border-b border-primary-foreground/20">
         <div className="container py-8">
@@ -36,7 +36,7 @@ const Footer = () => {
           {/* Brand */}
           <div>
             <Link to="/" className="flex items-center gap-2 mb-4">
-              <div className="w-10 h-10 rounded-full bg-gradient-to-br from-sahel-terracotta to-sahel-gold flex items-center justify-center">
+              <div className="w-10 h-10 rounded-full bg-gradient-to-br from-loummel-light to-accent flex items-center justify-center">
                 <Store className="w-5 h-5 text-primary-foreground" />
               </div>
               <span className="font-display text-xl font-bold">

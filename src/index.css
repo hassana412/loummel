@@ -6,7 +6,7 @@
 
 @layer base {
   :root {
-    /* E-commerce Vibrant Theme - Inspired by Amazon/Alibaba */
+    /* Loummel Theme - Copper Brown #966442 = HSL(24, 38%, 42%) */
     --background: 0 0% 100%;
     --foreground: 220 20% 10%;
 
@@ -16,8 +16,8 @@
     --popover: 0 0% 100%;
     --popover-foreground: 220 20% 10%;
 
-    /* Orange vif - Amazon inspired Primary */
-    --primary: 25 95% 53%;
+    /* Loummel Copper Brown - Primary */
+    --primary: 24 38% 42%;
     --primary-foreground: 0 0% 100%;
 
     /* Gris léger - Secondary */
@@ -28,8 +28,8 @@
     --muted: 220 14% 96%;
     --muted-foreground: 220 10% 45%;
 
-    /* Orange doré - Accent deals/promos */
-    --accent: 38 92% 50%;
+    /* Copper accent - warm variant */
+    --accent: 30 45% 55%;
     --accent-foreground: 0 0% 100%;
 
     --destructive: 0 84% 60%;
@@ -37,13 +37,19 @@
 
     --border: 220 13% 91%;
     --input: 220 13% 91%;
-    --ring: 25 95% 53%;
+    --ring: 24 38% 42%;
 
     --radius: 0.5rem;
 
+    /* Loummel Brand Colors */
+    --loummel-brown: 24 38% 42%;
+    --loummel-brown-light: 24 38% 55%;
+    --loummel-brown-dark: 24 38% 32%;
+    --loummel-copper: 24 38% 42%;
+    
     /* E-commerce Custom Colors */
-    --ecom-orange: 25 95% 53%;
-    --ecom-orange-dark: 20 90% 45%;
+    --ecom-orange: 24 38% 42%;
+    --ecom-orange-dark: 24 38% 32%;
     --ecom-gold: 45 93% 47%;
     --ecom-teal: 174 72% 40%;
     --ecom-navy: 220 60% 20%;
@@ -61,26 +67,26 @@
     --vip-gold: 45 93% 47%;
     --vip-gold-light: 45 90% 65%;
 
-    /* Gradients */
-    --gradient-hero: linear-gradient(135deg, hsl(25 95% 53%), hsl(38 92% 50%));
-    --gradient-deal: linear-gradient(135deg, hsl(0 85% 55%), hsl(25 95% 53%));
-    --gradient-promo: linear-gradient(135deg, hsl(38 92% 50%), hsl(45 93% 47%));
+    /* Gradients - Updated for Loummel */
+    --gradient-hero: linear-gradient(135deg, hsl(24 38% 42%), hsl(30 45% 55%));
+    --gradient-deal: linear-gradient(135deg, hsl(0 85% 55%), hsl(24 38% 42%));
+    --gradient-promo: linear-gradient(135deg, hsl(30 45% 55%), hsl(45 93% 47%));
     --gradient-dark: linear-gradient(135deg, hsl(220 60% 15%), hsl(220 60% 25%));
 
     /* Shadows */
     --shadow-soft: 0 2px 8px -2px hsl(220 20% 10% / 0.1);
     --shadow-card: 0 4px 12px -4px hsl(220 20% 10% / 0.15);
     --shadow-hover: 0 8px 24px -8px hsl(220 20% 10% / 0.2);
-    --shadow-glow: 0 0 20px hsl(25 95% 53% / 0.3);
+    --shadow-glow: 0 0 20px hsl(24 38% 42% / 0.3);
 
-    --sidebar-background: 220 60% 15%;
+    --sidebar-background: 24 38% 25%;
     --sidebar-foreground: 0 0% 100%;
-    --sidebar-primary: 25 95% 53%;
+    --sidebar-primary: 24 38% 42%;
     --sidebar-primary-foreground: 0 0% 100%;
-    --sidebar-accent: 220 60% 25%;
+    --sidebar-accent: 24 38% 35%;
     --sidebar-accent-foreground: 0 0% 100%;
-    --sidebar-border: 220 50% 25%;
-    --sidebar-ring: 25 95% 53%;
+    --sidebar-border: 24 30% 30%;
+    --sidebar-ring: 24 38% 42%;
   }
 
   .dark {
@@ -93,7 +99,7 @@
     --popover: 220 20% 12%;
     --popover-foreground: 0 0% 98%;
 
-    --primary: 25 95% 55%;
+    --primary: 24 38% 50%;
     --primary-foreground: 0 0% 100%;
 
     --secondary: 220 20% 18%;
@@ -102,7 +108,7 @@
     --muted: 220 20% 18%;
     --muted-foreground: 220 10% 65%;
 
-    --accent: 38 92% 55%;
+    --accent: 30 45% 60%;
     --accent-foreground: 0 0% 100%;
 
     --destructive: 0 72% 50%;
@@ -110,16 +116,16 @@
 
     --border: 220 20% 20%;
     --input: 220 20% 20%;
-    --ring: 25 95% 55%;
+    --ring: 24 38% 50%;
 
-    --sidebar-background: 220 25% 10%;
+    --sidebar-background: 24 30% 12%;
     --sidebar-foreground: 0 0% 98%;
-    --sidebar-primary: 25 95% 55%;
+    --sidebar-primary: 24 38% 50%;
     --sidebar-primary-foreground: 0 0% 100%;
-    --sidebar-accent: 220 20% 18%;
+    --sidebar-accent: 24 30% 20%;
     --sidebar-accent-foreground: 0 0% 98%;
-    --sidebar-border: 220 20% 20%;
-    --sidebar-ring: 25 95% 55%;
+    --sidebar-border: 24 25% 18%;
+    --sidebar-ring: 24 38% 50%;
   }
 }
 

@@ -57,6 +57,9 @@ const App = () => (
             {/* Legacy /auth redirects to client auth */}
             <Route path="/auth" element={<Navigate to="/connexion" replace />} />
             
+            {/* Admin shortcut route */}
+            <Route path="/admin" element={<Navigate to="/dashboard/admin" replace />} />
+            
             {/* Boutique public pages */}
             <Route path="/boutique/:slug" element={<BoutiqueLayout />}>
               <Route index element={<BoutiqueProduits />} />
