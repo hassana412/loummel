@@ -1,4 +1,8 @@
-import { LayoutDashboard, Store, Truck, Settings, LogOut, ChevronLeft, ChevronRight } from "lucide-react";
+import { 
+  LayoutDashboard, Store, Truck, Settings, LogOut, 
+  ChevronLeft, ChevronRight, Grid3X3, Users, Handshake,
+  Bell, MessageSquareWarning
+} from "lucide-react";
 import { NavLink } from "@/components/NavLink";
 import {
   Sidebar,
@@ -19,7 +23,12 @@ import { useNavigate } from "react-router-dom";
 
 const menuItems = [
   { title: "Dashboard", url: "/dashboard/admin", icon: LayoutDashboard, tab: "overview" },
+  { title: "Catégories", url: "/dashboard/admin?tab=categories", icon: Grid3X3, tab: "categories" },
   { title: "Boutiques", url: "/dashboard/admin?tab=boutiques", icon: Store, tab: "boutiques" },
+  { title: "Utilisateurs", url: "/dashboard/admin?tab=users", icon: Users, tab: "users" },
+  { title: "Partenaires", url: "/dashboard/admin?tab=partners", icon: Handshake, tab: "partners" },
+  { title: "Notifications", url: "/dashboard/admin?tab=notifications", icon: Bell, tab: "notifications" },
+  { title: "Réclamations", url: "/dashboard/admin?tab=complaints", icon: MessageSquareWarning, tab: "complaints" },
   { title: "Wanda Services", url: "/dashboard/admin?tab=wanda", icon: Truck, tab: "wanda" },
   { title: "Paramètres", url: "/dashboard/admin?tab=settings", icon: Settings, tab: "settings" },
 ];

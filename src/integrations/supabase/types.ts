@@ -44,6 +44,54 @@ export type Database = {
         }
         Relationships: []
       }
+      complaints: {
+        Row: {
+          assigned_to: string | null
+          complainant_id: string
+          created_at: string
+          description: string | null
+          id: string
+          priority: string
+          resolution_notes: string | null
+          resolved_at: string | null
+          status: string
+          subject: string
+          target_id: string | null
+          target_type: string
+          updated_at: string
+        }
+        Insert: {
+          assigned_to?: string | null
+          complainant_id: string
+          created_at?: string
+          description?: string | null
+          id?: string
+          priority?: string
+          resolution_notes?: string | null
+          resolved_at?: string | null
+          status?: string
+          subject: string
+          target_id?: string | null
+          target_type: string
+          updated_at?: string
+        }
+        Update: {
+          assigned_to?: string | null
+          complainant_id?: string
+          created_at?: string
+          description?: string | null
+          id?: string
+          priority?: string
+          resolution_notes?: string | null
+          resolved_at?: string | null
+          status?: string
+          subject?: string
+          target_id?: string | null
+          target_type?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
       flyers: {
         Row: {
           badge: string | null

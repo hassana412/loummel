@@ -7,6 +7,11 @@ import { DashboardOverview } from "@/components/admin/DashboardOverview";
 import { ShopsManagement } from "@/components/admin/ShopsManagement";
 import { WandaServicesTab } from "@/components/admin/WandaServicesTab";
 import { SettingsTab } from "@/components/admin/SettingsTab";
+import { CategoriesTab } from "@/components/admin/CategoriesTab";
+import { UsersManagement } from "@/components/admin/UsersManagement";
+import { PartnersManagement } from "@/components/admin/PartnersManagement";
+import { NotificationCenter } from "@/components/admin/NotificationCenter";
+import { ComplaintsTab } from "@/components/admin/ComplaintsTab";
 import { useAuth } from "@/contexts/AuthContext";
 
 const AdminDashboard = () => {
@@ -34,8 +39,18 @@ const AdminDashboard = () => {
 
   const renderContent = () => {
     switch (activeTab) {
+      case "categories":
+        return <CategoriesTab />;
       case "boutiques":
         return <ShopsManagement />;
+      case "users":
+        return <UsersManagement />;
+      case "partners":
+        return <PartnersManagement />;
+      case "notifications":
+        return <NotificationCenter />;
+      case "complaints":
+        return <ComplaintsTab />;
       case "wanda":
         return <WandaServicesTab />;
       case "settings":
