@@ -162,7 +162,7 @@ const Recherche = () => {
                   <SelectValue placeholder="Toutes les régions" />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="">Toutes les régions</SelectItem>
+                  <SelectItem value="all">Toutes les régions</SelectItem>
                   {regions.map((region) => (
                     <SelectItem key={region} value={region}>{region}</SelectItem>
                   ))}
