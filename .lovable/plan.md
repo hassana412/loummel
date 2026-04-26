@@ -1,253 +1,79 @@
+# Plan : Panier global Loummel (Context + Drawer + Header)
 
-# Plan d'implementation : Nouveaux Menus Admin + Corrections Securite
+## Objectif
 
-## Resume Executif
-
-Ce plan ajoute 5 nouveaux menus au Dashboard Admin tout en corrigeant les vulnerabilites de securite restantes. L'identite visuelle (#966442) et les fonctionnalites existantes sont preservees.
-
----
-
-## Phase 1 : Base de Donnees - Nouvelles Tables
-
-### 1.1 Table des Reclamations (Ticketing)
-
-```text
-Table: complaints
-+------------------+----------------------------------+
-| Colonne          | Description                      |
-+------------------+----------------------------------+
-| id               | UUID PRIMARY KEY                 |
-| complainant_id   | UUID (user_id de celui qui reclame)|
-| target_type      | TEXT ('shop' | 'product' | 'partner' | 'order')|
-| target_id        | UUID (ID de l'entite concernee)  |
-| subject          | TEXT (titre de la reclamation)   |
-| description      | TEXT (details)                   |
-| status           | TEXT ('pending' | 'in_progress' | 'resolved' | 'closed')|
-| priority         | TEXT ('low' | 'medium' | 'high') |
-| assigned_to      | UUID (admin assignee) NULLABLE   |
-| resolution_notes | TEXT NULLABLE                    |
-| created_at       | TIMESTAMPTZ                      |
-| resolved_at      | TIMESTAMPTZ NULLABLE             |
-| updated_at       | TIMESTAMPTZ                      |
-+------------------+----------------------------------+
-```
-
-### 1.2 Table Stats Categories (Vue Agregee)
-
-```text
-Table: category_stats (Vue materialisee ou requete dynamique)
-+------------------+----------------------------------+
-| Colonne          | Description                      |
-+------------------+----------------------------------+
-| category         | TEXT (categorie de boutique)     |
-| total_shops      | INTEGER                          |
-| total_visits     | INTEGER                          |
-| total_products   | INTEGER                          |
-| total_services   | INTEGER                          |
-| total_revenue    | NUMERIC                          |
-| total_shipments  | INTEGER                          |
-| total_complaints | INTEGER                          |
-+------------------+----------------------------------+
-```
-
-### 1.3 Politiques RLS
-
-- **complaints** : Super admins (lecture/ecriture totale), Users (lecture de leurs propres reclamations)
-- Toutes les nouvelles tables auront RLS active avec has_role()
+Mettre en place un système de panier client persistant et accessible depuis tout le site, avec ouverture en drawer latéral depuis le bouton panier du Header.
 
 ---
 
-## Phase 2 : Nouveaux Composants Admin
+## Fichiers à créer / modifier
 
-### 2.1 Structure des Fichiers
+### 1. `src/contexts/CartContext.tsx` (nouveau)
 
-```text
-src/components/admin/
-+-- CategoriesTab.tsx         (Vue agregee par categorie)
-+-- CategoryCard.tsx          (Carte individuelle categorie)
-+-- UsersManagement.tsx       (Table utilisateurs + filtres)
-+-- PartnersManagement.tsx    (Gestion partenaires)
-+-- NotificationCenter.tsx    (Historique notifications)
-+-- ComplaintsTab.tsx         (Ticketing reclamations)
-+-- ComplaintCard.tsx         (Carte reclamation individuelle)
-+-- SettingsTab.tsx           (MODIFIER: ajouter connectivite)
-```
+Contexte React exposant :
+- `items: CartItem[]` — `{ product_id, name, price, image_url, quantity, shop_id, shop_name }`
+- `addToCart(item)` — ajoute, ou incrémente la quantité si le `product_id` existe déjà
+- `removeFromCart(product_id)` — supprime un article
+- `updateQuantity(product_id, qty)` — met à jour ; si `qty <= 0`, supprime
+- `clearCart()` — vide le panier
+- `cartCount` — somme des quantités (mémorisé)
+- `cartTotal` — total en FCFA (mémorisé)
+- `isOpen` / `setIsOpen` — état d'ouverture du drawer
 
-### 2.2 Mise a Jour Sidebar
+**Persistance** : `localStorage` clé `loummel_cart`. Lecture initiale depuis le storage (avec try/catch + fallback `[]`), réécriture à chaque modification via `useEffect`.
 
-Ajout des nouveaux menus dans AdminSidebar.tsx :
+Hook `useCart()` qui throw si utilisé hors `CartProvider`.
 
-| Menu              | Icone (lucide-react) | Tab ID       |
-|-------------------|----------------------|--------------|
-| Categories        | Grid3X3              | categories   |
-| Utilisateurs      | Users                | users        |
-| Partenaires       | Handshake            | partners     |
-| Notifications     | Bell                 | notifications|
-| Reclamations      | MessageSquareWarning | complaints   |
-| Wanda Services    | Truck                | wanda        |
-| Parametres        | Settings             | settings     |
+### 2. `src/components/cart/CartDrawer.tsx` (nouveau)
 
-### 2.3 Details des Composants
+`Sheet` shadcn `side="right"`, largeur `sm:max-w-md`, ouvert/fermé via `isOpen`/`setIsOpen` du contexte.
 
-**CategoriesTab.tsx** :
-- Grille de cartes par categorie (Artisanat, Electronique, Restaurants, etc.)
-- Chaque carte affiche : CA total, nb boutiques, nb visites, produits/services, livraisons, reclamations
-- Clic sur carte = filtre les boutiques par categorie
+**État vide** : icône `ShoppingCart` dans un cercle, texte "Votre panier est vide" + sous-texte + bouton "Explorer les boutiques" (lien `/recherche`).
 
-**UsersManagement.tsx** :
-- Tableau paginee de tous les utilisateurs (profiles)
-- Filtrage par role (Client, Partenaire, Proprietaire, Admin)
-- Colonnes : Nom, Email, Role, Date inscription, Actions
+**État rempli** :
+- Header : titre "Mon panier" + nombre d'articles
+- Liste scrollable : pour chaque item — image (80x80), nom, nom boutique, prix unitaire, contrôle quantité (`-` / valeur / `+`), bouton supprimer (icône poubelle)
+- Footer : Total formaté FCFA + 2 boutons côte à côte → "Voir mon panier" (`outline`, `/panier`) et "Commander" (variant `default` = couleur primaire #966442, `/checkout`). Les deux ferment le drawer au clic.
 
-**PartnersManagement.tsx** :
-- Vue dediee aux partenaires commerciaux
-- Affiche : Type (commission/forfait), Zone, Boutiques recrutees, Commissions
-- Actions : Approuver, Suspendre, Voir details
+Format prix : `new Intl.NumberFormat("fr-FR").format(price) + " FCFA"`.
 
-**NotificationCenter.tsx** :
-- Historique de TOUTES les notifications envoyees
-- Filtres : Type, Destinataire, Date
-- Export CSV possible
+### 3. `src/components/layout/Header.tsx` (modification ciblée)
 
-**ComplaintsTab.tsx** :
-- Tableau de bord ticketing
-- Colonnes : Expediteur, Cible, Motif, Statut, Priorite, Date
-- Actions : Assigner, Changer statut, Resoudre
-- Badges colores par statut
+- Importer `useCart` et `CartDrawer`
+- Récupérer `cartCount` et `setIsOpen` (renommé `setCartOpen`)
+- Remplacer le bouton ShoppingCart actuel (lignes 107-112) :
+  - `onClick={() => setCartOpen(true)}`
+  - Badge `cartCount` masqué si `=== 0`, affiche `99+` si `> 99`, taille adaptative
+- Ajouter `<CartDrawer />` juste avant `</header>` (ligne 211)
 
-**SettingsTab.tsx (Modifications)** :
-- Nouvel onglet "Connectivite"
-- Bouton "Sauvegarde JSON/CSV" pour exporter donnees
-- Bouton "Test Supabase" pour verifier connexion backend
+### 4. `src/App.tsx` (modification ciblée)
 
----
+Wrapper `CartProvider` à l'intérieur de `AuthProvider`, autour de `BrowserRouter`/`Toaster`/`Sonner` :
 
-## Phase 3 : Corrections Securite
-
-### 3.1 Vulnerabilites a Corriger
-
-| Issue                    | Priorite | Action                              |
-|--------------------------|----------|-------------------------------------|
-| reset-test-passwords     | CRITIQUE | DEJA SUPPRIME (verifie)            |
-| Leaked Password Protection| HAUTE   | Activer via configure-auth          |
-| Storage INSERT policy    | MOYENNE  | Restreindre aux proprietaires       |
-| Affiliate code generation| BASSE    | Utiliser crypto.getRandomValues()   |
-| CORS wildcard            | INFO     | Acceptable pour plateforme publique |
-
-### 3.2 Activation Protection Mots de Passe
-
-Utiliser l'outil configure-auth pour activer la protection contre les mots de passe compromis.
-
-### 3.3 Amelioration Generation Code Affilie
-
-Remplacer Math.random() par crypto.getRandomValues() :
-
-```typescript
-export const generateAffiliateCode = (): string => {
-  const chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
-  const array = new Uint8Array(8); // 8 caracteres au lieu de 6
-  crypto.getRandomValues(array);
-  
-  let code = "";
-  for (let i = 0; i < 8; i++) {
-    code += chars.charAt(array[i] % chars.length);
-  }
-  return `LM-${code}`;
-};
-```
-
-### 3.4 Correction Storage Policy
-
-Migration SQL pour securiser les uploads :
-
-```sql
-DROP POLICY IF EXISTS "Authenticated users can upload shop images" 
-  ON storage.objects;
-
-CREATE POLICY "Shop owners can upload to their own folder"
-ON storage.objects FOR INSERT
-WITH CHECK (
-  bucket_id = 'shop-images' 
-  AND auth.uid()::text = (storage.foldername(name))[1]
-);
+```tsx
+<AuthProvider>
+  <CartProvider>
+    <Toaster />
+    <Sonner />
+    <BrowserRouter>...</BrowserRouter>
+  </CartProvider>
+</AuthProvider>
 ```
 
 ---
 
-## Phase 4 : Mise a Jour Routing
+## Détails techniques
 
-### 4.1 AdminDashboard.tsx
+- TypeScript strict : interface `CartItem` exportée depuis `CartContext`
+- `useCallback` sur toutes les actions, `useMemo` pour `cartCount` et `cartTotal`
+- `addToCart` accepte une quantité optionnelle (défaut 1) — utile pour évolutions futures
+- Gestion d'erreur localStorage (SSR-safe avec `typeof window` check, try/catch)
+- Sheet shadcn déjà disponible (`src/components/ui/sheet.tsx`)
+- Pas de modification du schéma BD ni d'appel Supabase — purement client
+- Routes `/panier` et `/checkout` ne sont **pas** créées dans ce plan (les liens fonctionneront mais mèneront au 404 actuel — à traiter dans une étape ultérieure)
 
-Ajouter les nouveaux cas dans renderContent() :
+## Hors scope
 
-```typescript
-case "categories":
-  return <CategoriesTab />;
-case "users":
-  return <UsersManagement />;
-case "partners":
-  return <PartnersManagement />;
-case "notifications":
-  return <NotificationCenter />;
-case "complaints":
-  return <ComplaintsTab />;
-```
-
----
-
-## Phase 5 : Tests et Validation
-
-### 5.1 Scenarios de Test
-
-1. Navigation sidebar : tous les onglets fonctionnels
-2. Categories : agregation correcte des stats
-3. Users : filtrage par role operationnel
-4. Reclamations : workflow complet (creation -> resolution)
-5. Parametres : export JSON/CSV + test connexion
-6. Securite : verification RLS sur nouvelles tables
-
----
-
-## Resume des Fichiers
-
-| Fichier                                | Action    |
-|----------------------------------------|-----------|
-| `supabase/migrations/xxx_complaints.sql` | Creer    |
-| `src/components/admin/AdminSidebar.tsx`| Modifier  |
-| `src/components/admin/CategoriesTab.tsx`| Creer    |
-| `src/components/admin/CategoryCard.tsx` | Creer    |
-| `src/components/admin/UsersManagement.tsx`| Creer  |
-| `src/components/admin/PartnersManagement.tsx`| Creer|
-| `src/components/admin/NotificationCenter.tsx`| Creer|
-| `src/components/admin/ComplaintsTab.tsx`| Creer    |
-| `src/components/admin/SettingsTab.tsx` | Modifier  |
-| `src/pages/dashboard/AdminDashboard.tsx`| Modifier |
-| `src/lib/generateAffiliateCode.ts`     | Modifier  |
-
----
-
-## Estimation
-
-| Phase | Complexite | Temps estime |
-|-------|------------|--------------|
-| Phase 1 (DB) | Moyenne | 10 min |
-| Phase 2 (Composants) | Elevee | 45 min |
-| Phase 3 (Securite) | Faible | 10 min |
-| Phase 4 (Routing) | Faible | 5 min |
-| Phase 5 (Tests) | Moyenne | 15 min |
-| **Total** | | **~1h25** |
-
----
-
-## Resultat Attendu
-
-Apres implementation :
-- 7 onglets dans la sidebar admin (au lieu de 4)
-- Vue agregee par categorie avec stats completes
-- Gestion centralisee utilisateurs et partenaires
-- Historique complet des notifications
-- Systeme de ticketing pour reclamations
-- Export donnees JSON/CSV
-- Test de connexion backend
-- Securite renforcee (mots de passe, storage, codes affilies)
-- Interface coherente avec #966442
+- Branchement du bouton "Ajouter au panier" sur `ProductDetail.tsx` (actuellement il affiche un toast — à connecter dans une prochaine itération si souhaité)
+- Création des pages `/panier` et `/checkout`
+- Synchronisation du panier avec Supabase (utilisateur connecté)
