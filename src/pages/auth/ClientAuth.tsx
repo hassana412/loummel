@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { useNavigate, useSearchParams } from "react-router-dom";
+import { useNavigate, Link, useSearchParams } from "react-router-dom";
 import { useAuth } from "@/contexts/AuthContext";
 import Header from "@/components/layout/Header";
 import Footer from "@/components/layout/Footer";
@@ -449,7 +449,15 @@ const ClientAuth = () => {
                   </div>
                   
                   <div className="space-y-2">
-                    <Label htmlFor="login-password">Mot de passe</Label>
+                    <div className="flex items-center justify-between">
+                      <Label htmlFor="login-password">Mot de passe</Label>
+                      <Link
+                        to="/mot-de-passe-oublie"
+                        className="text-sm text-primary hover:underline"
+                      >
+                        Mot de passe oublié ?
+                      </Link>
+                    </div>
                     <PasswordInput
                       id="login-password"
                       value={loginPassword}
@@ -465,16 +473,6 @@ const ClientAuth = () => {
                     )}
                     Se connecter
                   </Button>
-                  
-                  <div className="text-center">
-                    <button
-                      type="button"
-                      onClick={() => setAuthMode("forgot")}
-                      className="text-sm text-primary hover:underline"
-                    >
-                      Mot de passe oublié ?
-                    </button>
-                  </div>
                 </form>
               </TabsContent>
               

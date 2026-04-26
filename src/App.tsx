@@ -23,6 +23,8 @@ import CommandeConfirmee from "./pages/CommandeConfirmee";
 import ClientAuth from "./pages/auth/ClientAuth";
 import VendeurAuth from "./pages/auth/VendeurAuth";
 import PartenaireAuth from "./pages/auth/PartenaireAuth";
+import ForgotPassword from "./pages/auth/ForgotPassword";
+import ResetPassword from "./pages/auth/ResetPassword";
 
 // Boutique pages
 import BoutiqueLayout from "./pages/boutique/BoutiqueLayout";
@@ -61,6 +63,8 @@ const App = () => (
             <Route path="/connexion" element={<ClientAuth />} />
             <Route path="/auth/vendeur" element={<VendeurAuth />} />
             <Route path="/auth/partenaire" element={<PartenaireAuth />} />
+            <Route path="/mot-de-passe-oublie" element={<ForgotPassword />} />
+            <Route path="/reinitialiser-mot-de-passe" element={<ResetPassword />} />
             <Route path="/backoffice" element={<Backoffice />} />
             
             {/* Legacy /auth redirects to client auth */}
