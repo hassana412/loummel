@@ -142,16 +142,6 @@ export const CartProvider = ({ children }: { children: ReactNode }) => {
         setIsOpen,
       }}
     >
-        addToCart,
-        removeFromCart,
-        updateQuantity,
-        clearCart,
-        cartCount,
-        cartTotal,
-        isOpen,
-        setIsOpen,
-      }}
-    >
       {children}
     </CartContext.Provider>
   );
