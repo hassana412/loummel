@@ -108,10 +108,40 @@ export const CartProvider = ({ children }: { children: ReactNode }) => {
     [items]
   );
 
+  const itemsByShop = useMemo(() => {
+    return items.reduce((acc, item) => {
+      if (!acc[item.shop_id]) {
+        acc[item.shop_id] = {
+          shop_id: item.shop_id,
+          shop_name: item.shop_name,
+          items: [],
+          subtotal: 0,
+        };
+      }
+      acc[item.shop_id].items.push(item);
+      acc[item.shop_id].subtotal += item.price * item.quantity;
+      return acc;
+    }, {} as Record<string, ShopGroup>);
+  }, [items]);
+
+  const shopCount = useMemo(() => Object.keys(itemsByShop).length, [itemsByShop]);
+
   return (
     <CartContext.Provider
       value={{
         items,
+        addToCart,
+        removeFromCart,
+        updateQuantity,
+        clearCart,
+        cartCount,
+        cartTotal,
+        itemsByShop,
+        shopCount,
+        isOpen,
+        setIsOpen,
+      }}
+    >
         addToCart,
         removeFromCart,
         updateQuantity,
