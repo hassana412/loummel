@@ -516,7 +516,15 @@ const VendeurAuth = () => {
               </div>
               
               <div className="space-y-2">
-                <Label htmlFor="password">Mot de passe</Label>
+                <div className="flex items-center justify-between">
+                  <Label htmlFor="password">Mot de passe</Label>
+                  <Link
+                    to="/mot-de-passe-oublie"
+                    className="text-sm text-primary hover:underline"
+                  >
+                    Mot de passe oublié ?
+                  </Link>
+                </div>
                 <PasswordInput
                   id="password"
                   value={password}
@@ -532,12 +540,6 @@ const VendeurAuth = () => {
                 )}
                 Se connecter
               </Button>
-
-              <div className="text-center">
-                <button type="button" onClick={() => setAuthMode("forgot")} className="text-sm text-green-600 hover:underline">
-                  Mot de passe oublié ?
-                </button>
-              </div>
             </form>
 
             <div className="mt-6 pt-4 border-t text-center">
