@@ -124,7 +124,12 @@ const Panier = () => {
                 <h2 className="text-xl font-semibold mb-4">Résumé</h2>
                 <div className="space-y-3 text-sm">
                   <div className="flex justify-between">
-                    <span className="text-muted-foreground">Articles</span>
+                    <div className="flex flex-col">
+                      <span className="text-muted-foreground">Articles</span>
+                      <span className="text-xs text-muted-foreground">
+                        {shopCount} boutique{shopCount > 1 ? "s" : ""}
+                      </span>
+                    </div>
                     <span>{cartCount}</span>
                   </div>
                   <div className="flex justify-between">
