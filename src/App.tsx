@@ -15,6 +15,9 @@ import Recherche from "./pages/Recherche";
 import InscriptionVendeur from "./pages/InscriptionVendeur";
 import DevenirPartenaire from "./pages/DevenirPartenaire";
 import CreerMaBoutique from "./pages/CreerMaBoutique";
+import Panier from "./pages/Panier";
+import Checkout from "./pages/Checkout";
+import CommandeConfirmee from "./pages/CommandeConfirmee";
 
 // Auth pages
 import ClientAuth from "./pages/auth/ClientAuth";
