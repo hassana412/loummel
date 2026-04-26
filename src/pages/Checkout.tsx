@@ -1,6 +1,6 @@
-import { useState } from "react";
+import { useState, useMemo } from "react";
 import { Link, Navigate, useNavigate } from "react-router-dom";
-import { Check } from "lucide-react";
+import { Check, Loader2, ShieldCheck } from "lucide-react";
 import Header from "@/components/layout/Header";
 import Footer from "@/components/layout/Footer";
 import { Button } from "@/components/ui/button";
@@ -27,12 +27,14 @@ type DeliveryForm = {
   notes: string;
 };
 
+type PaymentMode = "orange_money" | "mtn_momo";
+
 const Checkout = () => {
   const { user, loading } = useAuth();
-  const { items, cartTotal, clearCart } = useCart();
+  const { items, cartTotal, clearCart, itemsByShop } = useCart();
   const navigate = useNavigate();
 
-  const [step, setStep] = useState<1 | 2>(1);
+  const [step, setStep] = useState<1 | 2 | 3>(1);
   const [submitting, setSubmitting] = useState(false);
   const [delivery, setDelivery] = useState<DeliveryForm>({
     full_name: "",
@@ -42,7 +44,10 @@ const Checkout = () => {
     address: "",
     notes: "",
   });
-  const [paymentMode, setPaymentMode] = useState<string>("livraison");
+  const [paymentMode, setPaymentMode] = useState<PaymentMode>("orange_money");
+  const [paymentNumber, setPaymentNumber] = useState("");
+
+  const shopGroups = useMemo(() => Object.values(itemsByShop), [itemsByShop]);
 
   if (loading) {
     return (
@@ -87,62 +92,127 @@ const Checkout = () => {
   };
 
   const handleConfirmOrder = async () => {
+    if (!paymentNumber.trim()) {
+      toast.error("Merci de renseigner votre numéro de paiement");
+      return;
+    }
+
     setSubmitting(true);
+    setStep(3);
+
+    let createdOrderId: string | null = null;
+
     try {
-      const { data, error } = await supabase
+      // 1. Insert global order
+      const { data: order, error: orderError } = await supabase
         .from("orders")
         .insert({
           user_id: user.id,
           items: items as any,
           total: cartTotal,
           mode_paiement: paymentMode,
+          mode_paiement_numero: paymentNumber,
           adresse_livraison: delivery as any,
-          statut: "en_attente",
+          statut: "paiement_en_cours",
         })
         .select("id")
         .single();
 
-      if (error) throw error;
+      if (orderError) throw orderError;
+      createdOrderId = order.id;
 
+      // 2. Insert one shop_order per shop
+      const shopOrdersPayload = shopGroups.map((group) => ({
+        order_id: order.id,
+        shop_id: group.shop_id,
+        shop_name: group.shop_name,
+        items: group.items as any,
+        subtotal: group.subtotal,
+        statut: "en_attente",
+      }));
+
+      const { error: shopOrdersError } = await supabase
+        .from("shop_orders")
+        .insert(shopOrdersPayload);
+
+      if (shopOrdersError) throw shopOrdersError;
+
+      // 3. Clear cart and navigate
       clearCart();
       toast.success("Commande confirmée !");
-      navigate(`/commande-confirmee?id=${data.id}`);
+      navigate(`/commande-confirmee?id=${order.id}`);
     } catch (err: any) {
       console.error("[Checkout] Order creation failed:", err);
       toast.error(err.message || "Erreur lors de la création de la commande");
+
+      // Mark order as errored if it was created
+      if (createdOrderId) {
+        await supabase
+          .from("orders")
+          .update({ statut: "erreur" })
+          .eq("id", createdOrderId);
+      }
+
       setSubmitting(false);
+      setStep(2);
     }
   };
 
-  const Stepper = () => (
-    <div className="flex items-center justify-center gap-4 mb-8">
-      <div className="flex items-center gap-2">
-        <div
-          className={`w-8 h-8 rounded-full flex items-center justify-center font-semibold ${
-            step >= 1 ? "bg-primary text-primary-foreground" : "bg-muted text-muted-foreground"
-          }`}
-        >
-          {step > 1 ? <Check className="w-4 h-4" /> : "1"}
-        </div>
-        <span className={step >= 1 ? "font-medium" : "text-muted-foreground"}>
-          Livraison
-        </span>
+  const Stepper = () => {
+    const steps = [
+      { n: 1, label: "Livraison" },
+      { n: 2, label: "Paiement" },
+      { n: 3, label: "Confirmation" },
+    ];
+    return (
+      <div className="flex items-center justify-center gap-2 sm:gap-4 mb-8">
+        {steps.map((s, idx) => (
+          <div key={s.n} className="flex items-center gap-2 sm:gap-4">
+            <div className="flex items-center gap-2">
+              <div
+                className={`w-8 h-8 rounded-full flex items-center justify-center font-semibold text-sm ${
+                  step >= s.n
+                    ? "bg-primary text-primary-foreground"
+                    : "bg-muted text-muted-foreground"
+                }`}
+              >
+                {step > s.n ? <Check className="w-4 h-4" /> : s.n}
+              </div>
+              <span
+                className={`text-sm ${
+                  step >= s.n ? "font-medium" : "text-muted-foreground"
+                } hidden sm:inline`}
+              >
+                {s.label}
+              </span>
+            </div>
+            {idx < steps.length - 1 && <div className="w-8 sm:w-12 h-px bg-border" />}
+          </div>
+        ))}
       </div>
-      <div className="w-12 h-px bg-border" />
-      <div className="flex items-center gap-2">
-        <div
-          className={`w-8 h-8 rounded-full flex items-center justify-center font-semibold ${
-            step >= 2 ? "bg-primary text-primary-foreground" : "bg-muted text-muted-foreground"
-          }`}
-        >
-          2
-        </div>
-        <span className={step >= 2 ? "font-medium" : "text-muted-foreground"}>
-          Confirmation
-        </span>
+    );
+  };
+
+  // Loading overlay during processing
+  if (step === 3 && submitting) {
+    return (
+      <div className="min-h-screen flex flex-col bg-background">
+        <Header />
+        <main className="flex-1 flex items-center justify-center p-4">
+          <Card className="p-10 text-center max-w-md w-full">
+            <Loader2 className="w-16 h-16 mx-auto text-primary animate-spin mb-4" />
+            <h2 className="text-xl font-semibold mb-2">
+              Traitement de votre commande...
+            </h2>
+            <p className="text-sm text-muted-foreground">
+              Merci de patienter, ne fermez pas cette page.
+            </p>
+          </Card>
+        </main>
+        <Footer />
       </div>
-    </div>
-  );
+    );
+  }
 
   return (
     <div className="min-h-screen flex flex-col bg-background">
@@ -223,7 +293,7 @@ const Checkout = () => {
                 />
               </div>
               <Button type="submit" size="lg" className="w-full">
-                Continuer
+                Continuer →
               </Button>
             </form>
           </Card>
@@ -232,54 +302,90 @@ const Checkout = () => {
         {step === 2 && (
           <div className="space-y-6">
             <Card className="p-6">
-              <h2 className="text-xl font-semibold mb-4">Récapitulatif</h2>
-              <div className="space-y-2">
-                {items.map((item) => (
-                  <div
-                    key={item.product_id}
-                    className="flex justify-between text-sm"
-                  >
-                    <span className="truncate pr-2">
-                      {item.name}{" "}
-                      <span className="text-muted-foreground">
-                        × {item.quantity}
-                      </span>
-                    </span>
-                    <span className="shrink-0">
-                      {formatFCFA(item.price * item.quantity)}
-                    </span>
-                  </div>
-                ))}
-                <Separator className="my-3" />
-                <div className="flex justify-between text-base font-semibold">
-                  <span>Total</span>
-                  <span className="text-primary">{formatFCFA(cartTotal)}</span>
+              <div className="flex items-start gap-3 mb-4">
+                <ShieldCheck className="w-6 h-6 text-primary shrink-0 mt-0.5" />
+                <div>
+                  <h2 className="text-xl font-semibold">Paiement sécurisé</h2>
+                  <p className="text-sm text-muted-foreground">
+                    Votre paiement sera reçu par Loummel et dispatché à chaque boutique.
+                  </p>
                 </div>
+              </div>
+
+              <RadioGroup
+                value={paymentMode}
+                onValueChange={(v) => setPaymentMode(v as PaymentMode)}
+                className="space-y-2"
+              >
+                <div className="flex items-center space-x-3 border rounded-md p-3 hover:bg-accent transition-colors">
+                  <RadioGroupItem value="orange_money" id="orange_money" />
+                  <Label
+                    htmlFor="orange_money"
+                    className="flex-1 cursor-pointer flex items-center gap-3"
+                  >
+                    <span className="w-8 h-8 rounded-full bg-orange-500 flex items-center justify-center text-white font-bold text-xs">
+                      OM
+                    </span>
+                    <span className="font-medium">Orange Money</span>
+                  </Label>
+                </div>
+                <div className="flex items-center space-x-3 border rounded-md p-3 hover:bg-accent transition-colors">
+                  <RadioGroupItem value="mtn_momo" id="mtn_momo" />
+                  <Label
+                    htmlFor="mtn_momo"
+                    className="flex-1 cursor-pointer flex items-center gap-3"
+                  >
+                    <span className="w-8 h-8 rounded-full bg-yellow-400 flex items-center justify-center text-foreground font-bold text-xs">
+                      MTN
+                    </span>
+                    <span className="font-medium">MTN Mobile Money</span>
+                  </Label>
+                </div>
+              </RadioGroup>
+
+              <div className="mt-4">
+                <Label htmlFor="payment_number">
+                  Numéro de paiement *
+                </Label>
+                <Input
+                  id="payment_number"
+                  type="tel"
+                  placeholder="6XX XXX XXX"
+                  value={paymentNumber}
+                  onChange={(e) => setPaymentNumber(e.target.value)}
+                  required
+                />
+                <p className="text-xs text-muted-foreground mt-1">
+                  Numéro {paymentMode === "orange_money" ? "Orange Money" : "MTN MoMo"} à débiter
+                </p>
               </div>
             </Card>
 
             <Card className="p-6">
-              <h2 className="text-xl font-semibold mb-4">Mode de paiement</h2>
-              <RadioGroup value={paymentMode} onValueChange={setPaymentMode}>
-                <div className="flex items-center space-x-2 border rounded-md p-3">
-                  <RadioGroupItem value="livraison" id="livraison" />
-                  <Label htmlFor="livraison" className="flex-1 cursor-pointer">
-                    Paiement à la livraison
-                  </Label>
+              <h2 className="text-lg font-semibold mb-3">Récapitulatif</h2>
+              <div className="space-y-2">
+                {shopGroups.map((group) => (
+                  <div
+                    key={group.shop_id}
+                    className="flex justify-between text-sm py-1"
+                  >
+                    <span className="truncate pr-2 text-muted-foreground">
+                      {group.shop_name}
+                      <span className="ml-1 text-xs">
+                        ({group.items.length} article{group.items.length > 1 ? "s" : ""})
+                      </span>
+                    </span>
+                    <span className="shrink-0 font-medium">
+                      {formatFCFA(group.subtotal)}
+                    </span>
+                  </div>
+                ))}
+                <Separator className="my-3" />
+                <div className="flex justify-between text-base font-bold">
+                  <span>Total</span>
+                  <span className="text-primary">{formatFCFA(cartTotal)}</span>
                 </div>
-                <div className="flex items-center space-x-2 border rounded-md p-3">
-                  <RadioGroupItem value="orange_money" id="orange_money" />
-                  <Label htmlFor="orange_money" className="flex-1 cursor-pointer">
-                    Orange Money
-                  </Label>
-                </div>
-                <div className="flex items-center space-x-2 border rounded-md p-3">
-                  <RadioGroupItem value="mtn_momo" id="mtn_momo" />
-                  <Label htmlFor="mtn_momo" className="flex-1 cursor-pointer">
-                    MTN Mobile Money
-                  </Label>
-                </div>
-              </RadioGroup>
+              </div>
             </Card>
 
             <div className="flex flex-col sm:flex-row gap-3">
@@ -289,7 +395,7 @@ const Checkout = () => {
                 disabled={submitting}
                 className="sm:w-auto"
               >
-                Retour
+                ← Retour
               </Button>
               <Button
                 onClick={handleConfirmOrder}
@@ -297,7 +403,7 @@ const Checkout = () => {
                 size="lg"
                 className="flex-1"
               >
-                {submitting ? "Envoi..." : "Confirmer la commande"}
+                Confirmer le paiement
               </Button>
             </div>
           </div>
