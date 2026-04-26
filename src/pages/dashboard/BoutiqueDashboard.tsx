@@ -11,10 +11,11 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { toast } from "@/hooks/use-toast";
+import { MesVentes } from "@/components/boutique/MesVentes";
 import {
   Store, Package, Briefcase, Settings, LogOut, Plus,
   Trash2, Eye, Crown, Clock, Copy, Handshake, Phone, Mail, Shield,
-  TrendingUp, AlertTriangle, Users, FileText, BarChart3, ShoppingCart
+  TrendingUp, AlertTriangle, Users, FileText, BarChart3, ShoppingCart, ShoppingBag
 } from "lucide-react";
 
 interface ShopData {
@@ -499,13 +500,22 @@ const BoutiqueDashboard = () => {
 
           {/* Tabs */}
           <Tabs defaultValue="overview">
-            <TabsList className="grid grid-cols-5 w-full max-w-2xl">
+            <TabsList className="grid grid-cols-6 w-full max-w-3xl">
               <TabsTrigger value="overview">Aperçu</TabsTrigger>
+              <TabsTrigger value="ventes" className="gap-1.5">
+                <ShoppingBag className="w-4 h-4" />
+                Mes Ventes
+              </TabsTrigger>
               <TabsTrigger value="products">Produits</TabsTrigger>
               <TabsTrigger value="services">Services</TabsTrigger>
               <TabsTrigger value="clients">Clients</TabsTrigger>
               <TabsTrigger value="invoices">Factures</TabsTrigger>
             </TabsList>
+
+            {/* Mes Ventes Tab */}
+            <TabsContent value="ventes" className="mt-6">
+              <MesVentes />
+            </TabsContent>
 
             {/* Overview Tab */}
             <TabsContent value="overview" className="mt-6">
