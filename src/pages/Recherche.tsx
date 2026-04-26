@@ -88,6 +88,13 @@ const Recherche = () => {
     setSearchParams(params);
   };
 
+  const clearFilters = () => {
+    setQuery("");
+    setSelectedCategory("all");
+    setSelectedRegion("all");
+    setSearchParams(new URLSearchParams());
+  };
+
   const hasFilters = query || (selectedCategory && selectedCategory !== "all") || (selectedRegion && selectedRegion !== "all");
 
   return (
