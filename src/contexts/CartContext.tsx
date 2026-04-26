@@ -10,6 +10,13 @@ export interface CartItem {
   shop_name: string;
 }
 
+export interface ShopGroup {
+  shop_id: string;
+  shop_name: string;
+  items: CartItem[];
+  subtotal: number;
+}
+
 interface CartContextType {
   items: CartItem[];
   addToCart: (item: Omit<CartItem, "quantity"> & { quantity?: number }) => void;
@@ -18,6 +25,8 @@ interface CartContextType {
   clearCart: () => void;
   cartCount: number;
   cartTotal: number;
+  itemsByShop: Record<string, ShopGroup>;
+  shopCount: number;
   isOpen: boolean;
   setIsOpen: (open: boolean) => void;
 }
