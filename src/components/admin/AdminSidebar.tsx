@@ -1,7 +1,7 @@
 import { 
   LayoutDashboard, Store, Truck, Settings, LogOut, 
   ChevronLeft, ChevronRight, Grid3X3, Users, Handshake,
-  Bell, MessageSquareWarning
+  Bell, MessageSquareWarning, Wallet
 } from "lucide-react";
 import { NavLink } from "@/components/NavLink";
 import {
