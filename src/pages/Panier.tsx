@@ -1,17 +1,18 @@
 import { Link } from "react-router-dom";
-import { Minus, Plus, Trash2, ShoppingBag } from "lucide-react";
+import { Minus, Plus, Trash2, ShoppingBag, Store } from "lucide-react";
 import Header from "@/components/layout/Header";
 import Footer from "@/components/layout/Footer";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
+import { Badge } from "@/components/ui/badge";
 import { useCart } from "@/contexts/CartContext";
 
 const formatFCFA = (n: number) =>
   `${new Intl.NumberFormat("fr-FR").format(Math.round(n))} FCFA`;
 
 const Panier = () => {
-  const { items, updateQuantity, removeFromCart, clearCart, cartCount, cartTotal } = useCart();
+  const { items, updateQuantity, removeFromCart, clearCart, cartCount, cartTotal, itemsByShop, shopCount } = useCart();
 
   return (
     <div className="min-h-screen flex flex-col bg-background">
