@@ -1,11 +1,13 @@
 import { useState, useEffect } from "react";
-import { useParams, Link } from "react-router-dom";
+import { useParams, Link, useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
-import { ShoppingBag, Filter, Phone, Loader2 } from "lucide-react";
+import { toast } from "sonner";
+import { ShoppingBag, Filter, Loader2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { useShop } from "./BoutiqueLayout";
+import { useCart } from "@/contexts/CartContext";
 
 // Import des images locales
 import artisanJewelry from "@/assets/artisan-jewelry.jpg";
