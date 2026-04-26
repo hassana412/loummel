@@ -63,6 +63,8 @@ const App = () => (
             <Route path="/connexion" element={<ClientAuth />} />
             <Route path="/auth/vendeur" element={<VendeurAuth />} />
             <Route path="/auth/partenaire" element={<PartenaireAuth />} />
+            <Route path="/mot-de-passe-oublie" element={<ForgotPassword />} />
+            <Route path="/reinitialiser-mot-de-passe" element={<ResetPassword />} />
             <Route path="/backoffice" element={<Backoffice />} />
             
             {/* Legacy /auth redirects to client auth */}
