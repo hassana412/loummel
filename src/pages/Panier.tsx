@@ -114,8 +114,28 @@ const Panier = () => {
                       </div>
                     </Card>
                   ))}
+
+                  {/* Lien pour ajouter d'autres articles de cette boutique */}
+                  <div className="px-1">
+                    <Button asChild variant="ghost" size="sm" className="text-primary hover:text-primary">
+                      <Link to={`/boutique/${group.shop_id}/produits`}>
+                        <PlusIcon className="w-4 h-4 mr-1" />
+                        Ajouter d'autres articles de {group.shop_name}
+                      </Link>
+                    </Button>
+                  </div>
                 </div>
               ))}
+
+              {/* Bouton global pour continuer les achats */}
+              <Card className="p-4 border-dashed">
+                <Button asChild variant="outline" className="w-full">
+                  <Link to="/recherche">
+                    <PlusIcon className="w-4 h-4 mr-2" />
+                    Découvrir d'autres boutiques
+                  </Link>
+                </Button>
+              </Card>
             </div>
 
             {/* Summary */}
