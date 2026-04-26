@@ -18,6 +18,7 @@ import CreerMaBoutique from "./pages/CreerMaBoutique";
 import Panier from "./pages/Panier";
 import Checkout from "./pages/Checkout";
 import CommandeConfirmee from "./pages/CommandeConfirmee";
+import MonProfil from "./pages/MonProfil";
 
 // Auth pages
 import ClientAuth from "./pages/auth/ClientAuth";
@@ -58,6 +59,7 @@ const App = () => (
             <Route path="/panier" element={<Panier />} />
             <Route path="/checkout" element={<Checkout />} />
             <Route path="/commande-confirmee" element={<CommandeConfirmee />} />
+            <Route path="/mon-profil" element={<MonProfil />} />
             
             {/* Auth routes - 4 separate login pages */}
             <Route path="/connexion" element={<ClientAuth />} />
