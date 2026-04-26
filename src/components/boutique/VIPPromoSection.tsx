@@ -1,6 +1,9 @@
-import { Crown, Sparkles, ShoppingBag, Phone } from "lucide-react";
+import { Crown, Sparkles, ShoppingBag } from "lucide-react";
+import { useNavigate } from "react-router-dom";
+import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
+import { useCart } from "@/contexts/CartContext";
 
 interface PromoItem {
   id: string;
@@ -15,11 +18,15 @@ interface PromoItem {
 interface VIPPromoSectionProps {
   shopName: string;
   whatsapp: string;
+  shopId?: string;
   promoTitle?: string;
   promoItems: PromoItem[];
 }
 
-const VIPPromoSection = ({ shopName, whatsapp, promoTitle, promoItems }: VIPPromoSectionProps) => {
+const VIPPromoSection = ({ shopName, shopId, promoTitle, promoItems }: VIPPromoSectionProps) => {
+  const navigate = useNavigate();
+  const { addToCart } = useCart();
+
   const formatPrice = (price: number) => {
     return new Intl.NumberFormat('fr-FR').format(price) + ' FCFA';
   };
@@ -29,11 +36,20 @@ const VIPPromoSection = ({ shopName, whatsapp, promoTitle, promoItems }: VIPProm
     return Math.round(((original - promo) / original) * 100);
   };
 
-  const handleWhatsAppOrder = (itemName: string) => {
-    const message = encodeURIComponent(
-      `Bonjour ${shopName}! Je suis intéressé(e) par "${itemName}" vu sur Loummel. Pouvez-vous me donner plus d'informations?`
-    );
-    window.open(`https://wa.me/${whatsapp}?text=${message}`, '_blank');
+  const handleOrder = (item: PromoItem) => {
+    if (shopId && item.type === 'product') {
+      addToCart({
+        product_id: item.id,
+        name: item.name,
+        price: item.promoPrice ?? item.originalPrice,
+        image_url: item.image,
+        quantity: 1,
+        shop_id: shopId,
+        shop_name: shopName,
+      });
+      toast.success("Ajouté au panier ✓", { description: item.name });
+    }
+    navigate("/panier");
   };
 
   if (promoItems.length === 0) return null;
@@ -124,14 +140,14 @@ const VIPPromoSection = ({ shopName, whatsapp, promoTitle, promoItems }: VIPProm
                   )}
                 </div>
 
-                {/* WhatsApp Button */}
+                {/* Order Button */}
                 <Button
-                  onClick={() => handleWhatsAppOrder(item.name)}
-                  className="w-full bg-green-600 hover:bg-green-700 text-white"
+                  onClick={() => handleOrder(item)}
+                  className="w-full"
                   size="sm"
                 >
-                  <Phone className="w-4 h-4 mr-2" />
-                  Commander via WhatsApp
+                  <ShoppingBag className="w-4 h-4 mr-2" />
+                  Commander
                 </Button>
               </div>
             </div>

@@ -1,8 +1,8 @@
 import { useEffect, useState } from "react";
-import { useParams, Link } from "react-router-dom";
+import { useParams, Link, useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
-import { ShoppingCart, Phone, PackageX } from "lucide-react";
+import { ShoppingCart, ShoppingBag, PackageX } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Skeleton } from "@/components/ui/skeleton";
@@ -36,6 +36,7 @@ const ProductDetail = () => {
   const { slug, id } = useParams<{ slug: string; id: string }>();
   const { shop } = useShop();
   const { addToCart, setIsOpen: setCartOpen } = useCart();
+  const navigate = useNavigate();
 
   const [product, setProduct] = useState<Product | null>(null);
   const [related, setRelated] = useState<Product[]>([]);
@@ -131,12 +132,18 @@ const ProductDetail = () => {
     setCartOpen(true);
   };
 
-  const handleWhatsAppOrder = () => {
-    const whatsapp = (shop as any).contact_whatsapp || "237677888999";
-    const message = encodeURIComponent(
-      `Bonjour ${shop.name}! Je suis intéressé(e) par "${product.name}" vu sur Loummel. Pouvez-vous me donner plus d'informations?`
-    );
-    window.open(`https://wa.me/${whatsapp}?text=${message}`, "_blank");
+  const handleOrderNow = () => {
+    addToCart({
+      product_id: product.id,
+      name: product.name,
+      price: displayPrice,
+      image_url: product.image_url,
+      quantity: 1,
+      shop_id: shop.id,
+      shop_name: shop.name,
+    });
+    toast.success("Ajouté au panier ✓", { description: "Direction le panier..." });
+    navigate("/panier");
   };
 
   return (
@@ -218,11 +225,12 @@ const ProductDetail = () => {
             </Button>
             <Button
               size="lg"
-              className="flex-1 bg-green-600 hover:bg-green-700 text-white"
-              onClick={handleWhatsAppOrder}
+              variant="outline"
+              className="flex-1 border-primary text-primary hover:bg-primary hover:text-primary-foreground"
+              onClick={handleOrderNow}
             >
-              <Phone className="w-5 h-5 mr-2" />
-              Commander via WhatsApp
+              <ShoppingBag className="w-5 h-5 mr-2" />
+              Commander maintenant
             </Button>
           </div>
         </div>

@@ -1,11 +1,13 @@
 import { useState, useEffect } from "react";
-import { useParams, Link } from "react-router-dom";
+import { useParams, Link, useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
-import { ShoppingBag, Filter, Phone, Loader2 } from "lucide-react";
+import { toast } from "sonner";
+import { ShoppingBag, Filter, Loader2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { useShop } from "./BoutiqueLayout";
+import { useCart } from "@/contexts/CartContext";
 
 // Import des images locales
 import artisanJewelry from "@/assets/artisan-jewelry.jpg";
@@ -55,6 +57,8 @@ const categories = ["Tous", "Bijoux", "Poterie", "Cuir", "Textiles", "Artisanat"
 const BoutiqueProduits = () => {
   const { slug } = useParams();
   const { shop } = useShop();
+  const navigate = useNavigate();
+  const { addToCart } = useCart();
   const [products, setProducts] = useState<Product[]>([]);
   const [loading, setLoading] = useState(true);
   const [filter, setFilter] = useState("Tous");
@@ -112,13 +116,21 @@ const BoutiqueProduits = () => {
     return new Intl.NumberFormat('fr-FR').format(price) + ' FCFA';
   };
 
-  const handleWhatsAppOrder = (productName: string) => {
-    const whatsapp = shop?.contact_whatsapp || "237677888999";
-    const shopName = shop?.name || "la boutique";
-    const message = encodeURIComponent(
-      `Bonjour ${shopName}! Je suis intéressé(e) par "${productName}" vu sur Loummel. Pouvez-vous me donner plus d'informations?`
-    );
-    window.open(`https://wa.me/${whatsapp}?text=${message}`, '_blank');
+  const handleOrder = (product: Product) => {
+    if (!shop) return;
+    const hasPromo = product.is_promo && product.promo_price;
+    const price = hasPromo ? product.promo_price! : product.price;
+    addToCart({
+      product_id: product.id,
+      name: product.name,
+      price,
+      image_url: product.image_url,
+      quantity: 1,
+      shop_id: shop.id,
+      shop_name: shop.name,
+    });
+    toast.success("Ajouté au panier ✓", { description: product.name });
+    navigate("/panier");
   };
 
   if (loading) {
@@ -223,10 +235,9 @@ const BoutiqueProduits = () => {
                   </div>
                   <Button
                     size="sm"
-                    className="bg-green-600 hover:bg-green-700"
-                    onClick={() => handleWhatsAppOrder(product.name)}
+                    onClick={() => handleOrder(product)}
                   >
-                    <Phone className="w-4 h-4 mr-1" />
+                    <ShoppingBag className="w-4 h-4 mr-1" />
                     Commander
                   </Button>
                 </div>
