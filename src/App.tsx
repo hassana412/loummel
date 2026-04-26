@@ -63,14 +63,12 @@ const App = () => (
             {/* Admin shortcut route */}
             <Route path="/admin" element={<Navigate to="/dashboard/admin" replace />} />
             
-            {/* Boutique - product detail (standalone with own breadcrumb) */}
-            <Route path="/boutique/:slug/produit/:id" element={<ProductDetail />} />
-
             {/* Boutique public pages */}
             <Route path="/boutique/:slug" element={<BoutiqueLayout />}>
               <Route index element={<BoutiqueProduits />} />
               <Route path="services" element={<BoutiqueServices />} />
               <Route path="contact" element={<BoutiqueContact />} />
+              <Route path="produit/:id" element={<ProductDetail />} />
             </Route>
 
             {/* Protected: Super Admin Dashboard */}
