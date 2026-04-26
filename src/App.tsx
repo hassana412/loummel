@@ -25,6 +25,7 @@ import BoutiqueLayout from "./pages/boutique/BoutiqueLayout";
 import BoutiqueProduits from "./pages/boutique/BoutiqueProduits";
 import BoutiqueServices from "./pages/boutique/BoutiqueServices";
 import BoutiqueContact from "./pages/boutique/BoutiqueContact";
+import ProductDetail from "./pages/boutique/ProductDetail";
 
 // Dashboard pages
 import AdminDashboard from "./pages/dashboard/AdminDashboard";
@@ -60,6 +61,9 @@ const App = () => (
             {/* Admin shortcut route */}
             <Route path="/admin" element={<Navigate to="/dashboard/admin" replace />} />
             
+            {/* Boutique - product detail (standalone with own breadcrumb) */}
+            <Route path="/boutique/:slug/produit/:id" element={<ProductDetail />} />
+
             {/* Boutique public pages */}
             <Route path="/boutique/:slug" element={<BoutiqueLayout />}>
               <Route index element={<BoutiqueProduits />} />
