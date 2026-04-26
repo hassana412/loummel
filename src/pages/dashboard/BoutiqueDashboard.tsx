@@ -11,10 +11,11 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { toast } from "@/hooks/use-toast";
+import { MesVentes } from "@/components/boutique/MesVentes";
 import {
   Store, Package, Briefcase, Settings, LogOut, Plus,
   Trash2, Eye, Crown, Clock, Copy, Handshake, Phone, Mail, Shield,
-  TrendingUp, AlertTriangle, Users, FileText, BarChart3, ShoppingCart
+  TrendingUp, AlertTriangle, Users, FileText, BarChart3, ShoppingCart, ShoppingBag
 } from "lucide-react";
 
 interface ShopData {
