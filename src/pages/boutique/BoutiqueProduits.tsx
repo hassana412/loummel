@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { useParams } from "react-router-dom";
+import { useParams, Link } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { ShoppingBag, Filter, Phone, Loader2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -181,7 +181,7 @@ const BoutiqueProduits = () => {
               className="group bg-card rounded-xl overflow-hidden shadow-sahel hover:shadow-sahel-card transition-all duration-300 hover:-translate-y-1"
             >
               {/* Image */}
-              <div className="relative h-48 overflow-hidden">
+              <Link to={`/boutique/${slug}/produit/${product.id}`} className="block relative h-48 overflow-hidden">
                 <img
                   src={resolveImageUrl(product.image_url)}
                   alt={product.name}
@@ -199,7 +199,7 @@ const BoutiqueProduits = () => {
                     </Badge>
                   )}
                 </div>
-              </div>
+              </Link>
 
               {/* Content */}
               <div className="p-4">
