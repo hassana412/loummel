@@ -31,8 +31,8 @@ const categories = [
 const Recherche = () => {
   const [searchParams, setSearchParams] = useSearchParams();
   const [query, setQuery] = useState(searchParams.get("q") || "");
-  const [selectedCategory, setSelectedCategory] = useState(searchParams.get("category") || "");
-  const [selectedRegion, setSelectedRegion] = useState(searchParams.get("region") || "");
+  const [selectedCategory, setSelectedCategory] = useState(searchParams.get("category") || "all");
+  const [selectedRegion, setSelectedRegion] = useState(searchParams.get("region") || "all");
   const [shops, setShops] = useState<Shop[]>([]);
   const [loading, setLoading] = useState(true);
   const [showFilters, setShowFilters] = useState(false);
@@ -83,19 +83,19 @@ const Recherche = () => {
     e.preventDefault();
     const params = new URLSearchParams();
     if (query) params.set("q", query);
-    if (selectedCategory) params.set("category", selectedCategory);
-    if (selectedRegion) params.set("region", selectedRegion);
+    if (selectedCategory && selectedCategory !== "all") params.set("category", selectedCategory);
+    if (selectedRegion && selectedRegion !== "all") params.set("region", selectedRegion);
     setSearchParams(params);
   };
 
   const clearFilters = () => {
     setQuery("");
-    setSelectedCategory("");
-    setSelectedRegion("");
-    setSearchParams({});
+    setSelectedCategory("all");
+    setSelectedRegion("all");
+    setSearchParams(new URLSearchParams());
   };
 
-  const hasFilters = query || selectedCategory || selectedRegion;
+  const hasFilters = query || (selectedCategory && selectedCategory !== "all") || (selectedRegion && selectedRegion !== "all");
 
   return (
     <div className="min-h-screen flex flex-col bg-background">
@@ -150,7 +150,7 @@ const Recherche = () => {
                   <SelectValue placeholder="Toutes les catégories" />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="">Toutes les catégories</SelectItem>
+                  <SelectItem value="all">Toutes les catégories</SelectItem>
                   {categories.map((cat) => (
                     <SelectItem key={cat} value={cat}>{cat}</SelectItem>
                   ))}
@@ -162,7 +162,7 @@ const Recherche = () => {
                   <SelectValue placeholder="Toutes les régions" />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="">Toutes les régions</SelectItem>
+                  <SelectItem value="all">Toutes les régions</SelectItem>
                   {regions.map((region) => (
                     <SelectItem key={region} value={region}>{region}</SelectItem>
                   ))}
