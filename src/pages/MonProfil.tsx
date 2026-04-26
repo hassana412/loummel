@@ -204,6 +204,25 @@ const MonProfil = () => {
                   </Button>
                 </CardContent>
               </Card>
+
+              {/* Orders shortcut */}
+              <Card>
+                <CardHeader>
+                  <CardTitle>Mes commandes</CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <p className="text-sm text-muted-foreground mb-4">
+                    Consultez l'historique de vos commandes et suivez leur
+                    statut.
+                  </p>
+                  <Button
+                    asChild
+                    className="bg-primary hover:bg-primary/90 text-primary-foreground"
+                  >
+                    <Link to="/mes-commandes">Voir toutes mes commandes</Link>
+                  </Button>
+                </CardContent>
+              </Card>
             </div>
           )}
         </div>
