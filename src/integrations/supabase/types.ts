@@ -228,6 +228,8 @@ export type Database = {
           id: string
           items: Json
           mode_paiement: string
+          mode_paiement_numero: string | null
+          reference_paiement: string | null
           statut: string
           total: number
           updated_at: string
@@ -239,6 +241,8 @@ export type Database = {
           id?: string
           items?: Json
           mode_paiement: string
+          mode_paiement_numero?: string | null
+          reference_paiement?: string | null
           statut?: string
           total?: number
           updated_at?: string
@@ -250,6 +254,8 @@ export type Database = {
           id?: string
           items?: Json
           mode_paiement?: string
+          mode_paiement_numero?: string | null
+          reference_paiement?: string | null
           statut?: string
           total?: number
           updated_at?: string
@@ -514,6 +520,111 @@ export type Database = {
             columns: ["shop_id"]
             isOneToOne: false
             referencedRelation: "shops"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      shop_orders: {
+        Row: {
+          created_at: string
+          id: string
+          items: Json
+          order_id: string | null
+          shop_id: string | null
+          shop_name: string
+          statut: string
+          subtotal: number
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          items?: Json
+          order_id?: string | null
+          shop_id?: string | null
+          shop_name: string
+          statut?: string
+          subtotal?: number
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          items?: Json
+          order_id?: string | null
+          shop_id?: string | null
+          shop_name?: string
+          statut?: string
+          subtotal?: number
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "shop_orders_order_id_fkey"
+            columns: ["order_id"]
+            isOneToOne: false
+            referencedRelation: "orders"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "shop_orders_shop_id_fkey"
+            columns: ["shop_id"]
+            isOneToOne: false
+            referencedRelation: "shops"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      shop_payouts: {
+        Row: {
+          created_at: string
+          dispatched_at: string | null
+          id: string
+          mode_paiement: string | null
+          montant: number
+          notes: string | null
+          reference_transaction: string | null
+          shop_id: string | null
+          shop_order_id: string | null
+          statut: string
+        }
+        Insert: {
+          created_at?: string
+          dispatched_at?: string | null
+          id?: string
+          mode_paiement?: string | null
+          montant?: number
+          notes?: string | null
+          reference_transaction?: string | null
+          shop_id?: string | null
+          shop_order_id?: string | null
+          statut?: string
+        }
+        Update: {
+          created_at?: string
+          dispatched_at?: string | null
+          id?: string
+          mode_paiement?: string | null
+          montant?: number
+          notes?: string | null
+          reference_transaction?: string | null
+          shop_id?: string | null
+          shop_order_id?: string | null
+          statut?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "shop_payouts_shop_id_fkey"
+            columns: ["shop_id"]
+            isOneToOne: false
+            referencedRelation: "shops"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "shop_payouts_shop_order_id_fkey"
+            columns: ["shop_order_id"]
+            isOneToOne: false
+            referencedRelation: "shop_orders"
             referencedColumns: ["id"]
           },
         ]
