@@ -15,6 +15,9 @@ import Recherche from "./pages/Recherche";
 import InscriptionVendeur from "./pages/InscriptionVendeur";
 import DevenirPartenaire from "./pages/DevenirPartenaire";
 import CreerMaBoutique from "./pages/CreerMaBoutique";
+import Panier from "./pages/Panier";
+import Checkout from "./pages/Checkout";
+import CommandeConfirmee from "./pages/CommandeConfirmee";
 
 // Auth pages
 import ClientAuth from "./pages/auth/ClientAuth";
@@ -50,6 +53,9 @@ const App = () => (
             <Route path="/inscription-vendeur" element={<InscriptionVendeur />} />
             <Route path="/devenir-partenaire" element={<DevenirPartenaire />} />
             <Route path="/creer-ma-boutique" element={<CreerMaBoutique />} />
+            <Route path="/panier" element={<Panier />} />
+            <Route path="/checkout" element={<Checkout />} />
+            <Route path="/commande-confirmee" element={<CommandeConfirmee />} />
             
             {/* Auth routes - 4 separate login pages */}
             <Route path="/connexion" element={<ClientAuth />} />

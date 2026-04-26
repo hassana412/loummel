@@ -221,6 +221,42 @@ export type Database = {
         }
         Relationships: []
       }
+      orders: {
+        Row: {
+          adresse_livraison: Json
+          created_at: string
+          id: string
+          items: Json
+          mode_paiement: string
+          statut: string
+          total: number
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          adresse_livraison?: Json
+          created_at?: string
+          id?: string
+          items?: Json
+          mode_paiement: string
+          statut?: string
+          total?: number
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          adresse_livraison?: Json
+          created_at?: string
+          id?: string
+          items?: Json
+          mode_paiement?: string
+          statut?: string
+          total?: number
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       partners: {
         Row: {
           arrondissements: string[] | null
