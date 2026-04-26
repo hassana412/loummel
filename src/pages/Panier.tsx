@@ -1,17 +1,18 @@
 import { Link } from "react-router-dom";
-import { Minus, Plus, Trash2, ShoppingBag } from "lucide-react";
+import { Minus, Plus, Trash2, ShoppingBag, Store } from "lucide-react";
 import Header from "@/components/layout/Header";
 import Footer from "@/components/layout/Footer";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
+import { Badge } from "@/components/ui/badge";
 import { useCart } from "@/contexts/CartContext";
 
 const formatFCFA = (n: number) =>
   `${new Intl.NumberFormat("fr-FR").format(Math.round(n))} FCFA`;
 
 const Panier = () => {
-  const { items, updateQuantity, removeFromCart, clearCart, cartCount, cartTotal } = useCart();
+  const { items, updateQuantity, removeFromCart, clearCart, cartCount, cartTotal, itemsByShop, shopCount } = useCart();
 
   return (
     <div className="min-h-screen flex flex-col bg-background">
@@ -29,76 +30,91 @@ const Panier = () => {
           </div>
         ) : (
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-            {/* Items list */}
-            <div className="lg:col-span-2 space-y-4">
-              {items.map((item) => (
-                <Card key={item.product_id} className="p-4">
-                  <div className="flex gap-4">
-                    <div className="w-20 h-20 rounded overflow-hidden bg-muted shrink-0">
-                      {item.image_url ? (
-                        <img
-                          src={item.image_url}
-                          alt={item.name}
-                          className="w-20 h-20 object-cover rounded"
-                        />
-                      ) : (
-                        <div className="w-full h-full flex items-center justify-center text-muted-foreground">
-                          <ShoppingBag className="w-8 h-8" />
-                        </div>
-                      )}
-                    </div>
-
-                    <div className="flex-1 min-w-0">
-                      <div className="flex justify-between gap-2">
-                        <div className="min-w-0">
-                          <h3 className="font-semibold truncate">{item.name}</h3>
-                          <p className="text-sm text-muted-foreground truncate">
-                            {item.shop_name}
-                          </p>
-                          <p className="text-sm mt-1">{formatFCFA(item.price)}</p>
-                        </div>
-                        <button
-                          onClick={() => removeFromCart(item.product_id)}
-                          className="text-muted-foreground hover:text-destructive transition-colors shrink-0"
-                          aria-label="Supprimer"
-                        >
-                          <Trash2 className="w-5 h-5" />
-                        </button>
-                      </div>
-
-                      <div className="flex items-center justify-between mt-3 flex-wrap gap-2">
-                        <div className="flex items-center border rounded-md">
-                          <Button
-                            variant="ghost"
-                            size="icon"
-                            className="h-8 w-8"
-                            onClick={() =>
-                              updateQuantity(item.product_id, item.quantity - 1)
-                            }
-                          >
-                            <Minus className="w-4 h-4" />
-                          </Button>
-                          <span className="w-8 text-center text-sm font-medium">
-                            {item.quantity}
-                          </span>
-                          <Button
-                            variant="ghost"
-                            size="icon"
-                            className="h-8 w-8"
-                            onClick={() =>
-                              updateQuantity(item.product_id, item.quantity + 1)
-                            }
-                          >
-                            <Plus className="w-4 h-4" />
-                          </Button>
-                        </div>
-                        <p className="font-semibold">
-                          {formatFCFA(item.price * item.quantity)}
-                        </p>
-                      </div>
-                    </div>
+            {/* Items list grouped by shop */}
+            <div className="lg:col-span-2 space-y-6">
+              {Object.values(itemsByShop).map((group) => (
+                <div key={group.shop_id} className="space-y-3">
+                  {/* Shop header */}
+                  <div className="flex items-center justify-between gap-2 px-1">
+                    <Badge variant="secondary" className="flex items-center gap-1.5 py-1.5 px-3">
+                      <Store className="w-3.5 h-3.5" />
+                      <span className="font-semibold">{group.shop_name}</span>
+                    </Badge>
+                    <span className="text-sm font-semibold text-primary">
+                      {formatFCFA(group.subtotal)}
+                    </span>
                   </div>
-                </Card>
+
+                  {group.items.map((item) => (
+                    <Card key={item.product_id} className="p-4">
+                      <div className="flex gap-4">
+                        <div className="w-20 h-20 rounded overflow-hidden bg-muted shrink-0">
+                          {item.image_url ? (
+                            <img
+                              src={item.image_url}
+                              alt={item.name}
+                              className="w-20 h-20 object-cover rounded"
+                            />
+                          ) : (
+                            <div className="w-full h-full flex items-center justify-center text-muted-foreground">
+                              <ShoppingBag className="w-8 h-8" />
+                            </div>
+                          )}
+                        </div>
+
+                        <div className="flex-1 min-w-0">
+                          <div className="flex justify-between gap-2">
+                            <div className="min-w-0">
+                              <h3 className="font-semibold truncate">{item.name}</h3>
+                              <p className="text-sm text-muted-foreground truncate">
+                                {item.shop_name}
+                              </p>
+                              <p className="text-sm mt-1">{formatFCFA(item.price)}</p>
+                            </div>
+                            <button
+                              onClick={() => removeFromCart(item.product_id)}
+                              className="text-muted-foreground hover:text-destructive transition-colors shrink-0"
+                              aria-label="Supprimer"
+                            >
+                              <Trash2 className="w-5 h-5" />
+                            </button>
+                          </div>
+
+                          <div className="flex items-center justify-between mt-3 flex-wrap gap-2">
+                            <div className="flex items-center border rounded-md">
+                              <Button
+                                variant="ghost"
+                                size="icon"
+                                className="h-8 w-8"
+                                onClick={() =>
+                                  updateQuantity(item.product_id, item.quantity - 1)
+                                }
+                              >
+                                <Minus className="w-4 h-4" />
+                              </Button>
+                              <span className="w-8 text-center text-sm font-medium">
+                                {item.quantity}
+                              </span>
+                              <Button
+                                variant="ghost"
+                                size="icon"
+                                className="h-8 w-8"
+                                onClick={() =>
+                                  updateQuantity(item.product_id, item.quantity + 1)
+                                }
+                              >
+                                <Plus className="w-4 h-4" />
+                              </Button>
+                            </div>
+                            <p className="font-semibold">
+                              {formatFCFA(item.price * item.quantity)}
+                            </p>
+                          </div>
+                        </div>
+                      </div>
+                    </Card>
+                  ))}
+                </div>
               ))}
             </div>
 
@@ -108,7 +124,12 @@ const Panier = () => {
                 <h2 className="text-xl font-semibold mb-4">Résumé</h2>
                 <div className="space-y-3 text-sm">
                   <div className="flex justify-between">
-                    <span className="text-muted-foreground">Articles</span>
+                    <div className="flex flex-col">
+                      <span className="text-muted-foreground">Articles</span>
+                      <span className="text-xs text-muted-foreground">
+                        {shopCount} boutique{shopCount > 1 ? "s" : ""}
+                      </span>
+                    </div>
                     <span>{cartCount}</span>
                   </div>
                   <div className="flex justify-between">

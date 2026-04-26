@@ -10,6 +10,13 @@ export interface CartItem {
   shop_name: string;
 }
 
+export interface ShopGroup {
+  shop_id: string;
+  shop_name: string;
+  items: CartItem[];
+  subtotal: number;
+}
+
 interface CartContextType {
   items: CartItem[];
   addToCart: (item: Omit<CartItem, "quantity"> & { quantity?: number }) => void;
@@ -18,6 +25,8 @@ interface CartContextType {
   clearCart: () => void;
   cartCount: number;
   cartTotal: number;
+  itemsByShop: Record<string, ShopGroup>;
+  shopCount: number;
   isOpen: boolean;
   setIsOpen: (open: boolean) => void;
 }
@@ -99,6 +108,24 @@ export const CartProvider = ({ children }: { children: ReactNode }) => {
     [items]
   );
 
+  const itemsByShop = useMemo(() => {
+    return items.reduce((acc, item) => {
+      if (!acc[item.shop_id]) {
+        acc[item.shop_id] = {
+          shop_id: item.shop_id,
+          shop_name: item.shop_name,
+          items: [],
+          subtotal: 0,
+        };
+      }
+      acc[item.shop_id].items.push(item);
+      acc[item.shop_id].subtotal += item.price * item.quantity;
+      return acc;
+    }, {} as Record<string, ShopGroup>);
+  }, [items]);
+
+  const shopCount = useMemo(() => Object.keys(itemsByShop).length, [itemsByShop]);
+
   return (
     <CartContext.Provider
       value={{
@@ -109,6 +136,8 @@ export const CartProvider = ({ children }: { children: ReactNode }) => {
         clearCart,
         cartCount,
         cartTotal,
+        itemsByShop,
+        shopCount,
         isOpen,
         setIsOpen,
       }}
