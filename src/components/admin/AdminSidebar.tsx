@@ -1,7 +1,7 @@
 import { 
   LayoutDashboard, Store, Truck, Settings, LogOut, 
   ChevronLeft, ChevronRight, Grid3X3, Users, Handshake,
-  Bell, MessageSquareWarning
+  Bell, MessageSquareWarning, Wallet
 } from "lucide-react";
 import { NavLink } from "@/components/NavLink";
 import {
@@ -29,6 +29,7 @@ const menuItems = [
   { title: "Partenaires", url: "/dashboard/admin?tab=partners", icon: Handshake, tab: "partners" },
   { title: "Notifications", url: "/dashboard/admin?tab=notifications", icon: Bell, tab: "notifications" },
   { title: "Réclamations", url: "/dashboard/admin?tab=complaints", icon: MessageSquareWarning, tab: "complaints" },
+  { title: "Paiements", url: "/dashboard/admin?tab=payments", icon: Wallet, tab: "payments" },
   { title: "Wanda Services", url: "/dashboard/admin?tab=wanda", icon: Truck, tab: "wanda" },
   { title: "Paramètres", url: "/dashboard/admin?tab=settings", icon: Settings, tab: "settings" },
 ];

@@ -12,6 +12,7 @@ import { UsersManagement } from "@/components/admin/UsersManagement";
 import { PartnersManagement } from "@/components/admin/PartnersManagement";
 import { NotificationCenter } from "@/components/admin/NotificationCenter";
 import { ComplaintsTab } from "@/components/admin/ComplaintsTab";
+import { PaymentsTab } from "@/components/admin/PaymentsTab";
 import { useAuth } from "@/contexts/AuthContext";
 
 const AdminDashboard = () => {
@@ -51,6 +52,8 @@ const AdminDashboard = () => {
         return <NotificationCenter />;
       case "complaints":
         return <ComplaintsTab />;
+      case "payments":
+        return <PaymentsTab />;
       case "wanda":
         return <WandaServicesTab />;
       case "settings":
