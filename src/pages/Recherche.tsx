@@ -85,6 +85,10 @@ const Recherche = () => {
     if (query) params.set("q", query);
     if (selectedCategory && selectedCategory !== "all") params.set("category", selectedCategory);
     if (selectedRegion && selectedRegion !== "all") params.set("region", selectedRegion);
+    setSearchParams(params);
+  };
+
+  const hasFilters = query || (selectedCategory && selectedCategory !== "all") || (selectedRegion && selectedRegion !== "all");
 
   return (
     <div className="min-h-screen flex flex-col bg-background">
