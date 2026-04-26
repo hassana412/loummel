@@ -52,6 +52,8 @@ const AdminDashboard = () => {
         return <NotificationCenter />;
       case "complaints":
         return <ComplaintsTab />;
+      case "payments":
+        return <PaymentsTab />;
       case "wanda":
         return <WandaServicesTab />;
       case "settings":
