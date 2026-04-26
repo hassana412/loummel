@@ -83,19 +83,8 @@ const Recherche = () => {
     e.preventDefault();
     const params = new URLSearchParams();
     if (query) params.set("q", query);
-    if (selectedCategory) params.set("category", selectedCategory);
-    if (selectedRegion) params.set("region", selectedRegion);
-    setSearchParams(params);
-  };
-
-  const clearFilters = () => {
-    setQuery("");
-    setSelectedCategory("");
-    setSelectedRegion("");
-    setSearchParams({});
-  };
-
-  const hasFilters = query || selectedCategory || selectedRegion;
+    if (selectedCategory && selectedCategory !== "all") params.set("category", selectedCategory);
+    if (selectedRegion && selectedRegion !== "all") params.set("region", selectedRegion);
 
   return (
     <div className="min-h-screen flex flex-col bg-background">
