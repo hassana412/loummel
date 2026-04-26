@@ -235,10 +235,9 @@ const BoutiqueProduits = () => {
                   </div>
                   <Button
                     size="sm"
-                    className="bg-green-600 hover:bg-green-700"
-                    onClick={() => handleWhatsAppOrder(product.name)}
+                    onClick={() => handleOrder(product)}
                   >
-                    <Phone className="w-4 h-4 mr-1" />
+                    <ShoppingBag className="w-4 h-4 mr-1" />
                     Commander
                   </Button>
                 </div>
