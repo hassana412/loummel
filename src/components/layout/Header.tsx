@@ -4,11 +4,14 @@ import { Search, ShoppingCart, Menu, X, User, Store, Handshake } from "lucide-re
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { useAuth } from "@/contexts/AuthContext";
+import { useCart } from "@/contexts/CartContext";
 import NotificationBell from "@/components/NotificationBell";
+import CartDrawer from "@/components/cart/CartDrawer";
 
 const Header = () => {
   const navigate = useNavigate();
   const { user, roles } = useAuth();
+  const { cartCount, setIsOpen: setCartOpen } = useCart();
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
 
@@ -104,11 +107,19 @@ const Header = () => {
                 </Button>
               </Link>
               
-              <Button variant="ghost" size="icon" className="relative">
+              <Button
+                variant="ghost"
+                size="icon"
+                className="relative"
+                onClick={() => setCartOpen(true)}
+                aria-label="Ouvrir le panier"
+              >
                 <ShoppingCart className="w-5 h-5" />
-                <span className="absolute -top-1 -right-1 w-5 h-5 bg-primary text-primary-foreground text-xs rounded-full flex items-center justify-center">
-                  0
-                </span>
+                {cartCount > 0 && (
+                  <span className="absolute -top-1 -right-1 min-w-[1.25rem] h-5 px-1 bg-primary text-primary-foreground text-xs font-semibold rounded-full flex items-center justify-center">
+                    {cartCount > 99 ? "99+" : cartCount}
+                  </span>
+                )}
               </Button>
               
               <Link to="/inscription-vendeur" className="hidden lg:block">
@@ -208,6 +219,8 @@ const Header = () => {
           </div>
         </div>
       )}
+      {/* Cart Drawer */}
+      <CartDrawer />
     </header>
   );
 };
