@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import { Search, ShoppingCart, Menu, X, User, Store, Handshake } from "lucide-react";
+import { Search, ShoppingCart, Menu, X, User, Store, Handshake, Package } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { useAuth } from "@/contexts/AuthContext";
@@ -206,6 +206,14 @@ const Header = () => {
                   {user ? "Mon compte" : "Se connecter"}
                 </Button>
               </Link>
+              {user && !roles.includes("shop_owner") && !roles.includes("partner") && !roles.includes("super_admin") && (
+                <Link to="/mes-commandes" onClick={() => setIsMenuOpen(false)}>
+                  <Button variant="outline" className="w-full">
+                    <Package className="w-4 h-4 mr-2" />
+                    Mes commandes
+                  </Button>
+                </Link>
+              )}
               <div className="grid grid-cols-2 gap-2">
                 {categories.map((cat) => (
                   <Link key={cat} to={`/recherche?category=${encodeURIComponent(cat)}`} onClick={() => setIsMenuOpen(false)}>
