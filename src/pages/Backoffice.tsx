@@ -40,7 +40,7 @@ const Backoffice = () => {
   useEffect(() => {
     if (user && !loading && authMode !== "reset") {
       if (roles.includes("super_admin")) {
-        navigate("/dashboard/admin", { replace: true });
+        navigate("/admin/dashboard", { replace: true });
       } else {
         // Non-admin users shouldn't access backoffice
         toast({
