@@ -40,6 +40,14 @@ import AdminDashboard from "./pages/dashboard/AdminDashboard";
 import PartenaireDashboard from "./pages/dashboard/PartenaireDashboard";
 import BoutiqueDashboard from "./pages/dashboard/BoutiqueDashboard";
 
+// New dedicated Admin interface
+import AdminDashboardPage from "./pages/admin/AdminDashboardPage";
+import AdminPartenairesPage from "./pages/admin/AdminPartenairesPage";
+import AdminBoutiquesPage from "./pages/admin/AdminBoutiquesPage";
+import AdminClientsPage from "./pages/admin/AdminClientsPage";
+import AdminFinancesPage from "./pages/admin/AdminFinancesPage";
+import AdminProduitsPage from "./pages/admin/AdminProduitsPage";
+
 const queryClient = new QueryClient();
 
 const App = () => (
