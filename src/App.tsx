@@ -40,6 +40,14 @@ import AdminDashboard from "./pages/dashboard/AdminDashboard";
 import PartenaireDashboard from "./pages/dashboard/PartenaireDashboard";
 import BoutiqueDashboard from "./pages/dashboard/BoutiqueDashboard";
 
+// New dedicated Admin interface
+import AdminDashboardPage from "./pages/admin/AdminDashboardPage";
+import AdminPartenairesPage from "./pages/admin/AdminPartenairesPage";
+import AdminBoutiquesPage from "./pages/admin/AdminBoutiquesPage";
+import AdminClientsPage from "./pages/admin/AdminClientsPage";
+import AdminFinancesPage from "./pages/admin/AdminFinancesPage";
+import AdminProduitsPage from "./pages/admin/AdminProduitsPage";
+
 const queryClient = new QueryClient();
 
 const App = () => (
@@ -74,8 +82,16 @@ const App = () => (
             {/* Legacy /auth redirects to client auth */}
             <Route path="/auth" element={<Navigate to="/connexion" replace />} />
             
-            {/* Admin shortcut route */}
-            <Route path="/admin" element={<Navigate to="/dashboard/admin" replace />} />
+            {/* Admin shortcut redirects to new admin dashboard */}
+            <Route path="/admin" element={<Navigate to="/admin/dashboard" replace />} />
+
+            {/* New dedicated Admin interface (super_admin only) */}
+            <Route path="/admin/dashboard" element={<ProtectedRoute allowedRoles={["super_admin"]}><AdminDashboardPage /></ProtectedRoute>} />
+            <Route path="/admin/partenaires" element={<ProtectedRoute allowedRoles={["super_admin"]}><AdminPartenairesPage /></ProtectedRoute>} />
+            <Route path="/admin/boutiques" element={<ProtectedRoute allowedRoles={["super_admin"]}><AdminBoutiquesPage /></ProtectedRoute>} />
+            <Route path="/admin/clients" element={<ProtectedRoute allowedRoles={["super_admin"]}><AdminClientsPage /></ProtectedRoute>} />
+            <Route path="/admin/finances" element={<ProtectedRoute allowedRoles={["super_admin"]}><AdminFinancesPage /></ProtectedRoute>} />
+            <Route path="/admin/produits" element={<ProtectedRoute allowedRoles={["super_admin"]}><AdminProduitsPage /></ProtectedRoute>} />
             
             {/* Boutique public pages */}
             <Route path="/boutique/:slug" element={<BoutiqueLayout />}>
