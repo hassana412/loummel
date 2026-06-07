@@ -55,9 +55,13 @@ const ClientAuth = () => {
   // Redirect if already logged in (but not in reset mode)
   useEffect(() => {
     if (user && !loading && authMode !== "reset") {
-      navigate("/", { replace: true });
+      if (roles.includes("super_admin")) {
+        navigate("/admin/dashboard", { replace: true });
+      } else {
+        navigate("/", { replace: true });
+      }
     }
-  }, [user, loading, navigate, authMode]);
+  }, [user, loading, roles, navigate, authMode]);
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
