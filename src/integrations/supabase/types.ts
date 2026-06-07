@@ -336,9 +336,12 @@ export type Database = {
           is_promo: boolean | null
           name: string
           price: number
+          prix_detail: number | null
+          prix_gros: number | null
           promo_price: number | null
           shop_id: string
           sort_order: number | null
+          unite: string | null
           updated_at: string | null
         }
         Insert: {
@@ -350,9 +353,12 @@ export type Database = {
           is_promo?: boolean | null
           name: string
           price: number
+          prix_detail?: number | null
+          prix_gros?: number | null
           promo_price?: number | null
           shop_id: string
           sort_order?: number | null
+          unite?: string | null
           updated_at?: string | null
         }
         Update: {
@@ -364,9 +370,12 @@ export type Database = {
           is_promo?: boolean | null
           name?: string
           price?: number
+          prix_detail?: number | null
+          prix_gros?: number | null
           promo_price?: number | null
           shop_id?: string
           sort_order?: number | null
+          unite?: string | null
           updated_at?: string | null
         }
         Relationships: [
@@ -637,6 +646,7 @@ export type Database = {
           contact_address: string | null
           contact_email: string | null
           contact_phone: string | null
+          contact_telegram: string | null
           contact_whatsapp: string | null
           created_at: string | null
           description: string | null
@@ -668,6 +678,7 @@ export type Database = {
           contact_address?: string | null
           contact_email?: string | null
           contact_phone?: string | null
+          contact_telegram?: string | null
           contact_whatsapp?: string | null
           created_at?: string | null
           description?: string | null
@@ -699,6 +710,7 @@ export type Database = {
           contact_address?: string | null
           contact_email?: string | null
           contact_phone?: string | null
+          contact_telegram?: string | null
           contact_whatsapp?: string | null
           created_at?: string | null
           description?: string | null
