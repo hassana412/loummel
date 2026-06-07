@@ -95,7 +95,7 @@ const ClientAuth = () => {
         title: "Connexion réussie",
         description: "Bienvenue sur Loummel !",
       });
-      navigate("/");
+      // Redirect handled by useEffect based on role
     }
     
     setIsLoading(false);
