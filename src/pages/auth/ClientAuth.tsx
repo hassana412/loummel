@@ -22,7 +22,7 @@ type AuthMode = "main" | "forgot" | "reset";
 const ClientAuth = () => {
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
-  const { user, signIn, signUp, resetPassword, updatePassword, loading } = useAuth();
+  const { user, roles, signIn, signUp, resetPassword, updatePassword, loading } = useAuth();
   
   const [isLoading, setIsLoading] = useState(false);
   const [authMode, setAuthMode] = useState<AuthMode>("main");
