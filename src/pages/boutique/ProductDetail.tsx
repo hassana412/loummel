@@ -47,12 +47,13 @@ const ProductDetail = () => {
       if (!id || !shop) return;
       setLoading(true);
 
-      // Produit
+      // Produit — filtrer actifs seulement
       const { data: prodData, error: prodErr } = await supabase
         .from("products")
         .select("id, name, description, price, category, image_url, is_promo, promo_price, shop_id")
         .eq("id", id)
         .eq("shop_id", shop.id)
+        .eq("statut", "actif")
         .maybeSingle();
 
       if (prodErr) {
@@ -60,12 +61,13 @@ const ProductDetail = () => {
       }
       setProduct((prodData as Product) || null);
 
-      // Autres produits
+      // Autres produits — filtrer actifs seulement
       if (prodData) {
         const { data: relatedData } = await supabase
           .from("products")
           .select("id, name, description, price, category, image_url, is_promo, promo_price, shop_id")
           .eq("shop_id", shop.id)
+          .eq("statut", "actif")
           .neq("id", id)
           .limit(4);
 
