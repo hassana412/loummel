@@ -70,11 +70,12 @@ const BoutiqueProduits = () => {
 
       // Demo shop fallback
       if (shop.id === "demo-artisanat-rhumsiki" || slug === "artisanat-rhumsiki") {
-        // Try DB first
+        // Try DB first — filtrer actifs seulement
         const { data } = await supabase
           .from("products")
           .select("*")
           .eq("shop_id", shop.id)
+          .eq("statut", "actif")
           .order("sort_order");
 
         if (data && data.length > 0) {
@@ -86,11 +87,12 @@ const BoutiqueProduits = () => {
         return;
       }
 
-      // Load from Supabase
+      // Load from Supabase — filtrer actifs seulement
       const { data } = await supabase
         .from("products")
         .select("*")
         .eq("shop_id", shop.id)
+        .eq("statut", "actif")
         .order("sort_order");
 
       if (data) {

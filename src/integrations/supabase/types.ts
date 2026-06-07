@@ -341,6 +341,7 @@ export type Database = {
           promo_price: number | null
           shop_id: string
           sort_order: number | null
+          statut: string
           unite: string | null
           updated_at: string | null
         }
@@ -358,6 +359,7 @@ export type Database = {
           promo_price?: number | null
           shop_id: string
           sort_order?: number | null
+          statut?: string
           unite?: string | null
           updated_at?: string | null
         }
@@ -375,6 +377,7 @@ export type Database = {
           promo_price?: number | null
           shop_id?: string
           sort_order?: number | null
+          statut?: string
           unite?: string | null
           updated_at?: string | null
         }
