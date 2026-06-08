@@ -56,7 +56,20 @@ const ClientAuth = () => {
   useEffect(() => {
     if (user && !loading && authMode !== "reset") {
       if (roles.includes("super_admin")) {
-        navigate("/admin/dashboard", { replace: true });
+        navigate("/admin", { replace: true });
+      } else if (roles.includes("shop_owner")) {
+        supabase
+          .from("shops")
+          .select("slug")
+          .eq("user_id", user.id)
+          .maybeSingle()
+          .then(({ data }) => {
+            if (data?.slug) {
+              navigate(`/boutique/${data.slug}/admin`, { replace: true });
+            } else {
+              navigate("/creer-ma-boutique", { replace: true });
+            }
+          });
       } else {
         navigate("/", { replace: true });
       }
