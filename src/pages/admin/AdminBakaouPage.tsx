@@ -81,6 +81,8 @@ export default function AdminBakaouPage() {
   };
 
   useEffect(() => {
+    // Wait until auth + roles are fully resolved to avoid race-condition redirects
+    if (loading) return;
     if (!user) return;
     const load = async () => {
       const { data: s } = await supabase
@@ -104,7 +106,7 @@ export default function AdminBakaouPage() {
       setLoadingData(false);
     };
     load();
-  }, [user, roles, navigate]);
+  }, [user, roles, loading, navigate]);
 
   const filtered = useMemo(
     () =>
