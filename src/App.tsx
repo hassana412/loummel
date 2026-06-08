@@ -47,6 +47,7 @@ import AdminBoutiquesPage from "./pages/admin/AdminBoutiquesPage";
 import AdminClientsPage from "./pages/admin/AdminClientsPage";
 import AdminFinancesPage from "./pages/admin/AdminFinancesPage";
 import AdminProduitsPage from "./pages/admin/AdminProduitsPage";
+import AdminBakaouPage from "./pages/admin/AdminBakaouPage";
 
 const queryClient = new QueryClient();
 
@@ -92,6 +93,8 @@ const App = () => (
             <Route path="/admin/clients" element={<ProtectedRoute allowedRoles={["super_admin"]}><AdminClientsPage /></ProtectedRoute>} />
             <Route path="/admin/finances" element={<ProtectedRoute allowedRoles={["super_admin"]}><AdminFinancesPage /></ProtectedRoute>} />
             <Route path="/admin/produits" element={<ProtectedRoute allowedRoles={["super_admin"]}><AdminProduitsPage /></ProtectedRoute>} />
+            <Route path="/admin/boutiques/bakaou" element={<ProtectedRoute allowedRoles={["super_admin"]}><AdminBakaouPage /></ProtectedRoute>} />
+            <Route path="/boutique/bakaou/admin" element={<ProtectedRoute allowedRoles={["super_admin"]}><AdminBakaouPage /></ProtectedRoute>} />
             
             {/* Boutique public pages */}
             <Route path="/boutique/:slug" element={<BoutiqueLayout />}>
