@@ -66,10 +66,13 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
 
       // Fire-and-forget - pas de await, pas de setLoading
       if (session?.user) {
-        loadRoles(session.user.id);
+        loadRoles(session.user.id).then((fetchedRoles) => {
+          if (isMounted) setRoles(fetchedRoles);
+        });
       } else {
         setRoles([]);
       }
+
     });
 
     // INITIALISATION (contrôle loading)

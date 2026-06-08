@@ -83,6 +83,7 @@ export default function AdminBakaouPage() {
   useEffect(() => {
     // Wait until auth + roles are fully resolved to avoid race-condition redirects
     if (loading) return;
+    if (roles.length === 0) return;
     if (!user) return;
     const load = async () => {
       const { data: s } = await supabase
@@ -107,6 +108,7 @@ export default function AdminBakaouPage() {
     };
     load();
   }, [user, roles, loading, navigate]);
+
 
   const filtered = useMemo(
     () =>
@@ -201,7 +203,12 @@ export default function AdminBakaouPage() {
     setDeleteId(null);
   };
 
-  if (loading) return null;
+  if (loading || loadingData) return (
+    <div className="min-h-screen flex items-center justify-center">
+      <Loader2 className="w-8 h-8 animate-spin text-[#E8500A]" />
+    </div>
+  );
+
 
   return (
     <AdminLayoutShell
