@@ -68,8 +68,8 @@ export default function AdminBakaouPage() {
   const [deleteId, setDeleteId] = useState<string | null>(null);
 
   useEffect(() => {
-    if (!loading && (!user || !roles.includes("super_admin"))) navigate("/", { replace: true });
-  }, [user, loading, roles, navigate]);
+    if (!loading && !user) navigate("/auth/vendeur", { replace: true });
+  }, [user, loading, navigate]);
 
   const loadProducts = async (shopId: string) => {
     const { data } = await supabase
@@ -81,14 +81,22 @@ export default function AdminBakaouPage() {
   };
 
   useEffect(() => {
+    if (!user) return;
     const load = async () => {
       const { data: s } = await supabase
         .from("shops")
-        .select("id, name, slug")
+        .select("id, name, slug, user_id")
         .eq("slug", SHOP_SLUG)
         .maybeSingle();
       if (!s) {
         setLoadingData(false);
+        return;
+      }
+      // Access control: super_admin OR owner of this shop
+      const isAdmin = roles.includes("super_admin");
+      const isOwner = roles.includes("shop_owner") && s.user_id === user.id;
+      if (!isAdmin && !isOwner) {
+        navigate("/", { replace: true });
         return;
       }
       setShop(s);
@@ -96,7 +104,7 @@ export default function AdminBakaouPage() {
       setLoadingData(false);
     };
     load();
-  }, []);
+  }, [user, roles, navigate]);
 
   const filtered = useMemo(
     () =>
