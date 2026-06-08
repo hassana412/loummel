@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import { useNavigate, Link, useSearchParams } from "react-router-dom";
 import { useAuth } from "@/contexts/AuthContext";
+import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -46,11 +47,30 @@ const VendeurAuth = () => {
   useEffect(() => {
     if (user && !loading && authMode !== "reset") {
       const redirectUrl = searchParams.get("redirect");
+      if (redirectUrl) {
+        navigate(redirectUrl, { replace: true });
+        return;
+      }
+      if (roles.includes("super_admin")) {
+        navigate("/admin", { replace: true });
+        return;
+      }
       if (roles.includes("shop_owner")) {
-        navigate(redirectUrl || "/dashboard/boutique", { replace: true });
+        // Find this owner's shop slug and redirect to their admin area
+        supabase
+          .from("shops")
+          .select("slug")
+          .eq("user_id", user.id)
+          .maybeSingle()
+          .then(({ data }) => {
+            if (data?.slug) {
+              navigate(`/boutique/${data.slug}/admin`, { replace: true });
+            } else {
+              navigate("/creer-ma-boutique", { replace: true });
+            }
+          });
       } else {
-        // User is logged in but has no shop - redirect to shop creation
-        navigate(redirectUrl || "/creer-ma-boutique", { replace: true });
+        navigate("/", { replace: true });
       }
     }
   }, [user, roles, loading, navigate, authMode, searchParams]);
