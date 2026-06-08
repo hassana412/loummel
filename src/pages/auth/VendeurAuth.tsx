@@ -56,6 +56,11 @@ const VendeurAuth = () => {
         return;
       }
       if (roles.includes("shop_owner")) {
+        // Special case: Bakaou shop manager → dedicated admin page
+        if (user.email === "bakaou@loummel.com") {
+          navigate("/boutique/bakaou/admin", { replace: true });
+          return;
+        }
         // Find this owner's shop slug and redirect to their admin area
         supabase
           .from("shops")
