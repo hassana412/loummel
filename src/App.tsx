@@ -54,93 +54,94 @@ const queryClient = new QueryClient();
 
 const App = () => (
   <QueryClientProvider client={queryClient}>
-    <TooltipProvider>
-      <AuthProvider>
-        <CartProvider>
+    <AuthProvider>
+      <CartProvider>
+        <TooltipProvider>
           <Toaster />
           <Sonner />
           <BrowserRouter>
+            <Header />
             <Routes>
-            {/* Public routes */}
-            <Route path="/" element={<Index />} />
-            <Route path="/recherche" element={<Recherche />} />
-            <Route path="/inscription-vendeur" element={<InscriptionVendeur />} />
-            <Route path="/devenir-partenaire" element={<DevenirPartenaire />} />
-            <Route path="/creer-ma-boutique" element={<CreerMaBoutique />} />
-            <Route path="/panier" element={<Panier />} />
-            <Route path="/checkout" element={<Checkout />} />
-            <Route path="/commande-confirmee" element={<CommandeConfirmee />} />
-            <Route path="/mon-profil" element={<MonProfil />} />
-            <Route path="/mes-commandes" element={<MesCommandes />} />
-            
-            {/* Auth routes - 4 separate login pages */}
-            <Route path="/connexion" element={<ClientAuth />} />
-            <Route path="/auth/vendeur" element={<VendeurAuth />} />
-            <Route path="/auth/partenaire" element={<PartenaireAuth />} />
-            <Route path="/mot-de-passe-oublie" element={<ForgotPassword />} />
-            <Route path="/reinitialiser-mot-de-passe" element={<ResetPassword />} />
-            <Route path="/backoffice" element={<Backoffice />} />
-            
-            {/* Legacy /auth redirects to client auth */}
-            <Route path="/auth" element={<Navigate to="/connexion" replace />} />
-            
-            {/* Admin shortcut redirects to new admin dashboard */}
-            <Route path="/admin" element={<Navigate to="/admin/dashboard" replace />} />
+              {/* Public routes */}
+              <Route path="/" element={<Index />} />
+              <Route path="/recherche" element={<Recherche />} />
+              <Route path="/inscription-vendeur" element={<InscriptionVendeur />} />
+              <Route path="/devenir-partenaire" element={<DevenirPartenaire />} />
+              <Route path="/creer-ma-boutique" element={<CreerMaBoutique />} />
+              <Route path="/panier" element={<Panier />} />
+              <Route path="/checkout" element={<Checkout />} />
+              <Route path="/commande-confirmee" element={<CommandeConfirmee />} />
+              <Route path="/mon-profil" element={<MonProfil />} />
+              <Route path="/mes-commandes" element={<MesCommandes />} />
+              
+              {/* Auth routes - 4 separate login pages */}
+              <Route path="/connexion" element={<ClientAuth />} />
+              <Route path="/auth/vendeur" element={<VendeurAuth />} />
+              <Route path="/auth/partenaire" element={<PartenaireAuth />} />
+              <Route path="/mot-de-passe-oublie" element={<ForgotPassword />} />
+              <Route path="/reinitialiser-mot-de-passe" element={<ResetPassword />} />
+              <Route path="/backoffice" element={<Backoffice />} />
+              
+              {/* Legacy /auth redirects to client auth */}
+              <Route path="/auth" element={<Navigate to="/connexion" replace />} />
+              
+              {/* Admin shortcut redirects to new admin dashboard */}
+              <Route path="/admin" element={<Navigate to="/admin/dashboard" replace />} />
 
-            {/* New dedicated Admin interface (super_admin only) */}
-            <Route path="/admin/dashboard" element={<ProtectedRoute allowedRoles={["super_admin"]}><AdminDashboardPage /></ProtectedRoute>} />
-            <Route path="/admin/partenaires" element={<ProtectedRoute allowedRoles={["super_admin"]}><AdminPartenairesPage /></ProtectedRoute>} />
-            <Route path="/admin/boutiques" element={<ProtectedRoute allowedRoles={["super_admin"]}><AdminBoutiquesPage /></ProtectedRoute>} />
-            <Route path="/admin/clients" element={<ProtectedRoute allowedRoles={["super_admin"]}><AdminClientsPage /></ProtectedRoute>} />
-            <Route path="/admin/finances" element={<ProtectedRoute allowedRoles={["super_admin"]}><AdminFinancesPage /></ProtectedRoute>} />
-            <Route path="/admin/produits" element={<ProtectedRoute allowedRoles={["super_admin"]}><AdminProduitsPage /></ProtectedRoute>} />
-            <Route path="/boutique/bakaou/admin" element={<ProtectedRoute allowedRoles={["super_admin", "shop_owner"]}><AdminBakaouPage /></ProtectedRoute>} />
-            
-            {/* Boutique public pages */}
-            <Route path="/boutique/:slug" element={<BoutiqueLayout />}>
-              <Route index element={<BoutiqueProduits />} />
-              <Route path="services" element={<BoutiqueServices />} />
-              <Route path="contact" element={<BoutiqueContact />} />
-              <Route path="produit/:id" element={<ProductDetail />} />
-            </Route>
+              {/* New dedicated Admin interface (super_admin only) */}
+              <Route path="/admin/dashboard" element={<ProtectedRoute allowedRoles={["super_admin"]}><AdminDashboardPage /></ProtectedRoute>} />
+              <Route path="/admin/partenaires" element={<ProtectedRoute allowedRoles={["super_admin"]}><AdminPartenairesPage /></ProtectedRoute>} />
+              <Route path="/admin/boutiques" element={<ProtectedRoute allowedRoles={["super_admin"]}><AdminBoutiquesPage /></ProtectedRoute>} />
+              <Route path="/admin/clients" element={<ProtectedRoute allowedRoles={["super_admin"]}><AdminClientsPage /></ProtectedRoute>} />
+              <Route path="/admin/finances" element={<ProtectedRoute allowedRoles={["super_admin"]}><AdminFinancesPage /></ProtectedRoute>} />
+              <Route path="/admin/produits" element={<ProtectedRoute allowedRoles={["super_admin"]}><AdminProduitsPage /></ProtectedRoute>} />
+              <Route path="/boutique/bakaou/admin" element={<ProtectedRoute allowedRoles={["super_admin", "shop_owner"]}><AdminBakaouPage /></ProtectedRoute>} />
+              
+              {/* Boutique public pages */}
+              <Route path="/boutique/:slug" element={<BoutiqueLayout />}>
+                <Route index element={<BoutiqueProduits />} />
+                <Route path="services" element={<BoutiqueServices />} />
+                <Route path="contact" element={<BoutiqueContact />} />
+                <Route path="produit/:id" element={<ProductDetail />} />
+              </Route>
 
-            {/* Protected: Super Admin Dashboard */}
-            <Route
-              path="/dashboard/admin"
-              element={
-                <ProtectedRoute allowedRoles={["super_admin"]}>
-                  <AdminDashboard />
-                </ProtectedRoute>
-              }
-            />
+              {/* Protected: Super Admin Dashboard */}
+              <Route
+                path="/dashboard/admin"
+                element={
+                  <ProtectedRoute allowedRoles={["super_admin"]}>
+                    <AdminDashboard />
+                  </ProtectedRoute>
+                }
+              />
 
-            {/* Protected: Partner Dashboard */}
-            <Route
-              path="/dashboard/partenaire"
-              element={
-                <ProtectedRoute allowedRoles={["partner"]}>
-                  <PartenaireDashboard />
-                </ProtectedRoute>
-              }
-            />
+              {/* Protected: Partner Dashboard */}
+              <Route
+                path="/dashboard/partenaire"
+                element={
+                  <ProtectedRoute allowedRoles={["partner"]}>
+                    <PartenaireDashboard />
+                  </ProtectedRoute>
+                }
+              />
 
-            {/* Protected: Shop Owner Dashboard */}
-            <Route
-              path="/dashboard/boutique"
-              element={
-                <ProtectedRoute allowedRoles={["shop_owner"]}>
-                  <BoutiqueDashboard />
-                </ProtectedRoute>
-              }
-            />
+              {/* Protected: Shop Owner Dashboard */}
+              <Route
+                path="/dashboard/boutique"
+                element={
+                  <ProtectedRoute allowedRoles={["shop_owner"]}>
+                    <BoutiqueDashboard />
+                  </ProtectedRoute>
+                }
+              />
 
-            {/* Catch-all */}
-            <Route path="*" element={<NotFound />} />
-          </Routes>
+              {/* Catch-all */}
+              <Route path="*" element={<NotFound />} />
+            </Routes>
           </BrowserRouter>
-        </CartProvider>
-      </AuthProvider>
-    </TooltipProvider>
+        </TooltipProvider>
+      </CartProvider>
+    </AuthProvider>
   </QueryClientProvider>
 );
 
