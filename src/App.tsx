@@ -47,6 +47,7 @@ import AdminBoutiquesPage from "./pages/admin/AdminBoutiquesPage";
 import AdminClientsPage from "./pages/admin/AdminClientsPage";
 import AdminFinancesPage from "./pages/admin/AdminFinancesPage";
 import AdminProduitsPage from "./pages/admin/AdminProduitsPage";
+import AdminBakaouPage from "./pages/admin/AdminBakaouPage";
 
 const queryClient = new QueryClient();
 
