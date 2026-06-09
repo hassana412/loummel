@@ -1,4 +1,5 @@
 import { Toaster } from "@/components/ui/toaster";
+import PartnerBoutiquePage from "./pages/partner/PartnerBoutiquePage";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
@@ -100,6 +101,7 @@ const App = () => (
               <Route path="/boutique/bakaou/admin" element={<ProtectedRoute allowedRoles={["super_admin", "shop_owner"]}><AdminBakaouPage /></ProtectedRoute>} />
               <Route path="/partner" element={<ProtectedRoute><PartnerSpacePage /></ProtectedRoute>} />
               <Route path="/partner/boutique/:id" element={<ProtectedRoute><PartnerBoutiqueDetailPage /></ProtectedRoute>} />
+              <Route path="/partner/boutique/:id" element={<ProtectedRoute><PartnerBoutiquePage /></ProtectedRoute>} />
               
               {/* Boutique public pages */}
               <Route path="/boutique/:slug" element={<BoutiqueLayout />}>
