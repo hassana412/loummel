@@ -101,8 +101,7 @@ const App = () => (
               <Route path="/boutique/bakaou/admin" element={<ProtectedRoute allowedRoles={["super_admin", "shop_owner"]}><AdminBakaouPage /></ProtectedRoute>} />
               <Route path="/partner" element={<ProtectedRoute><PartnerSpacePage /></ProtectedRoute>} />
               <Route path="/partner/boutique/:id" element={<ProtectedRoute><PartnerBoutiqueDetailPage /></ProtectedRoute>} />
-              <Route path="/partner/boutique/:id" element={<ProtectedRoute><PartnerBoutiquePage /></ProtectedRoute>} />
-              
+                            
               {/* Boutique public pages */}
               <Route path="/boutique/:slug" element={<BoutiqueLayout />}>
                 <Route index element={<BoutiqueProduits />} />
