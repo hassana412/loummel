@@ -174,7 +174,7 @@ const DevenirPartenaire = () => {
         if (!userId) throw new Error("Échec de la création du compte.");
       }
 
-      // Create partner in database
+      // 1. Create partner in database — wait for confirmation
       const { data: partnerData, error: partnerError } = await supabase
         .from("partners")
         .insert({
@@ -196,27 +196,32 @@ const DevenirPartenaire = () => {
         .single();
 
       if (partnerError) throw partnerError;
+      if (!partnerData?.id) throw new Error("Échec de la création du partenaire.");
+      console.log("[DevenirPartenaire] Partner row created:", partnerData.id);
 
-      // Assign partner role
-      await supabase
+      // 2. Assign partner role — wait for confirmation
+      const { error: roleError } = await supabase
         .from("user_roles")
-        .upsert({
-          user_id: userId,
-          role: "partner",
-        }, { onConflict: "user_id,role" });
+        .upsert(
+          { user_id: userId, role: "partner" },
+          { onConflict: "user_id,role" }
+        );
 
-      // Assign partner role
-      await supabase
-      // Update profile with name and phone
-      await supabase
+      if (roleError) throw roleError;
+      console.log("[DevenirPartenaire] Partner role assigned for user:", userId);
+
+      // 3. Update profile (non-blocking for redirect, but still awaited)
+      const { error: profileError } = await supabase
         .from("profiles")
         .update({
           full_name: formData.name,
           phone: formData.phone,
         })
         .eq("id", userId);
+      if (profileError) console.warn("[DevenirPartenaire] Profile update warning:", profileError);
+      else console.log("[DevenirPartenaire] Profile updated");
 
-      // Create notification for admins
+      // 4. Notify admins (best-effort)
       const { data: admins } = await supabase
         .from("user_roles")
         .select("user_id")
@@ -232,14 +237,15 @@ const DevenirPartenaire = () => {
             related_id: partnerData.id,
           }))
         );
+        console.log("[DevenirPartenaire] Admin notifications sent");
       }
 
       toast({
         title: "Candidature envoyée !",
         description: "Notre équipe vous contactera dans les 48 heures.",
       });
-      // Wait for DB transaction to fully commit before redirecting
-      await new Promise((resolve) => setTimeout(resolve, 1000));
+
+      console.log("[DevenirPartenaire] All inserts confirmed — redirecting to /partner");
       navigate("/partner");
 
     } catch (error: any) {
