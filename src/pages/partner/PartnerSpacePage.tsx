@@ -71,7 +71,9 @@ const PartnerSpacePage = () => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [authLoading, user]);
 
-  const load = async () => {
+  const [retrying, setRetrying] = useState(false);
+
+  const load = async (isRetry = false) => {
     if (!user) return;
     setLoading(true);
     try {
@@ -84,6 +86,14 @@ const PartnerSpacePage = () => {
 
       if (partnerError) throw partnerError;
       if (!partnerData) {
+        if (!isRetry) {
+          // Record may not yet be committed — wait then retry once
+          setRetrying(true);
+          setLoading(false);
+          await new Promise((resolve) => setTimeout(resolve, 3000));
+          setRetrying(false);
+          return load(true);
+        }
         setAccessDenied(true);
         return;
       }
@@ -194,10 +204,15 @@ const PartnerSpacePage = () => {
     }
   };
 
-  if (authLoading || loading) {
+  if (authLoading || loading || retrying) {
     return (
       <div className="container mx-auto px-4 py-8 space-y-6">
         <Skeleton className="h-12 w-1/2" />
+        {retrying && (
+          <p className="text-sm text-muted-foreground">
+            Finalisation de votre inscription partenaire…
+          </p>
+        )}
         <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
           {Array.from({ length: 4 }).map((_, i) => (
             <Skeleton key={i} className="h-28" />
