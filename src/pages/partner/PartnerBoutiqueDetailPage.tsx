@@ -23,9 +23,13 @@ import {
   DialogDescription,
   DialogFooter,
 } from "@/components/ui/dialog";
+import {
+  AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent,
+  AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
 import { Textarea } from "@/components/ui/textarea";
 import { toast } from "@/hooks/use-toast";
-import { ArrowLeft, Wallet } from "lucide-react";
+import { ArrowLeft, Wallet, AlertTriangle } from "lucide-react";
 
 type Shop = any;
 type PartnerBoutique = {
@@ -67,6 +71,8 @@ const PartnerBoutiqueDetailPage = () => {
 
   const [suspendOpen, setSuspendOpen] = useState(false);
   const [suspendComment, setSuspendComment] = useState("");
+  const [activateOpen, setActivateOpen] = useState(false);
+  const [reactivateOpen, setReactivateOpen] = useState(false);
   const [actionLoading, setActionLoading] = useState(false);
 
   useEffect(() => {
@@ -226,14 +232,30 @@ const PartnerBoutiqueDetailPage = () => {
         patch.date_suspension = new Date().toISOString();
         patch.commentaire_suspension = commentaire || null;
       }
+
+      if (newStatut === "actif" && pb.boutique_id) {
+        const { error: shopErr } = await supabase
+          .from("shops")
+          .update({ status: "active" })
+          .eq("id", pb.boutique_id);
+        if (shopErr) throw shopErr;
+      }
+
       const { error } = await supabase
         .from("partner_boutiques")
         .update(patch)
         .eq("id", pb.id);
       if (error) throw error;
-      toast({ title: "Statut mis à jour" });
+
+      toast({
+        title: newStatut === "actif"
+          ? "Boutique activée avec succès"
+          : "Statut mis à jour",
+      });
       setSuspendOpen(false);
       setSuspendComment("");
+      setActivateOpen(false);
+      setReactivateOpen(false);
       load();
     } catch (e: any) {
       toast({ title: "Erreur", description: e.message, variant: "destructive" });
@@ -320,10 +342,22 @@ const PartnerBoutiqueDetailPage = () => {
                   </span>
                 )}
               </div>
+              {pb?.statut === "creation" && (
+                <div className="flex items-start gap-3 p-4 rounded-lg border border-yellow-300 bg-yellow-50">
+                  <AlertTriangle className="w-5 h-5 text-yellow-700 mt-0.5" />
+                  <div className="text-sm text-yellow-900">
+                    Cette boutique est en attente de validation.
+                  </div>
+                </div>
+              )}
               <div className="flex flex-wrap gap-2">
                 {pb?.statut === "creation" && (
-                  <Button onClick={() => updateStatut("actif")} disabled={actionLoading}>
-                    Activer
+                  <Button
+                    onClick={() => setActivateOpen(true)}
+                    disabled={actionLoading}
+                    className="bg-green-600 hover:bg-green-700 text-white"
+                  >
+                    Activer la boutique
                   </Button>
                 )}
                 {pb?.statut === "actif" && (
@@ -336,7 +370,10 @@ const PartnerBoutiqueDetailPage = () => {
                   </Button>
                 )}
                 {pb?.statut === "suspendu" && (
-                  <Button onClick={() => updateStatut("reactif")} disabled={actionLoading}>
+                  <Button
+                    onClick={() => setReactivateOpen(true)}
+                    disabled={actionLoading}
+                  >
                     Réactiver
                   </Button>
                 )}
@@ -492,6 +529,47 @@ const PartnerBoutiqueDetailPage = () => {
           </DialogFooter>
         </DialogContent>
       </Dialog>
+
+      <AlertDialog open={activateOpen} onOpenChange={setActivateOpen}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Activer la boutique</AlertDialogTitle>
+            <AlertDialogDescription>
+              La boutique sera mise en ligne et visible des clients. Confirmer ?
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel disabled={actionLoading}>Annuler</AlertDialogCancel>
+            <AlertDialogAction
+              disabled={actionLoading}
+              onClick={() => updateStatut("actif")}
+              className="bg-green-600 hover:bg-green-700"
+            >
+              Activer
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
+
+      <AlertDialog open={reactivateOpen} onOpenChange={setReactivateOpen}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Réactiver la boutique</AlertDialogTitle>
+            <AlertDialogDescription>
+              La boutique repassera à l'état actif. Confirmer ?
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel disabled={actionLoading}>Annuler</AlertDialogCancel>
+            <AlertDialogAction
+              disabled={actionLoading}
+              onClick={() => updateStatut("reactif")}
+            >
+              Réactiver
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   );
 };
