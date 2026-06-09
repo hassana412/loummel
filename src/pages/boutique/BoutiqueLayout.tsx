@@ -1,8 +1,6 @@
 import { useState, useEffect, createContext, useContext } from "react";
 import { Outlet, useParams, NavLink } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
-import Header from "@/components/layout/Header";
-import Footer from "@/components/layout/Footer";
 import { Store, ShoppingBag, Briefcase, Phone, Star, MapPin, Crown, Loader2 } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import VIPPromoSection from "@/components/boutique/VIPPromoSection";
@@ -115,11 +113,9 @@ const BoutiqueLayout = () => {
   if (loading) {
     return (
       <div className="min-h-screen flex flex-col bg-background">
-        <Header />
         <main className="flex-1 flex items-center justify-center">
           <Loader2 className="w-8 h-8 animate-spin text-primary" />
         </main>
-        <Footer />
       </div>
     );
   }
@@ -127,7 +123,6 @@ const BoutiqueLayout = () => {
   if (!shop) {
     return (
       <div className="min-h-screen flex flex-col bg-background">
-        <Header />
         <main className="flex-1 flex items-center justify-center">
           <div className="text-center">
             <Store className="w-16 h-16 text-muted-foreground mx-auto mb-4" />
@@ -135,7 +130,6 @@ const BoutiqueLayout = () => {
             <p className="text-muted-foreground">Cette boutique n'existe pas ou n'est pas encore active.</p>
           </div>
         </main>
-        <Footer />
       </div>
     );
   }
@@ -154,7 +148,6 @@ const BoutiqueLayout = () => {
   return (
     <ShopContext.Provider value={{ shop, loading }}>
       <div className="min-h-screen flex flex-col bg-background">
-        <Header />
         
         <main className="flex-1">
           {/* Shop Header */}
@@ -257,7 +250,6 @@ const BoutiqueLayout = () => {
           </div>
         </main>
         
-        <Footer />
       </div>
     </ShopContext.Provider>
   );

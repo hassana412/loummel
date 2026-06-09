@@ -2,8 +2,6 @@ import { useState, useEffect } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import { useAuth } from "@/contexts/AuthContext";
 import { supabase } from "@/integrations/supabase/client";
-import Header from "@/components/layout/Header";
-import Footer from "@/components/layout/Footer";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
@@ -308,7 +306,6 @@ const BoutiqueDashboard = () => {
 
   return (
     <div className="min-h-screen flex flex-col bg-background">
-      <Header />
       
       <main className="flex-1 py-8">
         <div className="container">
@@ -822,7 +819,6 @@ const BoutiqueDashboard = () => {
         </div>
       </main>
       
-      <Footer />
     </div>
   );
 };

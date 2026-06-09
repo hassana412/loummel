@@ -1,7 +1,5 @@
 import { Link, useSearchParams } from "react-router-dom";
 import { CheckCircle } from "lucide-react";
-import Header from "@/components/layout/Header";
-import Footer from "@/components/layout/Footer";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 
@@ -12,7 +10,6 @@ const CommandeConfirmee = () => {
 
   return (
     <div className="min-h-screen flex flex-col bg-background">
-      <Header />
       <main className="flex-1 container mx-auto px-4 py-12 flex items-center justify-center">
         <Card className="p-8 md:p-12 max-w-lg w-full text-center">
           <div className="flex justify-center mb-6">
@@ -36,7 +33,6 @@ const CommandeConfirmee = () => {
           </Button>
         </Card>
       </main>
-      <Footer />
     </div>
   );
 };

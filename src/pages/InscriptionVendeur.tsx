@@ -1,7 +1,5 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import Header from "@/components/layout/Header";
-import Footer from "@/components/layout/Footer";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
@@ -301,7 +299,6 @@ const InscriptionVendeur = () => {
   if (createdShopCode) {
     return (
       <div className="min-h-screen flex flex-col bg-background">
-        <Header />
         <main className="flex-1 py-16">
           <div className="container max-w-lg text-center">
             <div className="w-20 h-20 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-6">
@@ -343,14 +340,12 @@ const InscriptionVendeur = () => {
             </div>
           </div>
         </main>
-        <Footer />
       </div>
     );
   }
 
   return (
     <div className="min-h-screen flex flex-col bg-background">
-      <Header />
       
       <main className="flex-1 py-8">
         <div className="container max-w-4xl">
@@ -857,7 +852,6 @@ const InscriptionVendeur = () => {
         </div>
       </main>
       
-      <Footer />
     </div>
   );
 };
