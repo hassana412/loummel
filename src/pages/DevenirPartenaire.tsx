@@ -238,6 +238,8 @@ const DevenirPartenaire = () => {
         title: "Candidature envoyée !",
         description: "Notre équipe vous contactera dans les 48 heures.",
       });
+      // Wait for DB transaction to fully commit before redirecting
+      await new Promise((resolve) => setTimeout(resolve, 1000));
       navigate("/partner");
 
     } catch (error: any) {
