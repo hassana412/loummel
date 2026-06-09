@@ -611,7 +611,7 @@ const DevenirPartenaire = () => {
                 variant="hero" 
                 size="lg" 
                 className="px-12"
-                disabled={isSubmitting || !user}
+                disabled={isSubmitting}
               >
                 {isSubmitting ? "Envoi en cours..." : (
                   <>
