@@ -14,6 +14,63 @@ export type Database = {
   }
   public: {
     Tables: {
+      abonnements: {
+        Row: {
+          boutique_id: string | null
+          created_at: string | null
+          date_debut: string | null
+          date_fin: string | null
+          id: string
+          mode_paiement: string | null
+          montant: number
+          notes: string | null
+          partner_id: string | null
+          statut_paiement: string | null
+          type_service: string
+        }
+        Insert: {
+          boutique_id?: string | null
+          created_at?: string | null
+          date_debut?: string | null
+          date_fin?: string | null
+          id?: string
+          mode_paiement?: string | null
+          montant: number
+          notes?: string | null
+          partner_id?: string | null
+          statut_paiement?: string | null
+          type_service: string
+        }
+        Update: {
+          boutique_id?: string | null
+          created_at?: string | null
+          date_debut?: string | null
+          date_fin?: string | null
+          id?: string
+          mode_paiement?: string | null
+          montant?: number
+          notes?: string | null
+          partner_id?: string | null
+          statut_paiement?: string | null
+          type_service?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "abonnements_boutique_id_fkey"
+            columns: ["boutique_id"]
+            isOneToOne: false
+            referencedRelation: "shops"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "abonnements_partner_id_fkey"
+            columns: ["partner_id"]
+            isOneToOne: false
+            referencedRelation: "partners"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       audit_logs: {
         Row: {
           action: string
@@ -43,6 +100,65 @@ export type Database = {
           user_id?: string | null
         }
         Relationships: []
+      }
+      commandes: {
+        Row: {
+          boutique_id: string | null
+          client_nom: string
+          client_tel: string
+          client_whatsapp: string | null
+          confirme_at: string | null
+          confirme_par: string | null
+          created_at: string | null
+          id: string
+          mode_paiement: string | null
+          montant_total: number
+          produits: Json
+          statut_commande: string | null
+          statut_paiement: string | null
+          ticket_livraison: string | null
+        }
+        Insert: {
+          boutique_id?: string | null
+          client_nom: string
+          client_tel: string
+          client_whatsapp?: string | null
+          confirme_at?: string | null
+          confirme_par?: string | null
+          created_at?: string | null
+          id?: string
+          mode_paiement?: string | null
+          montant_total: number
+          produits: Json
+          statut_commande?: string | null
+          statut_paiement?: string | null
+          ticket_livraison?: string | null
+        }
+        Update: {
+          boutique_id?: string | null
+          client_nom?: string
+          client_tel?: string
+          client_whatsapp?: string | null
+          confirme_at?: string | null
+          confirme_par?: string | null
+          created_at?: string | null
+          id?: string
+          mode_paiement?: string | null
+          montant_total?: number
+          produits?: Json
+          statut_commande?: string | null
+          statut_paiement?: string | null
+          ticket_livraison?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "commandes_boutique_id_fkey"
+            columns: ["boutique_id"]
+            isOneToOne: false
+            referencedRelation: "shops"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       complaints: {
         Row: {
@@ -159,10 +275,12 @@ export type Database = {
           id: string
           last_sync_at: string | null
           operator: string
+          partner_id: string | null
           pending_balance: number
           total_received: number
           total_withdrawn: number
           updated_at: string
+          user_id: string | null
         }
         Insert: {
           balance?: number
@@ -170,10 +288,12 @@ export type Database = {
           id?: string
           last_sync_at?: string | null
           operator: string
+          partner_id?: string | null
           pending_balance?: number
           total_received?: number
           total_withdrawn?: number
           updated_at?: string
+          user_id?: string | null
         }
         Update: {
           balance?: number
@@ -181,12 +301,22 @@ export type Database = {
           id?: string
           last_sync_at?: string | null
           operator?: string
+          partner_id?: string | null
           pending_balance?: number
           total_received?: number
           total_withdrawn?: number
           updated_at?: string
+          user_id?: string | null
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "mobile_wallets_partner_id_fkey"
+            columns: ["partner_id"]
+            isOneToOne: false
+            referencedRelation: "partners"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       notifications: {
         Row: {
@@ -263,10 +393,59 @@ export type Database = {
         }
         Relationships: []
       }
+      partner_boutiques: {
+        Row: {
+          boutique_id: string | null
+          commentaire_suspension: string | null
+          created_at: string | null
+          date_activation: string | null
+          date_suspension: string | null
+          id: string
+          partner_id: string | null
+          statut: string | null
+        }
+        Insert: {
+          boutique_id?: string | null
+          commentaire_suspension?: string | null
+          created_at?: string | null
+          date_activation?: string | null
+          date_suspension?: string | null
+          id?: string
+          partner_id?: string | null
+          statut?: string | null
+        }
+        Update: {
+          boutique_id?: string | null
+          commentaire_suspension?: string | null
+          created_at?: string | null
+          date_activation?: string | null
+          date_suspension?: string | null
+          id?: string
+          partner_id?: string | null
+          statut?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "partner_boutiques_boutique_id_fkey"
+            columns: ["boutique_id"]
+            isOneToOne: false
+            referencedRelation: "shops"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "partner_boutiques_partner_id_fkey"
+            columns: ["partner_id"]
+            isOneToOne: false
+            referencedRelation: "partners"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       partners: {
         Row: {
           arrondissements: string[] | null
           base_commission_rate: number | null
+          code_partenaire: string | null
           created_at: string | null
           current_commission_rate: number | null
           departments: string[] | null
@@ -283,10 +462,12 @@ export type Database = {
           total_commission_earned: number | null
           updated_at: string | null
           user_id: string
+          whatsapp: string | null
         }
         Insert: {
           arrondissements?: string[] | null
           base_commission_rate?: number | null
+          code_partenaire?: string | null
           created_at?: string | null
           current_commission_rate?: number | null
           departments?: string[] | null
@@ -303,10 +484,12 @@ export type Database = {
           total_commission_earned?: number | null
           updated_at?: string | null
           user_id: string
+          whatsapp?: string | null
         }
         Update: {
           arrondissements?: string[] | null
           base_commission_rate?: number | null
+          code_partenaire?: string | null
           created_at?: string | null
           current_commission_rate?: number | null
           departments?: string[] | null
@@ -323,6 +506,7 @@ export type Database = {
           total_commission_earned?: number | null
           updated_at?: string | null
           user_id?: string
+          whatsapp?: string | null
         }
         Relationships: []
       }
@@ -776,8 +960,11 @@ export type Database = {
           created_at: string
           description: string | null
           fee: number
+          flux: string | null
           id: string
           metadata: Json | null
+          motif: string | null
+          partner_id: string | null
           phone_number: string | null
           reference: string | null
           related_id: string | null
@@ -792,8 +979,11 @@ export type Database = {
           created_at?: string
           description?: string | null
           fee?: number
+          flux?: string | null
           id?: string
           metadata?: Json | null
+          motif?: string | null
+          partner_id?: string | null
           phone_number?: string | null
           reference?: string | null
           related_id?: string | null
@@ -808,8 +998,11 @@ export type Database = {
           created_at?: string
           description?: string | null
           fee?: number
+          flux?: string | null
           id?: string
           metadata?: Json | null
+          motif?: string | null
+          partner_id?: string | null
           phone_number?: string | null
           reference?: string | null
           related_id?: string | null
@@ -819,6 +1012,13 @@ export type Database = {
           wallet_id?: string
         }
         Relationships: [
+          {
+            foreignKeyName: "wallet_transactions_partner_id_fkey"
+            columns: ["partner_id"]
+            isOneToOne: false
+            referencedRelation: "partners"
+            referencedColumns: ["id"]
+          },
           {
             foreignKeyName: "wallet_transactions_wallet_id_fkey"
             columns: ["wallet_id"]
