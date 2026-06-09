@@ -204,10 +204,15 @@ const PartnerSpacePage = () => {
     }
   };
 
-  if (authLoading || loading) {
+  if (authLoading || loading || retrying) {
     return (
       <div className="container mx-auto px-4 py-8 space-y-6">
         <Skeleton className="h-12 w-1/2" />
+        {retrying && (
+          <p className="text-sm text-muted-foreground">
+            Finalisation de votre inscription partenaire…
+          </p>
+        )}
         <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
           {Array.from({ length: 4 }).map((_, i) => (
             <Skeleton key={i} className="h-28" />
