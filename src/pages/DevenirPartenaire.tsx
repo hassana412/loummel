@@ -30,6 +30,8 @@ const DevenirPartenaire = () => {
     name: "",
     email: "",
     phone: "",
+    password: "",
+    confirmPassword: "",
     region: "",
     departments: [] as string[],
     arrondissements: [] as string[],
@@ -113,16 +115,6 @@ const DevenirPartenaire = () => {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
-    if (!user) {
-      toast({
-        title: "Connexion requise",
-        description: "Veuillez vous connecter pour devenir partenaire.",
-        variant: "destructive",
-      });
-      navigate("/auth");
-      return;
-    }
-
     if (!formData.name || !formData.email || !formData.phone || !formData.region) {
       toast({
         title: "Champs requis",
@@ -132,14 +124,61 @@ const DevenirPartenaire = () => {
       return;
     }
 
+    if (!user) {
+      if (!formData.password || formData.password.length < 6) {
+        toast({
+          title: "Mot de passe trop faible",
+          description: "Le mot de passe doit contenir au moins 6 caractères.",
+          variant: "destructive",
+        });
+        return;
+      }
+      if (formData.password !== formData.confirmPassword) {
+        toast({
+          title: "Mots de passe différents",
+          description: "Les deux mots de passe ne correspondent pas.",
+          variant: "destructive",
+        });
+        return;
+      }
+    }
+
     setIsSubmitting(true);
 
     try {
+      let userId = user?.id;
+
+      // Sign up if not authenticated
+      if (!userId) {
+        const { data: signUpData, error: signUpError } = await supabase.auth.signUp({
+          email: formData.email,
+          password: formData.password,
+          options: {
+            emailRedirectTo: `${window.location.origin}/partner`,
+            data: { full_name: formData.name },
+          },
+        });
+
+        if (signUpError) {
+          const msg = signUpError.message?.toLowerCase() || "";
+          if (msg.includes("already") || msg.includes("registered") || msg.includes("exists")) {
+            throw new Error("Cet email est déjà utilisé. Connectez-vous d'abord.");
+          }
+          if (msg.includes("password")) {
+            throw new Error("Mot de passe trop faible. Utilisez au moins 6 caractères.");
+          }
+          throw signUpError;
+        }
+
+        userId = signUpData.user?.id;
+        if (!userId) throw new Error("Échec de la création du compte.");
+      }
+
       // Create partner in database
       const { data: partnerData, error: partnerError } = await supabase
         .from("partners")
         .insert({
-          user_id: user.id,
+          user_id: userId,
           nom: formData.name,
           email: formData.email,
           telephone: formData.phone,
@@ -162,10 +201,12 @@ const DevenirPartenaire = () => {
       await supabase
         .from("user_roles")
         .upsert({
-          user_id: user.id,
+          user_id: userId,
           role: "partner",
         }, { onConflict: "user_id,role" });
 
+      // Assign partner role
+      await supabase
       // Update profile with name and phone
       await supabase
         .from("profiles")
@@ -173,7 +214,7 @@ const DevenirPartenaire = () => {
           full_name: formData.name,
           phone: formData.phone,
         })
-        .eq("id", user.id);
+        .eq("id", userId);
 
       // Create notification for admins
       const { data: admins } = await supabase
@@ -230,8 +271,8 @@ const DevenirPartenaire = () => {
               en recrutant des vendeurs dans votre région
             </p>
             {!user && (
-              <p className="text-destructive text-sm mt-2">
-                ⚠️ Vous devez être connecté pour devenir partenaire
+              <p className="text-muted-foreground text-sm mt-2">
+                Pas encore de compte ? Renseignez un mot de passe ci-dessous pour créer votre compte partenaire.
               </p>
             )}
           </div>
@@ -277,6 +318,34 @@ const DevenirPartenaire = () => {
                     required
                   />
                 </div>
+                {!user && (
+                  <>
+                    <div className="space-y-2">
+                      <Label htmlFor="password">Mot de passe *</Label>
+                      <Input
+                        id="password"
+                        type="password"
+                        minLength={6}
+                        value={formData.password}
+                        onChange={(e) => updateFormData("password", e.target.value)}
+                        placeholder="Min. 6 caractères"
+                        required
+                      />
+                    </div>
+                    <div className="space-y-2">
+                      <Label htmlFor="confirmPassword">Confirmer le mot de passe *</Label>
+                      <Input
+                        id="confirmPassword"
+                        type="password"
+                        minLength={6}
+                        value={formData.confirmPassword}
+                        onChange={(e) => updateFormData("confirmPassword", e.target.value)}
+                        placeholder="Retapez votre mot de passe"
+                        required
+                      />
+                    </div>
+                  </>
+                )}
               </CardContent>
             </Card>
 
@@ -542,7 +611,7 @@ const DevenirPartenaire = () => {
                 variant="hero" 
                 size="lg" 
                 className="px-12"
-                disabled={isSubmitting || !user}
+                disabled={isSubmitting}
               >
                 {isSubmitting ? "Envoi en cours..." : (
                   <>
