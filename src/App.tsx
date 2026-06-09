@@ -50,6 +50,7 @@ import AdminFinancesPage from "./pages/admin/AdminFinancesPage";
 import AdminProduitsPage from "./pages/admin/AdminProduitsPage";
 import AdminBakaouPage from "./pages/admin/AdminBakaouPage";
 import PartnerSpacePage from "./pages/partner/PartnerSpacePage";
+import PartnerBoutiqueDetailPage from "./pages/partner/PartnerBoutiqueDetailPage";
 
 const queryClient = new QueryClient();
 
@@ -98,6 +99,7 @@ const App = () => (
               <Route path="/admin/produits" element={<ProtectedRoute allowedRoles={["super_admin"]}><AdminProduitsPage /></ProtectedRoute>} />
               <Route path="/boutique/bakaou/admin" element={<ProtectedRoute allowedRoles={["super_admin", "shop_owner"]}><AdminBakaouPage /></ProtectedRoute>} />
               <Route path="/partner" element={<ProtectedRoute><PartnerSpacePage /></ProtectedRoute>} />
+              <Route path="/partner/boutique/:id" element={<ProtectedRoute><PartnerBoutiqueDetailPage /></ProtectedRoute>} />
               
               {/* Boutique public pages */}
               <Route path="/boutique/:slug" element={<BoutiqueLayout />}>
