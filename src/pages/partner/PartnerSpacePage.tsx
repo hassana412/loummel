@@ -71,7 +71,9 @@ const PartnerSpacePage = () => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [authLoading, user]);
 
-  const load = async () => {
+  const [retrying, setRetrying] = useState(false);
+
+  const load = async (isRetry = false) => {
     if (!user) return;
     setLoading(true);
     try {
@@ -84,6 +86,14 @@ const PartnerSpacePage = () => {
 
       if (partnerError) throw partnerError;
       if (!partnerData) {
+        if (!isRetry) {
+          // Record may not yet be committed — wait then retry once
+          setRetrying(true);
+          setLoading(false);
+          await new Promise((resolve) => setTimeout(resolve, 3000));
+          setRetrying(false);
+          return load(true);
+        }
         setAccessDenied(true);
         return;
       }
