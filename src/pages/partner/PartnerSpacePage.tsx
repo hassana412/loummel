@@ -79,6 +79,7 @@ const PartnerSpacePage = () => {
         .from("partners")
         .select("id, code_partenaire, region, user_id")
         .eq("user_id", user.id)
+        .in("status", ["active", "approved"])
         .maybeSingle();
 
       if (partnerError) throw partnerError;
