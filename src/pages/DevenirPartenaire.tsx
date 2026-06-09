@@ -271,8 +271,8 @@ const DevenirPartenaire = () => {
               en recrutant des vendeurs dans votre région
             </p>
             {!user && (
-              <p className="text-destructive text-sm mt-2">
-                ⚠️ Vous devez être connecté pour devenir partenaire
+              <p className="text-muted-foreground text-sm mt-2">
+                Pas encore de compte ? Renseignez un mot de passe ci-dessous pour créer votre compte partenaire.
               </p>
             )}
           </div>
