@@ -115,16 +115,6 @@ const DevenirPartenaire = () => {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
-    if (!user) {
-      toast({
-        title: "Connexion requise",
-        description: "Veuillez vous connecter pour devenir partenaire.",
-        variant: "destructive",
-      });
-      navigate("/auth");
-      return;
-    }
-
     if (!formData.name || !formData.email || !formData.phone || !formData.region) {
       toast({
         title: "Champs requis",
@@ -134,14 +124,61 @@ const DevenirPartenaire = () => {
       return;
     }
 
+    if (!user) {
+      if (!formData.password || formData.password.length < 6) {
+        toast({
+          title: "Mot de passe trop faible",
+          description: "Le mot de passe doit contenir au moins 6 caractères.",
+          variant: "destructive",
+        });
+        return;
+      }
+      if (formData.password !== formData.confirmPassword) {
+        toast({
+          title: "Mots de passe différents",
+          description: "Les deux mots de passe ne correspondent pas.",
+          variant: "destructive",
+        });
+        return;
+      }
+    }
+
     setIsSubmitting(true);
 
     try {
+      let userId = user?.id;
+
+      // Sign up if not authenticated
+      if (!userId) {
+        const { data: signUpData, error: signUpError } = await supabase.auth.signUp({
+          email: formData.email,
+          password: formData.password,
+          options: {
+            emailRedirectTo: `${window.location.origin}/partner`,
+            data: { full_name: formData.name },
+          },
+        });
+
+        if (signUpError) {
+          const msg = signUpError.message?.toLowerCase() || "";
+          if (msg.includes("already") || msg.includes("registered") || msg.includes("exists")) {
+            throw new Error("Cet email est déjà utilisé. Connectez-vous d'abord.");
+          }
+          if (msg.includes("password")) {
+            throw new Error("Mot de passe trop faible. Utilisez au moins 6 caractères.");
+          }
+          throw signUpError;
+        }
+
+        userId = signUpData.user?.id;
+        if (!userId) throw new Error("Échec de la création du compte.");
+      }
+
       // Create partner in database
       const { data: partnerData, error: partnerError } = await supabase
         .from("partners")
         .insert({
-          user_id: user.id,
+          user_id: userId,
           nom: formData.name,
           email: formData.email,
           telephone: formData.phone,
@@ -159,6 +196,14 @@ const DevenirPartenaire = () => {
         .single();
 
       if (partnerError) throw partnerError;
+
+      // Assign partner role
+      await supabase
+        .from("user_roles")
+        .upsert({
+          user_id: userId,
+          role: "partner",
+        }, { onConflict: "user_id,role" });
 
       // Assign partner role
       await supabase
