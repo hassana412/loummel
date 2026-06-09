@@ -197,7 +197,7 @@ const DevenirPartenaire = () => {
         title: "Candidature envoyée !",
         description: "Notre équipe vous contactera dans les 48 heures.",
       });
-      navigate("/dashboard/partenaire");
+      navigate("/partner");
 
     } catch (error: any) {
       console.error("Error creating partner:", error);
