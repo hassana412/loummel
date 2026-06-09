@@ -30,6 +30,8 @@ const DevenirPartenaire = () => {
     name: "",
     email: "",
     phone: "",
+    password: "",
+    confirmPassword: "",
     region: "",
     departments: [] as string[],
     arrondissements: [] as string[],
