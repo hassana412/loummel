@@ -449,16 +449,19 @@ export type Database = {
           created_at: string | null
           current_commission_rate: number | null
           departments: string[] | null
+          email: string | null
           forfait_amount: number | null
           forfait_end_date: string | null
           forfait_notes: string | null
           forfait_start_date: string | null
           id: string
           intercommunautaire: boolean | null
+          nom: string | null
           partnership_type: Database["public"]["Enums"]["partnership_type"]
           region: string | null
           shops_recruited: number | null
           status: Database["public"]["Enums"]["entity_status"] | null
+          telephone: string | null
           total_commission_earned: number | null
           updated_at: string | null
           user_id: string
@@ -471,16 +474,19 @@ export type Database = {
           created_at?: string | null
           current_commission_rate?: number | null
           departments?: string[] | null
+          email?: string | null
           forfait_amount?: number | null
           forfait_end_date?: string | null
           forfait_notes?: string | null
           forfait_start_date?: string | null
           id?: string
           intercommunautaire?: boolean | null
+          nom?: string | null
           partnership_type: Database["public"]["Enums"]["partnership_type"]
           region?: string | null
           shops_recruited?: number | null
           status?: Database["public"]["Enums"]["entity_status"] | null
+          telephone?: string | null
           total_commission_earned?: number | null
           updated_at?: string | null
           user_id: string
@@ -493,16 +499,19 @@ export type Database = {
           created_at?: string | null
           current_commission_rate?: number | null
           departments?: string[] | null
+          email?: string | null
           forfait_amount?: number | null
           forfait_end_date?: string | null
           forfait_notes?: string | null
           forfait_start_date?: string | null
           id?: string
           intercommunautaire?: boolean | null
+          nom?: string | null
           partnership_type?: Database["public"]["Enums"]["partnership_type"]
           region?: string | null
           shops_recruited?: number | null
           status?: Database["public"]["Enums"]["entity_status"] | null
+          telephone?: string | null
           total_commission_earned?: number | null
           updated_at?: string | null
           user_id?: string
