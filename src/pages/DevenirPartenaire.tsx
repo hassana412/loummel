@@ -140,6 +140,10 @@ const DevenirPartenaire = () => {
         .from("partners")
         .insert({
           user_id: user.id,
+          nom: formData.name,
+          email: formData.email,
+          telephone: formData.phone,
+          whatsapp: formData.phone,
           partnership_type: formData.partnershipType,
           region: formData.region,
           departments: formData.departments,
@@ -147,7 +151,7 @@ const DevenirPartenaire = () => {
           intercommunautaire: formData.intercommunautaire,
           base_commission_rate: COMMISSION_RATE,
           current_commission_rate: COMMISSION_RATE,
-          status: "pending",
+          status: "active",
         })
         .select()
         .single();
@@ -193,7 +197,7 @@ const DevenirPartenaire = () => {
         title: "Candidature envoyée !",
         description: "Notre équipe vous contactera dans les 48 heures.",
       });
-      navigate("/dashboard/partenaire");
+      navigate("/partner");
 
     } catch (error: any) {
       console.error("Error creating partner:", error);
