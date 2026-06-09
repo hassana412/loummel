@@ -207,12 +207,6 @@ const DevenirPartenaire = () => {
 
       // Assign partner role
       await supabase
-        .from("user_roles")
-        .upsert({
-          user_id: user.id,
-          role: "partner",
-        }, { onConflict: "user_id,role" });
-
       // Update profile with name and phone
       await supabase
         .from("profiles")
@@ -220,7 +214,7 @@ const DevenirPartenaire = () => {
           full_name: formData.name,
           phone: formData.phone,
         })
-        .eq("id", user.id);
+        .eq("id", userId);
 
       // Create notification for admins
       const { data: admins } = await supabase
