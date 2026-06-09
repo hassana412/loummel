@@ -90,7 +90,7 @@ const PartnerSpacePage = () => {
           // Record may not yet be committed — wait then retry once
           setRetrying(true);
           setLoading(false);
-          await new Promise((resolve) => setTimeout(resolve, 3000));
+          await new Promise((resolve) => setTimeout(resolve, 5000));
           setRetrying(false);
           return load(true);
         }
