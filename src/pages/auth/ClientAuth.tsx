@@ -2,8 +2,6 @@ import { useState, useEffect } from "react";
 import { useNavigate, Link, useSearchParams } from "react-router-dom";
 import { useAuth } from "@/contexts/AuthContext";
 import { supabase } from "@/integrations/supabase/client";
-import Header from "@/components/layout/Header";
-import Footer from "@/components/layout/Footer";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -278,7 +276,6 @@ const ClientAuth = () => {
   if (authMode === "forgot") {
     return (
       <div className="min-h-screen flex flex-col bg-background">
-        <Header />
         
         <main className="flex-1 flex items-center justify-center py-12 px-4">
           <Card className="w-full max-w-md shadow-sahel-card">
@@ -353,7 +350,6 @@ const ClientAuth = () => {
           </Card>
         </main>
         
-        <Footer />
       </div>
     );
   }
@@ -362,7 +358,6 @@ const ClientAuth = () => {
   if (authMode === "reset") {
     return (
       <div className="min-h-screen flex flex-col bg-background">
-        <Header />
         
         <main className="flex-1 flex items-center justify-center py-12 px-4">
           <Card className="w-full max-w-md shadow-sahel-card">
@@ -409,7 +404,6 @@ const ClientAuth = () => {
           </Card>
         </main>
         
-        <Footer />
       </div>
     );
   }
@@ -417,7 +411,6 @@ const ClientAuth = () => {
   // Main Client Auth View
   return (
     <div className="min-h-screen flex flex-col bg-background">
-      <Header />
       
       <main className="flex-1 flex items-center justify-center py-12 px-4">
         <Card className="w-full max-w-md shadow-sahel-card">
@@ -545,7 +538,6 @@ const ClientAuth = () => {
         </Card>
       </main>
       
-      <Footer />
     </div>
   );
 };

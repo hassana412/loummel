@@ -1,8 +1,6 @@
 import { useState, useMemo } from "react";
 import { Link, Navigate, useNavigate } from "react-router-dom";
 import { Check, Loader2, ShieldCheck } from "lucide-react";
-import Header from "@/components/layout/Header";
-import Footer from "@/components/layout/Footer";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
@@ -52,11 +50,9 @@ const Checkout = () => {
   if (loading) {
     return (
       <div className="min-h-screen flex flex-col bg-background">
-        <Header />
         <main className="flex-1 container mx-auto px-4 py-8">
           <div className="animate-pulse text-muted-foreground">Chargement...</div>
         </main>
-        <Footer />
       </div>
     );
   }
@@ -68,7 +64,6 @@ const Checkout = () => {
   if (items.length === 0 && !submitting) {
     return (
       <div className="min-h-screen flex flex-col bg-background">
-        <Header />
         <main className="flex-1 container mx-auto px-4 py-8">
           <Card className="p-8 text-center max-w-md mx-auto">
             <p className="text-lg mb-4">Votre panier est vide</p>
@@ -77,7 +72,6 @@ const Checkout = () => {
             </Button>
           </Card>
         </main>
-        <Footer />
       </div>
     );
   }
@@ -197,7 +191,6 @@ const Checkout = () => {
   if (step === 3 && submitting) {
     return (
       <div className="min-h-screen flex flex-col bg-background">
-        <Header />
         <main className="flex-1 flex items-center justify-center p-4">
           <Card className="p-10 text-center max-w-md w-full">
             <Loader2 className="w-16 h-16 mx-auto text-primary animate-spin mb-4" />
@@ -209,14 +202,12 @@ const Checkout = () => {
             </p>
           </Card>
         </main>
-        <Footer />
       </div>
     );
   }
 
   return (
     <div className="min-h-screen flex flex-col bg-background">
-      <Header />
       <main className="flex-1 container mx-auto px-4 py-8 max-w-3xl">
         <h1 className="text-3xl font-bold mb-6 text-center">Finaliser ma commande</h1>
         <Stepper />
@@ -409,7 +400,6 @@ const Checkout = () => {
           </div>
         )}
       </main>
-      <Footer />
     </div>
   );
 };

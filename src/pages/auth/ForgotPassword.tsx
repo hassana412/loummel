@@ -2,8 +2,6 @@ import { useState } from "react";
 import { Link } from "react-router-dom";
 import { KeyRound, CheckCircle2, Loader2, ArrowLeft } from "lucide-react";
 import { toast } from "sonner";
-import Header from "@/components/layout/Header";
-import Footer from "@/components/layout/Footer";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
@@ -39,7 +37,6 @@ const ForgotPassword = () => {
 
   return (
     <div className="min-h-screen flex flex-col bg-background">
-      <Header />
       <main className="flex-1 container mx-auto px-4 py-12">
         <div className="max-w-md mx-auto">
           {sent ? (
@@ -111,7 +108,6 @@ const ForgotPassword = () => {
           )}
         </div>
       </main>
-      <Footer />
     </div>
   );
 };

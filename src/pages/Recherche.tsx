@@ -1,8 +1,6 @@
 import { useState, useEffect } from "react";
 import { useSearchParams, Link } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
-import Header from "@/components/layout/Header";
-import Footer from "@/components/layout/Footer";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card, CardContent } from "@/components/ui/card";
@@ -99,7 +97,6 @@ const Recherche = () => {
 
   return (
     <div className="min-h-screen flex flex-col bg-background">
-      <Header />
       
       <main className="flex-1 py-8">
         <div className="container">
@@ -256,7 +253,6 @@ const Recherche = () => {
         </div>
       </main>
       
-      <Footer />
     </div>
   );
 };

@@ -1,7 +1,5 @@
 import { useState, useMemo } from "react";
 import { useNavigate } from "react-router-dom";
-import Header from "@/components/layout/Header";
-import Footer from "@/components/layout/Footer";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -262,7 +260,6 @@ const DevenirPartenaire = () => {
 
   return (
     <div className="min-h-screen flex flex-col bg-background">
-      <Header />
       
       <main className="flex-1 py-8">
         <div className="container max-w-4xl">
@@ -633,7 +630,6 @@ const DevenirPartenaire = () => {
         </div>
       </main>
       
-      <Footer />
     </div>
   );
 };

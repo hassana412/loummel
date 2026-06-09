@@ -2,8 +2,6 @@ import { useEffect, useState } from "react";
 import { Link, Navigate } from "react-router-dom";
 import { useAuth } from "@/contexts/AuthContext";
 import { supabase } from "@/integrations/supabase/client";
-import Header from "@/components/layout/Header";
-import Footer from "@/components/layout/Footer";
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -194,7 +192,6 @@ const MesCommandes = () => {
 
   return (
     <div className="min-h-screen flex flex-col">
-      <Header />
       <main className="flex-1">
         <div className="max-w-3xl mx-auto px-4 py-8">
           <div className="flex items-center gap-3 mb-6">
@@ -350,7 +347,6 @@ const MesCommandes = () => {
           )}
         </div>
       </main>
-      <Footer />
     </div>
   );
 };
